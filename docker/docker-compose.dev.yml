@@ -1,0 +1,115 @@
+services:
+  api:
+    image: oven/bun:1
+    working_dir: /workspace
+    env_file:
+      - ../.env.example
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      REDIS_URL: redis://redis:6379
+      PROVIDERS_OUTPUT_DIR: /workspace/output
+    command:
+      - sh
+      - -lc
+      - bun install --frozen-lockfile --ignore-scripts && bun --cwd packages/contracts build && bun --cwd apps/api build && bun apps/api/dist/main.js
+    ports:
+      - '3000:3000'
+    healthcheck:
+      test:
+        - CMD
+        - bun
+        - -e
+        - fetch('http://127.0.0.1:3000/api/health').then((response) => { if (!response.ok) { process.exit(1) } }).catch(() => process.exit(1))
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
+    depends_on:
+      - redis
+    develop:
+      watch:
+        - path: ../apps/api/src
+          action: restart
+        - path: ../packages/contracts/src
+          action: restart
+        - path: ../package.json
+          action: restart
+        - path: ../bun.lock
+          action: restart
+        - path: ../apps/api/package.json
+          action: restart
+        - path: ../apps/api/tsconfig.json
+          action: restart
+        - path: ../packages/contracts/package.json
+          action: restart
+        - path: ../packages/contracts/tsconfig.json
+          action: restart
+    volumes:
+      - ..:/workspace
+      - bun-install-cache:/root/.bun/install/cache
+      - root-node-modules:/workspace/node_modules
+      - api-node-modules:/workspace/apps/api/node_modules
+      - frontend-node-modules:/workspace/apps/frontend/node_modules
+      - contracts-node-modules:/workspace/packages/contracts/node_modules
+      - provider-output:/workspace/output
+
+  frontend:
+    image: oven/bun:1
+    working_dir: /workspace
+    env_file:
+      - ../.env.example
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      API_URL: http://api:3000
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+    command:
+      - sh
+      - -lc
+      - bun install --frozen-lockfile --ignore-scripts && bun --cwd packages/contracts build && bun --cwd apps/frontend next dev --hostname 0.0.0.0 --port 3001
+    ports:
+      - '3001:3001'
+    depends_on:
+      api:
+        condition: service_healthy
+    develop:
+      watch:
+        - path: ../package.json
+          action: restart
+        - path: ../bun.lock
+          action: restart
+        - path: ../apps/frontend/package.json
+          action: restart
+        - path: ../apps/frontend/tsconfig.json
+          action: restart
+        - path: ../apps/frontend/next.config.ts
+          action: restart
+        - path: ../packages/contracts/package.json
+          action: restart
+        - path: ../packages/contracts/tsconfig.json
+          action: restart
+    volumes:
+      - ..:/workspace
+      - bun-install-cache:/root/.bun/install/cache
+      - root-node-modules:/workspace/node_modules
+      - api-node-modules:/workspace/apps/api/node_modules
+      - frontend-node-modules:/workspace/apps/frontend/node_modules
+      - contracts-node-modules:/workspace/packages/contracts/node_modules
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+
+volumes:
+  api-node-modules:
+  bun-install-cache:
+  contracts-node-modules:
+  frontend-node-modules:
+  provider-output:
+  redis-data:
+  root-node-modules:

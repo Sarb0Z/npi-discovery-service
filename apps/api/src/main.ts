@@ -6,6 +6,8 @@ import { ApiExceptionFilter } from './common/filters/api-exception.filter'
 
 export async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+  const port = process.env.PORT ?? 3000
+  const host = process.env.HOST ?? '0.0.0.0'
 
   app.enableCors()
   app.setGlobalPrefix('api')
@@ -29,7 +31,7 @@ export async function bootstrap() {
 
   SwaggerModule.setup('api/docs', app, swaggerDocument)
 
-  await app.listen(process.env.PORT ?? 3000)
+  await app.listen(port, host)
 }
 
 if (require.main === module) {

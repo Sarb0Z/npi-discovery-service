@@ -21,6 +21,14 @@ cd docker
 docker compose up --build
 ```
 
+For live development inside Docker with the repository bind-mounted into the containers, use the root alias:
+
+```bash
+bun run docker:dev
+```
+
+That development stack mounts the repo into `/workspace`, installs dependencies inside Docker-managed volumes, and runs the API and frontend in watch mode.
+
 The services start at:
 
 - API: `http://localhost:3000/api`
@@ -47,6 +55,14 @@ Important variables:
 - `REDIS_URL`: Redis connection string for future cache and pub/sub integration
 
 The Docker Compose file loads values from `.env.example` by default and overrides service-specific values where needed.
+
+Useful root scripts:
+
+- `bun run docker:dev`: start the development Docker stack with mounted source code
+- `bun run docker:dev:down`: stop the development Docker stack
+- `bun run docker:watch`: start the development stack with Docker Compose watch enabled
+
+The development compose file also includes `develop.watch` rules, so Docker Desktop can enable watch mode for the API and frontend containers. Source changes are synced into the running containers, while `package.json` and lockfile changes trigger a rebuild.
 
 ## CI/CD
 

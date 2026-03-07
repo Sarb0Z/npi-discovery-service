@@ -12,6 +12,16 @@ services:
       PROVIDERS_OUTPUT_DIR: /app/output
     ports:
       - '3000:3000'
+    healthcheck:
+      test:
+        - CMD
+        - bun
+        - -e
+        - fetch('http://127.0.0.1:3000/api/health').then((response) => { if (!response.ok) { process.exit(1) } }).catch(() => process.exit(1))
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
     depends_on:
       - redis
     volumes:
@@ -31,7 +41,8 @@ services:
     ports:
       - '3001:3001'
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
   redis:
     image: redis:7-alpine

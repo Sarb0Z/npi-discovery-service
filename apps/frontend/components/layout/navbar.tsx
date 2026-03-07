@@ -5,6 +5,7 @@ import { Activity, Moon, Sun } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
+import { useSyncExternalStore } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -17,6 +18,11 @@ const navItems = [
 export function Navbar() {
   const pathname = usePathname()
   const { resolvedTheme, setTheme } = useTheme()
+  const isMounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  )
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/5 bg-white/75 backdrop-blur-2xl">
@@ -67,9 +73,16 @@ export function Navbar() {
           aria-label="Toggle theme"
           size="icon"
           variant="secondary"
+          disabled={!isMounted}
           onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
         >
-          {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {!isMounted ? (
+            <Moon className="h-4 w-4" />
+          ) : resolvedTheme === 'dark' ? (
+            <Sun className="h-4 w-4" />
+          ) : (
+            <Moon className="h-4 w-4" />
+          )}
         </Button>
       </div>
     </header>

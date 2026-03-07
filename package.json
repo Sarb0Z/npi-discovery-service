@@ -11,6 +11,11 @@
   },
   "scripts": {
     "build": "bun --cwd packages/contracts build && bun --cwd apps/api build && bun --cwd apps/frontend build",
+    "dev": "docker compose -f docker/docker-compose.dev.yml up --build --watch",
+    "docker:dev": "docker compose -f docker/docker-compose.dev.yml up --build",
+    "docker:dev:down": "docker compose -f docker/docker-compose.dev.yml down",
+    "docker:watch": "docker compose -f docker/docker-compose.dev.yml up --build --watch",
+    "docker:down": "docker compose -f docker/docker-compose.dev.yml down",
     "lint": "bun --cwd packages/contracts lint && bun --cwd apps/api lint && bun --cwd apps/frontend lint",
     "format": "bun --cwd packages/contracts format && bun --cwd apps/api format && bun --cwd apps/frontend format",
     "test": "bun --cwd packages/contracts test && bun --cwd apps/api test && bun --cwd apps/frontend test",
