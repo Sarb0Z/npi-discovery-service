@@ -1,13 +1,5 @@
 import { Type } from 'class-transformer'
-import {
-  IsIn,
-  IsInt,
-  IsOptional,
-  IsString,
-  Matches,
-  Max,
-  Min,
-} from 'class-validator'
+import { IsIn, IsInt, IsOptional, IsString, Matches, Max, Min } from 'class-validator'
 import { ProviderType, SEARCH_LIMITS } from '../constants/provider.constants'
 import { IsValidSearchCriteria } from '../validators/search-criteria.validator'
 

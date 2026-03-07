@@ -9,8 +9,14 @@ import { BulkCollectionService } from './bulk-collection.service'
 describe('BulkCollectionModule', () => {
   it('wires the bulk collection controller and service', () => {
     const imports = Reflect.getMetadata(MODULE_METADATA.IMPORTS, BulkCollectionModule) as unknown[]
-    const controllers = Reflect.getMetadata(MODULE_METADATA.CONTROLLERS, BulkCollectionModule) as unknown[]
-    const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, BulkCollectionModule) as unknown[]
+    const controllers = Reflect.getMetadata(
+      MODULE_METADATA.CONTROLLERS,
+      BulkCollectionModule,
+    ) as unknown[]
+    const providers = Reflect.getMetadata(
+      MODULE_METADATA.PROVIDERS,
+      BulkCollectionModule,
+    ) as unknown[]
 
     expect(imports).toEqual([ProvidersModule])
     expect(controllers).toEqual([BulkCollectionController])

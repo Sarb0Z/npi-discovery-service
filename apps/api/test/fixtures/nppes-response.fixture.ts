@@ -1,8 +1,4 @@
-import {
-  NppesEnumerationType,
-  type NppesRawProvider,
-  type NppesRawResponse,
-} from '@npi/contracts'
+import { NppesEnumerationType, type NppesRawProvider, type NppesRawResponse } from '@npi/contracts'
 
 export function createRawIndividualProvider(
   overrides: Partial<NppesRawProvider> = {},

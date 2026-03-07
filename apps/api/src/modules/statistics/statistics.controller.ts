@@ -8,7 +8,9 @@ export class StatisticsController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  async getStatistics(@Body() searchProvidersDto: SearchProvidersDto): Promise<StatisticsResponseDto> {
+  async getStatistics(
+    @Body() searchProvidersDto: SearchProvidersDto,
+  ): Promise<StatisticsResponseDto> {
     return this.statisticsService.getStatistics(searchProvidersDto)
   }
 }

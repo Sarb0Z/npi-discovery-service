@@ -1,5 +1,8 @@
 import { Test } from '@nestjs/testing'
-import { createIndividualProvider, createOrganizationProvider } from '../../../test/fixtures/provider.fixture'
+import {
+  createIndividualProvider,
+  createOrganizationProvider,
+} from '../../../test/fixtures/provider.fixture'
 import { createZipSearchDto } from '../../../test/fixtures/search-params.fixture'
 import { ProvidersService } from '../providers/providers.service'
 import { StatisticsService } from './statistics.service'
@@ -30,7 +33,10 @@ describe('StatisticsService', () => {
     providersService.search.mockResolvedValue({
       providers: [
         createIndividualProvider(),
-        createIndividualProvider({ npi: '2222222222', address: { ...createIndividualProvider().address, city: 'Austin' } }),
+        createIndividualProvider({
+          npi: '2222222222',
+          address: { ...createIndividualProvider().address, city: 'Austin' },
+        }),
         createOrganizationProvider(),
       ],
       metadata: {
@@ -63,7 +69,9 @@ describe('StatisticsService', () => {
       providers: [
         createIndividualProvider(),
         createIndividualProvider({ npi: '2222222222' }),
-        createOrganizationProvider({ address: { ...createOrganizationProvider().address, city: 'Austin' } }),
+        createOrganizationProvider({
+          address: { ...createOrganizationProvider().address, city: 'Austin' },
+        }),
       ],
       metadata: {
         totalCount: 3,

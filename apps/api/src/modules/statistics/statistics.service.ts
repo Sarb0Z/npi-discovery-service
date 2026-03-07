@@ -14,15 +14,17 @@ export class StatisticsService {
   async getStatistics(searchDto: SearchProvidersDto): Promise<StatisticsResponseDto> {
     const searchResponse = await this.providersService.search(searchDto)
     const providers = searchResponse.providers
-    const individualCount = providers.filter((provider) => provider.type === ProviderType.Individual).length
+    const individualCount = providers.filter(
+      (provider) => provider.type === ProviderType.Individual,
+    ).length
     const organizationCount = providers.filter(
       (provider) => provider.type === ProviderType.Organization,
     ).length
-    const multipleTaxonomiesCount = providers.filter((provider) => provider.specialties.length > 1).length
+    const multipleTaxonomiesCount = providers.filter(
+      (provider) => provider.specialties.length > 1,
+    ).length
     const uniqueCitiesCount = new Set(
-      providers
-        .map((provider) => provider.address.city)
-        .filter((city) => city.length > 0),
+      providers.map((provider) => provider.address.city).filter((city) => city.length > 0),
     ).size
 
     return {

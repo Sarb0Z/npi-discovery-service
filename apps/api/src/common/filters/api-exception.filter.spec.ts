@@ -1,9 +1,6 @@
 import { BadRequestException, HttpException, HttpStatus, type ArgumentsHost } from '@nestjs/common'
 import { ApiErrorCode } from '@npi/contracts'
-import {
-  NppesUnavailableException,
-  UpstreamRateLimitedException,
-} from '../errors/nppes.exceptions'
+import { NppesUnavailableException, UpstreamRateLimitedException } from '../errors/nppes.exceptions'
 import { ApiExceptionFilter } from './api-exception.filter'
 
 describe('ApiExceptionFilter', () => {
@@ -28,10 +25,7 @@ describe('ApiExceptionFilter', () => {
   }
 
   it('normalizes validation errors', () => {
-    filter.catch(
-      new BadRequestException(['zipCode must be a 5-digit string']),
-      createHost(),
-    )
+    filter.catch(new BadRequestException(['zipCode must be a 5-digit string']), createHost())
 
     expect(statusMock).toHaveBeenCalledWith(400)
     expect(jsonMock).toHaveBeenCalledWith(

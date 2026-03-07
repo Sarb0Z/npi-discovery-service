@@ -51,10 +51,7 @@ describe('AppController (e2e)', () => {
   })
 
   it('/api/health (GET)', () => {
-    return request(getHttpServer())
-      .get('/api/health')
-      .expect(200)
-      .expect({ status: 'ok' })
+    return request(getHttpServer()).get('/api/health').expect(200).expect({ status: 'ok' })
   })
 
   it('/api/providers/search (POST) returns providers', async () => {

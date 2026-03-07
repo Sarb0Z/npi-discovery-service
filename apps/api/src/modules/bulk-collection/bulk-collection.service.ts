@@ -1,5 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { buildProviderExportFileName, type BulkCollectionDto, type BulkJobResponseDto } from '@npi/contracts'
+import {
+  buildProviderExportFileName,
+  type BulkCollectionDto,
+  type BulkJobResponseDto,
+} from '@npi/contracts'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
@@ -19,7 +23,8 @@ export class BulkCollectionService {
     return Promise.resolve({
       jobId,
       status: 'PROCESSING',
-      message: 'Bulk collection initiated. Results will be saved to the configured output directory.',
+      message:
+        'Bulk collection initiated. Results will be saved to the configured output directory.',
     })
   }
 

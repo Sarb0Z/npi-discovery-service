@@ -57,7 +57,8 @@ describe('BulkCollectionService', () => {
     expect(result).toEqual({
       jobId: 'job-123',
       status: 'PROCESSING',
-      message: 'Bulk collection initiated. Results will be saved to the configured output directory.',
+      message:
+        'Bulk collection initiated. Results will be saved to the configured output directory.',
     })
   })
 

@@ -119,9 +119,7 @@ export function buildLocationLabel(input: SearchInputShape): string {
 export function sanitizeFileNameSegment(value?: string): string {
   const normalizedValue = normalizeString(value)?.toLowerCase() ?? 'all'
 
-  return normalizedValue
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '') || 'all'
+  return normalizedValue.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'all'
 }
 
 export function buildProviderExportFileName(

@@ -1,8 +1,6 @@
 import { ProviderType, type ProviderDto } from '@npi/contracts'
 
-export function createIndividualProvider(
-  overrides: Partial<ProviderDto> = {},
-): ProviderDto {
+export function createIndividualProvider(overrides: Partial<ProviderDto> = {}): ProviderDto {
   return {
     npi: '1234567893',
     type: ProviderType.Individual,
@@ -21,9 +19,7 @@ export function createIndividualProvider(
   }
 }
 
-export function createOrganizationProvider(
-  overrides: Partial<ProviderDto> = {},
-): ProviderDto {
+export function createOrganizationProvider(overrides: Partial<ProviderDto> = {}): ProviderDto {
   return {
     npi: '1098765432',
     type: ProviderType.Organization,

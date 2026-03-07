@@ -1,7 +1,4 @@
-import {
-  NppesEnumerationType,
-  ProviderType,
-} from '../constants/provider.constants'
+import { NppesEnumerationType, ProviderType } from '../constants/provider.constants'
 
 export function toNppesEnumerationType(
   providerType?: ProviderType,

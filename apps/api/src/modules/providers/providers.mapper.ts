@@ -7,37 +7,32 @@ import {
   type NppesRawProvider,
   type ProviderAddress,
   type ProviderDto,
-} from '@npi/contracts';
+} from '@npi/contracts'
 
-export function mapNppesProviders(
-  rawProviders: NppesRawProvider[] | undefined,
-): ProviderDto[] {
-  return (rawProviders ?? []).map((rawProvider) => mapNppesProvider(rawProvider));
+export function mapNppesProviders(rawProviders: NppesRawProvider[] | undefined): ProviderDto[] {
+  return (rawProviders ?? []).map((rawProvider) => mapNppesProvider(rawProvider))
 }
 
 export function mapNppesProvider(rawProvider: NppesRawProvider): ProviderDto {
-  const practiceAddress = rawProvider.addresses?.[0];
+  const practiceAddress = rawProvider.addresses?.[0]
   const specialties = (rawProvider.taxonomies ?? [])
     .map((taxonomy) => taxonomy.desc?.trim())
-    .filter((specialty): specialty is string => Boolean(specialty));
-  const primaryTaxonomy = rawProvider.taxonomies?.find(
-    (taxonomy) => taxonomy.primary,
-  );
+    .filter((specialty): specialty is string => Boolean(specialty))
+  const primaryTaxonomy = rawProvider.taxonomies?.find((taxonomy) => taxonomy.primary)
   const type =
     rawProvider.enumeration_type === NppesEnumerationType.Organization
       ? ProviderType.Organization
-      : ProviderType.Individual;
+      : ProviderType.Individual
 
   return {
     npi: rawProvider.number ?? '',
     type,
     name: buildProviderName(rawProvider),
-    primarySpecialty:
-      primaryTaxonomy?.desc?.trim() ?? specialties[0] ?? FALLBACK_SPECIALTY,
+    primarySpecialty: primaryTaxonomy?.desc?.trim() ?? specialties[0] ?? FALLBACK_SPECIALTY,
     specialties,
     address: buildAddress(practiceAddress),
     phone: practiceAddress?.telephone_number?.trim() ?? null,
-  };
+  }
 }
 
 export function matchesPrimaryTaxonomy(
@@ -46,62 +41,54 @@ export function matchesPrimaryTaxonomy(
   taxonomyCode?: string,
 ): boolean {
   if (!taxonomyDescription && !taxonomyCode) {
-    return true;
+    return true
   }
 
-  const primaryTaxonomy = rawProvider.taxonomies?.find(
-    (taxonomy) => taxonomy.primary,
-  );
+  const primaryTaxonomy = rawProvider.taxonomies?.find((taxonomy) => taxonomy.primary)
 
   if (!primaryTaxonomy) {
-    return false;
+    return false
   }
 
   const matchesDescription = taxonomyDescription
-    ? primaryTaxonomy.desc
-        ?.toLowerCase()
-        .includes(taxonomyDescription.toLowerCase())
-    : true;
-  const matchesCode = taxonomyCode
-    ? primaryTaxonomy.code === taxonomyCode
-    : true;
+    ? primaryTaxonomy.desc?.toLowerCase().includes(taxonomyDescription.toLowerCase())
+    : true
+  const matchesCode = taxonomyCode ? primaryTaxonomy.code === taxonomyCode : true
 
-  return Boolean(matchesDescription && matchesCode);
+  return Boolean(matchesDescription && matchesCode)
 }
 
 function buildProviderName(rawProvider: NppesRawProvider): string {
-  const basic = rawProvider.basic;
+  const basic = rawProvider.basic
 
   if (rawProvider.enumeration_type === NppesEnumerationType.Organization) {
-    const organizationName = basic?.organization_name?.trim();
+    const organizationName = basic?.organization_name?.trim()
 
     if (!organizationName) {
-      return FALLBACK_PROVIDER_NAME;
+      return FALLBACK_PROVIDER_NAME
     }
 
-    return organizationName;
+    return organizationName
   }
 
   const individualName = [basic?.first_name?.trim(), basic?.last_name?.trim()]
     .filter((nameSegment): nameSegment is string => Boolean(nameSegment))
-    .join(' ');
-  const credential = basic?.credential?.trim();
+    .join(' ')
+  const credential = basic?.credential?.trim()
 
   if (!individualName) {
-    return FALLBACK_PROVIDER_NAME;
+    return FALLBACK_PROVIDER_NAME
   }
 
-  return credential ? `${individualName}, ${credential}` : individualName;
+  return credential ? `${individualName}, ${credential}` : individualName
 }
 
-function buildAddress(
-  practiceAddress: NppesRawAddress | undefined,
-): ProviderAddress {
+function buildAddress(practiceAddress: NppesRawAddress | undefined): ProviderAddress {
   return {
     address1: practiceAddress?.address_1?.trim() ?? '',
     address2: practiceAddress?.address_2?.trim() ?? null,
     city: practiceAddress?.city?.trim() ?? '',
     state: practiceAddress?.state?.trim() ?? '',
     zipCode: practiceAddress?.postal_code?.trim() ?? '',
-  };
+  }
 }

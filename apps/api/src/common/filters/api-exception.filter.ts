@@ -61,7 +61,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
       code: payload.code ?? getErrorCodeForStatus(status),
       message: Array.isArray(payload.message)
         ? payload.message.join(', ')
-        : payload.message ?? exception.message ?? HttpStatus[status],
+        : (payload.message ?? exception.message ?? HttpStatus[status]),
     }
   }
 }

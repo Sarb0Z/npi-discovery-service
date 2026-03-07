@@ -29,7 +29,8 @@ describe('BulkCollectionController', () => {
     bulkCollectionService.startCollection.mockResolvedValue({
       jobId: 'job-123',
       status: 'PROCESSING',
-      message: 'Bulk collection initiated. Results will be saved to the configured output directory.',
+      message:
+        'Bulk collection initiated. Results will be saved to the configured output directory.',
     })
 
     await expect(controller.startCollection(createBulkCollectionDto())).resolves.toEqual(

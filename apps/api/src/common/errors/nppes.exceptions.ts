@@ -1,9 +1,4 @@
-import {
-  BadGatewayException,
-  HttpException,
-  HttpStatus,
-  NotFoundException,
-} from '@nestjs/common'
+import { BadGatewayException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common'
 import { ApiErrorCode } from '@npi/contracts'
 
 export class NppesUnavailableException extends BadGatewayException {

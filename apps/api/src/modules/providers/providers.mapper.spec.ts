@@ -1,19 +1,11 @@
 import 'reflect-metadata'
 
-import {
-  FALLBACK_PROVIDER_NAME,
-  FALLBACK_SPECIALTY,
-  NppesEnumerationType,
-} from '@npi/contracts'
+import { FALLBACK_PROVIDER_NAME, FALLBACK_SPECIALTY, NppesEnumerationType } from '@npi/contracts'
 import {
   createRawIndividualProvider,
   createRawOrganizationProvider,
 } from '../../../test/fixtures/nppes-response.fixture'
-import {
-  mapNppesProvider,
-  mapNppesProviders,
-  matchesPrimaryTaxonomy,
-} from './providers.mapper'
+import { mapNppesProvider, mapNppesProviders, matchesPrimaryTaxonomy } from './providers.mapper'
 
 describe('providers.mapper', () => {
   it('maps a raw individual provider into the contract shape', () => {

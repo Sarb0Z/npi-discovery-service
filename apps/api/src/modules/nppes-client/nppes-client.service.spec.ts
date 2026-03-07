@@ -3,7 +3,10 @@ import 'reflect-metadata'
 import { HttpService } from '@nestjs/axios'
 import { Test } from '@nestjs/testing'
 import { of, throwError } from 'rxjs'
-import { createNppesResponse, createRawIndividualProvider } from '../../../test/fixtures/nppes-response.fixture'
+import {
+  createNppesResponse,
+  createRawIndividualProvider,
+} from '../../../test/fixtures/nppes-response.fixture'
 import { createZipSearchDto } from '../../../test/fixtures/search-params.fixture'
 import {
   NppesUnavailableException,

@@ -1,6 +1,10 @@
 import { BadRequestException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { createNppesResponse, createRawIndividualProvider, createRawOrganizationProvider } from '../../../test/fixtures/nppes-response.fixture'
+import {
+  createNppesResponse,
+  createRawIndividualProvider,
+  createRawOrganizationProvider,
+} from '../../../test/fixtures/nppes-response.fixture'
 import {
   createCityStateSearchDto,
   createStateTaxonomySearchDto,
@@ -42,10 +46,13 @@ describe('ProvidersService', () => {
         ),
       )
       .mockResolvedValueOnce(
-        createNppesResponse([
-          createRawOrganizationProvider({ number: '9999999999' }),
-          createRawOrganizationProvider({ number: '8888888888' }),
-        ], 60),
+        createNppesResponse(
+          [
+            createRawOrganizationProvider({ number: '9999999999' }),
+            createRawOrganizationProvider({ number: '8888888888' }),
+          ],
+          60,
+        ),
       )
 
     const result = await service.search(createZipSearchDto({ limit: 50 }))
@@ -77,10 +84,7 @@ describe('ProvidersService', () => {
 
   it('filters by primary taxonomy description', async () => {
     nppesClientService.searchProviders.mockResolvedValue(
-      createNppesResponse([
-        createRawIndividualProvider(),
-        createRawOrganizationProvider(),
-      ]),
+      createNppesResponse([createRawIndividualProvider(), createRawOrganizationProvider()]),
     )
 
     const result = await service.search(
@@ -92,9 +96,9 @@ describe('ProvidersService', () => {
   })
 
   it('rejects a pure state-only search', async () => {
-    await expect(
-      service.search({ state: 'TX', page: 1, limit: 50 }),
-    ).rejects.toBeInstanceOf(BadRequestException)
+    await expect(service.search({ state: 'TX', page: 1, limit: 50 })).rejects.toBeInstanceOf(
+      BadRequestException,
+    )
   })
 
   it('allows state searches when taxonomy criteria are present', async () => {
