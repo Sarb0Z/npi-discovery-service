@@ -49,6 +49,8 @@ export const useSearchStore = create<SearchStore>()(
     }),
     {
       name: 'npi-discovery-search-store',
+      // Rehydrate after mount to keep initial SSR and client render consistent.
+      skipHydration: true,
       partialize: (state) => ({
         recentSearches: state.recentSearches,
         searchMode: state.searchMode,

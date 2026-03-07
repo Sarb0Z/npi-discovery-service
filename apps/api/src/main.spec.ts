@@ -69,6 +69,6 @@ describe('main bootstrap', () => {
     expect(exceptionFilter).toBeInstanceOf(ApiExceptionFilter)
     expect(createDocumentMock).toHaveBeenCalledWith(app, swaggerConfig)
     expect(setupMock).toHaveBeenCalledWith('api/docs', app, swaggerDocument)
-    expect(app.listen).toHaveBeenCalledWith(3000)
+    expect(app.listen).toHaveBeenCalledWith(3000, '0.0.0.0')
   })
 })

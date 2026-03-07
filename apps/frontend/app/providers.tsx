@@ -2,8 +2,9 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider } from 'next-themes'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Toaster } from 'sonner'
+import { useSearchStore } from '@/lib/stores/search-store'
 
 interface ProvidersProps {
   children: React.ReactNode
@@ -22,6 +23,10 @@ export function Providers({ children }: ProvidersProps) {
         },
       }),
   )
+
+  useEffect(() => {
+    void useSearchStore.persist.rehydrate()
+  }, [])
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
