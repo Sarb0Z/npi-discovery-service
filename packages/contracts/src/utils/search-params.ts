@@ -138,7 +138,7 @@ export function buildProviderExportFileName(
 function normalizeString(value?: string): string | undefined {
   const normalizedValue = value?.trim()
 
-  return normalizedValue ? normalizedValue : undefined
+  return normalizedValue === '' ? undefined : normalizedValue
 }
 
 function normalizeUppercaseCode(value?: string): string | undefined {

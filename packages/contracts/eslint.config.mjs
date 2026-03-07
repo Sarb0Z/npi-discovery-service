@@ -1,35 +1,28 @@
-import { defineConfig, globalIgnores } from 'eslint/config'
 import js from '@eslint/js'
 import eslintConfigPrettier from 'eslint-config-prettier'
-import nextVitals from 'eslint-config-next/core-web-vitals'
-import nextTs from 'eslint-config-next/typescript'
+import importPlugin from 'eslint-plugin-import'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
-const typedConfigFiles = ['**/*.{ts,tsx,mts}']
-
-const eslintConfig = defineConfig([
+export default tseslint.config(
+  {
+    ignores: ['dist/**', 'node_modules/**'],
+  },
   js.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked.map((config) => ({
-    ...config,
-    files: typedConfigFiles,
-  })),
-  ...tseslint.configs.stylisticTypeChecked.map((config) => ({
-    ...config,
-    files: typedConfigFiles,
-  })),
-  ...nextVitals,
-  ...nextTs,
+  ...tseslint.configs.recommendedTypeChecked,
+  ...tseslint.configs.stylisticTypeChecked,
+  importPlugin.flatConfigs.recommended,
+  importPlugin.flatConfigs.typescript,
   eslintConfigPrettier,
   {
-    files: typedConfigFiles,
+    files: ['src/**/*.ts', 'test/**/*.ts', 'jest.config.ts'],
     languageOptions: {
       globals: {
-        ...globals.browser,
+        ...globals.jest,
         ...globals.node,
       },
       parserOptions: {
-        projectService: true,
+        project: ['./tsconfig.eslint.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -41,11 +34,9 @@ const eslintConfig = defineConfig([
       '@typescript-eslint/prefer-optional-chain': 'error',
       'curly': ['error', 'all'],
       'eqeqeq': ['error', 'always'],
+      'import/no-default-export': 'off',
       'no-var': 'error',
       'prefer-const': 'error',
     },
   },
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'eslint.config.mjs', 'next-env.d.ts']),
-])
-
-export default eslintConfig
+)

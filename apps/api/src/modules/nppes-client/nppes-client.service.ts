@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios'
 import { HttpException, Injectable } from '@nestjs/common'
 import type { SearchProvidersDto, NppesRawResponse } from '@npi/contracts'
 import { buildNppesSearchParams } from '@npi/contracts'
-import axiosRetry from 'axios-retry'
+import axiosRetry, { exponentialDelay, isNetworkError } from 'axios-retry'
 import type { AxiosError } from 'axios'
 import { firstValueFrom } from 'rxjs'
 import {
@@ -15,11 +15,11 @@ export class NppesClientService {
   constructor(private readonly httpService: HttpService) {
     axiosRetry(this.httpService.axiosRef, {
       retries: 3,
-      retryDelay: axiosRetry.exponentialDelay,
+      retryDelay: exponentialDelay,
       retryCondition: (error) => {
         const status = error.response?.status
 
-        return status === 429 || status === 502 || status === 503 || axiosRetry.isNetworkError(error)
+        return status === 429 || status === 502 || status === 503 || isNetworkError(error)
       },
     })
   }

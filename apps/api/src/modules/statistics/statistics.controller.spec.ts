@@ -39,10 +39,8 @@ describe('StatisticsController', () => {
       topCities: [{ name: 'Austin', count: 1 }],
     })
 
-    await expect(controller.getStatistics(createZipSearchDto())).resolves.toEqual(
-      expect.objectContaining({
-        summary: expect.objectContaining({ totalProviders: 1 }),
-      }),
-    )
+    const result = await controller.getStatistics(createZipSearchDto())
+
+    expect(result.summary.totalProviders).toBe(1)
   })
 })

@@ -2,7 +2,6 @@ import 'reflect-metadata'
 
 import { HttpService } from '@nestjs/axios'
 import { Test } from '@nestjs/testing'
-import type { AxiosError } from 'axios'
 import { of, throwError } from 'rxjs'
 import { createNppesResponse, createRawIndividualProvider } from '../../../test/fixtures/nppes-response.fixture'
 import { createZipSearchDto } from '../../../test/fixtures/search-params.fixture'
@@ -59,13 +58,16 @@ describe('NppesClientService', () => {
 
     await service.searchProviders(createZipSearchDto({ limit: 25 }))
 
-    expect(httpService.get).toHaveBeenCalledWith('/', {
-      params: expect.objectContaining({
-        postal_code: '75201',
-        version: '2.1',
-        limit: 25,
-        skip: 0,
-      }),
+    const [, requestConfig] = httpService.get.mock.calls[0] as [
+      string,
+      { params: Record<string, string | number | undefined> },
+    ]
+
+    expect(requestConfig.params).toMatchObject({
+      postal_code: '75201',
+      version: '2.1',
+      limit: 25,
+      skip: 0,
     })
   })
 
@@ -76,12 +78,15 @@ describe('NppesClientService', () => {
 
     await service.searchProviders({ city: 'Austin', state: 'TX', page: 2, limit: 50 })
 
-    expect(httpService.get).toHaveBeenCalledWith('/', {
-      params: expect.objectContaining({
-        city: 'Austin',
-        state: 'TX',
-        skip: 50,
-      }),
+    const [, requestConfig] = httpService.get.mock.calls[0] as [
+      string,
+      { params: Record<string, string | number | undefined> },
+    ]
+
+    expect(requestConfig.params).toMatchObject({
+      city: 'Austin',
+      state: 'TX',
+      skip: 50,
     })
   })
 
@@ -89,7 +94,7 @@ describe('NppesClientService', () => {
     const error = {
       response: { status: 429 },
       message: 'rate limited',
-    } as AxiosError
+    }
 
     httpService.get.mockReturnValue(throwError(() => error))
 
@@ -102,7 +107,7 @@ describe('NppesClientService', () => {
     const error = {
       response: { status: 503 },
       message: 'service unavailable',
-    } as AxiosError
+    }
 
     httpService.get.mockReturnValue(throwError(() => error))
 

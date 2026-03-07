@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
@@ -73,7 +74,7 @@ describe('BulkCollectionService', () => {
   })
 
   it('logs and swallows collection failures', async () => {
-    const loggerSpy = jest.spyOn<any, any>(service['logger'], 'error').mockImplementation(() => undefined)
+    const loggerSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined)
     providersService.search.mockRejectedValueOnce(new Error('boom'))
 
     await service.startCollection(createBulkCollectionDto())

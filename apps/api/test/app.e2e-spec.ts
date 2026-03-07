@@ -1,8 +1,6 @@
-import { ValidationPipe } from '@nestjs/common'
-import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication } from '@nestjs/common'
-import request from 'supertest'
-import { App } from 'supertest/types'
+import { ValidationPipe, type INestApplication } from '@nestjs/common'
+import { Test, type TestingModule } from '@nestjs/testing'
+import request, { type Response } from 'supertest'
 import { ApiExceptionFilter } from '../src/common/filters/api-exception.filter'
 import { AppModule } from './../src/app.module'
 import { BulkCollectionService } from '../src/modules/bulk-collection/bulk-collection.service'
@@ -10,10 +8,13 @@ import { ProvidersService } from '../src/modules/providers/providers.service'
 import { StatisticsService } from '../src/modules/statistics/statistics.service'
 
 describe('AppController (e2e)', () => {
-  let app: INestApplication<App>
+  let app: INestApplication
   let providersService: { search: jest.Mock }
   let statisticsService: { getStatistics: jest.Mock }
   let bulkCollectionService: { startCollection: jest.Mock }
+
+  const getHttpServer = (): Parameters<typeof request>[0] =>
+    app.getHttpServer() as Parameters<typeof request>[0]
 
   beforeEach(async () => {
     providersService = {
@@ -50,7 +51,7 @@ describe('AppController (e2e)', () => {
   })
 
   it('/api/health (GET)', () => {
-    return request(app.getHttpServer())
+    return request(getHttpServer())
       .get('/api/health')
       .expect(200)
       .expect({ status: 'ok' })
@@ -85,24 +86,31 @@ describe('AppController (e2e)', () => {
       },
     })
 
-    await request(app.getHttpServer())
+    await request(getHttpServer())
       .post('/api/providers/search')
       .send({ zipCode: '75201' })
       .expect(200)
-      .expect((response) => {
-        expect(response.body.providers).toHaveLength(1)
-        expect(response.body.metadata.totalCount).toBe(1)
+      .expect((response: Response) => {
+        const body = response.body as {
+          providers: unknown[]
+          metadata: { totalCount: number }
+        }
+
+        expect(body.providers).toHaveLength(1)
+        expect(body.metadata.totalCount).toBe(1)
       })
   })
 
   it('/api/providers/search (POST) validates the zip code', async () => {
-    await request(app.getHttpServer())
+    await request(getHttpServer())
       .post('/api/providers/search')
       .send({ zipCode: '75A01' })
       .expect(400)
-      .expect((response) => {
-        expect(response.body.code).toBe('VALIDATION_ERROR')
-        expect(response.body.message).toBe('Validation failed')
+      .expect((response: Response) => {
+        const body = response.body as { code: string; message: string }
+
+        expect(body.code).toBe('VALIDATION_ERROR')
+        expect(body.message).toBe('Validation failed')
       })
   })
 
@@ -120,12 +128,14 @@ describe('AppController (e2e)', () => {
       topCities: [{ name: 'Austin', count: 1 }],
     })
 
-    await request(app.getHttpServer())
+    await request(getHttpServer())
       .post('/api/statistics')
       .send({ zipCode: '75201' })
       .expect(200)
-      .expect((response) => {
-        expect(response.body.summary.totalProviders).toBe(1)
+      .expect((response: Response) => {
+        const body = response.body as { summary: { totalProviders: number } }
+
+        expect(body.summary.totalProviders).toBe(1)
       })
   })
 
@@ -136,12 +146,14 @@ describe('AppController (e2e)', () => {
       message: 'Bulk collection initiated.',
     })
 
-    await request(app.getHttpServer())
+    await request(getHttpServer())
       .post('/api/providers/bulk')
       .send({ zipCode: '75201', batchSize: 200 })
       .expect(202)
-      .expect((response) => {
-        expect(response.body.jobId).toBe('job-123')
+      .expect((response: Response) => {
+        const body = response.body as { jobId: string }
+
+        expect(body.jobId).toBe('job-123')
       })
   })
 })

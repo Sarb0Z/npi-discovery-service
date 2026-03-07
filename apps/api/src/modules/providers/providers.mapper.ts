@@ -73,7 +73,13 @@ function buildProviderName(rawProvider: NppesRawProvider): string {
   const basic = rawProvider.basic;
 
   if (rawProvider.enumeration_type === NppesEnumerationType.Organization) {
-    return basic?.organization_name?.trim() || FALLBACK_PROVIDER_NAME;
+    const organizationName = basic?.organization_name?.trim();
+
+    if (!organizationName) {
+      return FALLBACK_PROVIDER_NAME;
+    }
+
+    return organizationName;
   }
 
   const individualName = [basic?.first_name?.trim(), basic?.last_name?.trim()]

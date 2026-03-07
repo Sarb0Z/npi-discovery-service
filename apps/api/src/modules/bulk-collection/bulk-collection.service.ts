@@ -11,16 +11,16 @@ export class BulkCollectionService {
 
   constructor(private readonly providersService: ProvidersService) {}
 
-  async startCollection(searchDto: BulkCollectionDto): Promise<BulkJobResponseDto> {
+  startCollection(searchDto: BulkCollectionDto): Promise<BulkJobResponseDto> {
     const jobId = randomUUID()
 
     void this.collect(jobId, searchDto)
 
-    return {
+    return Promise.resolve({
       jobId,
       status: 'PROCESSING',
       message: 'Bulk collection initiated. Results will be saved to the configured output directory.',
-    }
+    })
   }
 
   private async collect(jobId: string, searchDto: BulkCollectionDto): Promise<void> {

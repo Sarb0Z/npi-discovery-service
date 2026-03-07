@@ -1,4 +1,4 @@
-import { ArgumentsHost, BadRequestException, HttpException, HttpStatus } from '@nestjs/common'
+import { BadRequestException, HttpException, HttpStatus, type ArgumentsHost } from '@nestjs/common'
 import { ApiErrorCode } from '@npi/contracts'
 import {
   NppesUnavailableException,

@@ -1,16 +1,15 @@
-import { HttpStatus } from '@nestjs/common'
 import { ApiErrorCode } from '@npi/contracts'
 
 export function getErrorCodeForStatus(status: number): ApiErrorCode {
-  if (status === HttpStatus.BAD_REQUEST) {
+  if (status === 400) {
     return ApiErrorCode.ValidationError
   }
 
-  if (status === HttpStatus.NOT_FOUND) {
+  if (status === 404) {
     return ApiErrorCode.ProviderNotFound
   }
 
-  if (status === HttpStatus.TOO_MANY_REQUESTS) {
+  if (status === 429) {
     return ApiErrorCode.RateLimited
   }
 

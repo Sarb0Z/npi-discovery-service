@@ -122,9 +122,9 @@ describe('ProvidersService', () => {
         totalCount: 1,
         page: 1,
         limit: 25,
-        searchParams: expect.objectContaining({ zipCode: '75201' }),
       }),
     )
+    expect(result.metadata.searchParams.zipCode).toBe('75201')
     expect(result.metadata.timestamp).toEqual(expect.any(String))
     expect(result.metadata.duration).toEqual(expect.any(Number))
   })

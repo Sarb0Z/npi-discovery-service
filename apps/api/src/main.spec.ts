@@ -53,10 +53,10 @@ describe('main bootstrap', () => {
       AppModule: class AppModule {},
     }))
 
-    jest.isolateModules(() => {
-      require('./main')
+    await jest.isolateModulesAsync(async () => {
+      // eslint-disable-next-line import/no-unresolved
+      await import('./main.js')
     })
-    await new Promise((resolve) => setImmediate(resolve))
 
     expect(createMock).toHaveBeenCalledTimes(1)
     expect(app.setGlobalPrefix).toHaveBeenCalledWith('api')

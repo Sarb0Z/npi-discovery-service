@@ -5,9 +5,16 @@
     "apps/*",
     "packages/*"
   ],
+  "devDependencies": {
+    "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "^0.6.11"
+  },
   "scripts": {
     "build": "bun --cwd packages/contracts build && bun --cwd apps/api build",
+    "lint": "bun --cwd packages/contracts lint && bun --cwd apps/api lint && bun --cwd apps/frontend lint",
+    "format": "bun --cwd packages/contracts format && bun --cwd apps/api format && bun --cwd apps/frontend format",
     "test": "bun --cwd packages/contracts test && bun --cwd apps/api test",
-    "test:cov": "bun --cwd packages/contracts run test:cov && bun --cwd apps/api run test:cov"
+    "test:cov": "bun --cwd packages/contracts run test:cov && bun --cwd apps/api run test:cov",
+    "typecheck": "bun --cwd packages/contracts typecheck && bun --cwd apps/api typecheck && bun --cwd apps/frontend typecheck"
   }
 }
