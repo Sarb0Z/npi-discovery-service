@@ -3,6 +3,7 @@ import 'reflect-metadata'
 import { plainToInstance } from 'class-transformer'
 import { validate } from 'class-validator'
 import {
+  BulkCollectionDto,
   ProviderType,
   SearchProvidersDto,
   buildNppesSearchParams,
@@ -37,6 +38,42 @@ describe('SearchProvidersDto', () => {
     const errors = await validate(dto)
 
     expect(errors).toHaveLength(0)
+  })
+
+  it('rejects an invalid state code', async () => {
+    const dto = plainToInstance(SearchProvidersDto, { city: 'Austin', state: 'Texas' })
+    const errors = await validate(dto)
+
+    expect(errors.length).toBeGreaterThan(0)
+  })
+
+  it('accepts omitted optional fields when pagination defaults are provided', async () => {
+    const dto = plainToInstance(SearchProvidersDto, { page: 1, limit: 50, zipCode: '75201' })
+    const errors = await validate(dto)
+
+    expect(errors).toHaveLength(0)
+  })
+})
+
+describe('BulkCollectionDto', () => {
+  it('enforces batch size bounds', async () => {
+    const tooSmall = plainToInstance(BulkCollectionDto, {
+      zipCode: '75201',
+      page: 1,
+      limit: 50,
+      batchSize: 25,
+    })
+    const tooLarge = plainToInstance(BulkCollectionDto, {
+      zipCode: '75201',
+      page: 1,
+      limit: 50,
+      batchSize: 500,
+    })
+
+    const [smallErrors, largeErrors] = await Promise.all([validate(tooSmall), validate(tooLarge)])
+
+    expect(smallErrors.length).toBeGreaterThan(0)
+    expect(largeErrors.length).toBeGreaterThan(0)
   })
 })
 

@@ -2,6 +2,7 @@ import 'reflect-metadata'
 
 import { HttpService } from '@nestjs/axios'
 import { Test } from '@nestjs/testing'
+import { ProviderType } from '@npi/contracts'
 import { of, throwError } from 'rxjs'
 import {
   createNppesResponse,
@@ -13,15 +14,20 @@ import {
   UpstreamRateLimitedException,
 } from '../../common/errors/nppes.exceptions'
 import { NppesClientService } from './nppes-client.service'
+import axiosRetry from 'axios-retry'
 
 jest.mock('axios-retry', () => {
   const mockAxiosRetry = jest.fn()
+  const mockExponentialDelay = jest.fn()
+  const mockIsNetworkError = jest.fn().mockReturnValue(false)
 
   return {
     __esModule: true,
+    exponentialDelay: mockExponentialDelay,
+    isNetworkError: mockIsNetworkError,
     default: Object.assign(mockAxiosRetry, {
-      exponentialDelay: jest.fn(),
-      isNetworkError: jest.fn().mockReturnValue(false),
+      exponentialDelay: mockExponentialDelay,
+      isNetworkError: mockIsNetworkError,
     }),
   }
 })
@@ -52,6 +58,17 @@ describe('NppesClientService', () => {
     }).compile()
 
     service = module.get(NppesClientService)
+  })
+
+  it('registers axios-retry against the shared axios instance', () => {
+    expect(axiosRetry).toHaveBeenCalledWith(
+      httpService.axiosRef,
+      expect.objectContaining({
+        retries: 3,
+        retryDelay: expect.any(Function),
+        retryCondition: expect.any(Function),
+      }),
+    )
   })
 
   it('builds correct query params for ZIP searches', async () => {
@@ -93,6 +110,39 @@ describe('NppesClientService', () => {
     })
   })
 
+  it('maps providerType to the upstream enumeration_type parameter', async () => {
+    httpService.get.mockReturnValue(
+      of({ data: createNppesResponse([createRawIndividualProvider()]) }),
+    )
+
+    await service.searchProviders(createZipSearchDto({ providerType: ProviderType.Individual }))
+
+    const [, requestConfig] = httpService.get.mock.calls[0] as [
+      string,
+      { params: Record<string, string | number | undefined> },
+    ]
+
+    expect(requestConfig.params.enumeration_type).toBe('NPI-1')
+  })
+
+  it('clamps upstream limit and skip bounds when building params', async () => {
+    httpService.get.mockReturnValue(
+      of({ data: createNppesResponse([createRawIndividualProvider()]) }),
+    )
+
+    await service.searchProviders(createZipSearchDto({ page: 999, limit: 500 }))
+
+    const [, requestConfig] = httpService.get.mock.calls[0] as [
+      string,
+      { params: Record<string, string | number | undefined> },
+    ]
+
+    expect(requestConfig.params).toMatchObject({
+      limit: 200,
+      skip: 1000,
+    })
+  })
+
   it('maps upstream 429 responses to UpstreamRateLimitedException', async () => {
     const error = {
       response: { status: 429 },
@@ -110,6 +160,18 @@ describe('NppesClientService', () => {
     const error = {
       response: { status: 503 },
       message: 'service unavailable',
+    }
+
+    httpService.get.mockReturnValue(throwError(() => error))
+
+    await expect(service.searchProviders(createZipSearchDto())).rejects.toBeInstanceOf(
+      NppesUnavailableException,
+    )
+  })
+
+  it('maps network failures to NppesUnavailableException', async () => {
+    const error = {
+      message: 'connect ECONNREFUSED 127.0.0.1:443',
     }
 
     httpService.get.mockReturnValue(throwError(() => error))

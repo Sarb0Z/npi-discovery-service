@@ -3,6 +3,7 @@ import 'reflect-metadata'
 describe('main bootstrap', () => {
   const createDocumentMock = jest.fn()
   const setupMock = jest.fn()
+  const decoratorFactoryMock = jest.fn(() => () => undefined)
   const setTitleMock = jest.fn()
   const setDescriptionMock = jest.fn()
   const setVersionMock = jest.fn()
@@ -27,6 +28,7 @@ describe('main bootstrap', () => {
 
   it('bootstraps Nest with validation, filters, swagger, and listening port', async () => {
     const app = {
+      enableCors: jest.fn(),
       setGlobalPrefix: jest.fn(),
       useGlobalPipes: jest.fn(),
       useGlobalFilters: jest.fn(),
@@ -41,6 +43,12 @@ describe('main bootstrap', () => {
       },
     }))
     jest.doMock('@nestjs/swagger', () => ({
+      ApiAcceptedResponse: decoratorFactoryMock,
+      ApiBody: decoratorFactoryMock,
+      ApiOkResponse: decoratorFactoryMock,
+      ApiOperation: decoratorFactoryMock,
+      ApiPropertyOptional: decoratorFactoryMock,
+      ApiTags: decoratorFactoryMock,
       DocumentBuilder: jest.fn().mockImplementation(() => ({
         setTitle: setTitleMock,
       })),
@@ -53,12 +61,16 @@ describe('main bootstrap', () => {
       AppModule: class AppModule {},
     }))
 
-    await jest.isolateModulesAsync(async () => {
-      // eslint-disable-next-line import/no-unresolved
-      await import('./main.js')
+    jest.isolateModules(() => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-dynamic-require, global-require
+      require('./main')
     })
 
+    await Promise.resolve()
+    await Promise.resolve()
+
     expect(createMock).toHaveBeenCalledTimes(1)
+    expect(app.enableCors).toHaveBeenCalledTimes(1)
     expect(app.setGlobalPrefix).toHaveBeenCalledWith('api')
     expect(app.useGlobalPipes).toHaveBeenCalledTimes(1)
     expect(app.useGlobalFilters).toHaveBeenCalledTimes(1)

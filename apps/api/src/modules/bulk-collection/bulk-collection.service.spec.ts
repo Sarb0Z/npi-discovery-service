@@ -20,6 +20,11 @@ describe('BulkCollectionService', () => {
   let service: BulkCollectionService
   let providersService: { search: jest.Mock }
 
+  async function flushMicrotasks(): Promise<void> {
+    await Promise.resolve()
+    await Promise.resolve()
+  }
+
   beforeEach(async () => {
     providersService = {
       search: jest.fn().mockResolvedValue({
@@ -64,7 +69,7 @@ describe('BulkCollectionService', () => {
 
   it('writes the collected results to disk asynchronously', async () => {
     await service.startCollection(createBulkCollectionDto({ taxonomyDescription: 'Dentist' }))
-    await new Promise((resolve) => setImmediate(resolve))
+    await flushMicrotasks()
 
     expect(mkdir).toHaveBeenCalledWith(expect.any(String), { recursive: true })
     expect(writeFile).toHaveBeenCalledWith(
@@ -79,8 +84,19 @@ describe('BulkCollectionService', () => {
     providersService.search.mockRejectedValueOnce(new Error('boom'))
 
     await service.startCollection(createBulkCollectionDto())
-    await new Promise((resolve) => setImmediate(resolve))
+    await flushMicrotasks()
 
     expect(loggerSpy).toHaveBeenCalledWith('Bulk collection job job-123 failed', expect.any(Error))
+  })
+
+  it('includes serialized search metadata in the exported payload', async () => {
+    await service.startCollection(createBulkCollectionDto())
+    await flushMicrotasks()
+
+    expect(writeFile).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.stringContaining('"metadata": {'),
+      'utf8',
+    )
   })
 })

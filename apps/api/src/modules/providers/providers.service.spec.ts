@@ -10,6 +10,7 @@ import {
   createStateTaxonomySearchDto,
   createZipSearchDto,
 } from '../../../test/fixtures/search-params.fixture'
+import { UpstreamRateLimitedException } from '../../common/errors/nppes.exceptions'
 import { NppesClientService } from '../nppes-client/nppes-client.service'
 import { ProvidersService } from './providers.service'
 
@@ -131,5 +132,13 @@ describe('ProvidersService', () => {
     expect(result.metadata.searchParams.zipCode).toBe('75201')
     expect(result.metadata.timestamp).toEqual(expect.any(String))
     expect(result.metadata.duration).toEqual(expect.any(Number))
+  })
+
+  it('propagates upstream rate limiting errors', async () => {
+    nppesClientService.searchProviders.mockRejectedValue(new UpstreamRateLimitedException())
+
+    await expect(service.search(createZipSearchDto())).rejects.toBeInstanceOf(
+      UpstreamRateLimitedException,
+    )
   })
 })

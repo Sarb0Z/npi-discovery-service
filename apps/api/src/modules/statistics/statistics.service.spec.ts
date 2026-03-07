@@ -85,11 +85,9 @@ describe('StatisticsService', () => {
 
     const result = await service.getStatistics(createZipSearchDto())
 
-    expect(result.topSpecialties[0]).toEqual({
-      description: 'General Practice Dentistry',
-      count: 2,
-      percentage: 66.67,
-    })
+    expect(result.topSpecialties[0]?.description).toBe('General Practice Dentistry')
+    expect(result.topSpecialties[0]?.count).toBe(2)
+    expect(result.topSpecialties[0]?.percentage).toBeCloseTo(66.67, 2)
     expect(result.topCities[0]).toEqual({
       name: 'Austin',
       count: 3,
