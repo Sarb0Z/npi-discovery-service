@@ -6,8 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "bun --cwd ../../packages/contracts run build && nest build",
-    "dev": "bun --cwd ../../packages/contracts run build && nest start --watch",
+    "build": "bun --cwd ../../packages/contracts build && nest build",
+    "dev": "bun --cwd ../../packages/contracts build && nest start --watch",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

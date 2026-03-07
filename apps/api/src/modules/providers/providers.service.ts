@@ -16,8 +16,14 @@ export class ProvidersService {
   async search(searchDto: SearchProvidersDto): Promise<SearchResponseDto> {
     const startedAt = Date.now()
     const normalizedSearch = normalizeSearchInput(searchDto)
+    const hasStateOnlySearch =
+      normalizedSearch.state &&
+      !normalizedSearch.city &&
+      !normalizedSearch.zipCode &&
+      !normalizedSearch.taxonomyCode &&
+      !normalizedSearch.taxonomyDescription
 
-    if (normalizedSearch.state && !normalizedSearch.city && !normalizedSearch.zipCode) {
+    if (hasStateOnlySearch) {
       throw new BadRequestException(
         'State-only searches should use the bulk collection endpoint or include a taxonomy filter.',
       )
