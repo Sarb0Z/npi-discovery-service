@@ -5,6 +5,7 @@
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,
     "isolatedModules": true,
+    "tsBuildInfoFile": "./tsconfig.tsbuildinfo",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,

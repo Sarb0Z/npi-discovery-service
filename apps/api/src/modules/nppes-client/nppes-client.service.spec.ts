@@ -1,5 +1,6 @@
 import 'reflect-metadata'
 
+import axiosRetry from 'axios-retry'
 import { HttpService } from '@nestjs/axios'
 import { Test } from '@nestjs/testing'
 import { ProviderType } from '@npi/contracts'
@@ -14,7 +15,6 @@ import {
   UpstreamRateLimitedException,
 } from '../../common/errors/nppes.exceptions'
 import { NppesClientService } from './nppes-client.service'
-import axiosRetry from 'axios-retry'
 
 jest.mock('axios-retry', () => {
   const mockAxiosRetry = jest.fn()
@@ -63,17 +63,17 @@ describe('NppesClientService', () => {
   it('registers axios-retry against the shared axios instance', () => {
     expect(axiosRetry).toHaveBeenCalledTimes(1)
 
-    const retryCalls = (axiosRetry as jest.Mock).mock.calls as [
-      Record<string, unknown>,
-      {
-        retries: number
-        retryDelay: (retryCount: number) => number
-        retryCondition: (error: unknown) => boolean
-      },
-    ][]
-    const retryConfig = retryCalls[0]?.[1]
+    const retryCall = jest.mocked(axiosRetry).mock.calls[0]
 
-    expect(retryCalls[0]?.[0]).toBe(httpService.axiosRef)
+    expect(retryCall).toBeDefined()
+
+    if (!retryCall) {
+      throw new Error('Expected axios-retry to be configured during service construction.')
+    }
+
+    const [axiosInstance, retryConfig] = retryCall
+
+    expect(axiosInstance).toBe(httpService.axiosRef)
     expect(retryConfig).toBeDefined()
     expect(retryConfig?.retries).toBe(3)
     expect(retryConfig?.retryDelay).toEqual(expect.any(Function))

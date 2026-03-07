@@ -74,23 +74,21 @@ describe('ProviderSearchCollectorService', () => {
   })
 
   it('deduplicates providers returned from different partitions', async () => {
-    nppesClientService.searchProviders.mockImplementation(
-      ({ zipCode }: { zipCode?: string }) => {
-        if (zipCode === '75*' || zipCode === '76*') {
-          return createNppesResponse([], 1400)
-        }
+    nppesClientService.searchProviders.mockImplementation(({ zipCode }: { zipCode?: string }) => {
+      if (zipCode === '75*' || zipCode === '76*') {
+        return createNppesResponse([], 1400)
+      }
 
-        if (zipCode?.startsWith('75')) {
-          return createNppesResponse([createRawIndividualProvider({ number: '1234567890' })], 1)
-        }
+      if (zipCode?.startsWith('75')) {
+        return createNppesResponse([createRawIndividualProvider({ number: '1234567890' })], 1)
+      }
 
-        if (zipCode?.startsWith('76')) {
-          return createNppesResponse([createRawIndividualProvider({ number: '1234567890' })], 1)
-        }
+      if (zipCode?.startsWith('76')) {
+        return createNppesResponse([createRawIndividualProvider({ number: '1234567890' })], 1)
+      }
 
-        return createNppesResponse([], 0)
-      },
-    )
+      return createNppesResponse([], 0)
+    })
 
     const result = await service.collect(
       createStateOnlySearchDto({ providerType: ProviderType.Individual, limit: 200 }),

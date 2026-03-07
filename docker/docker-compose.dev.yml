@@ -26,7 +26,8 @@ services:
       retries: 30
       start_period: 120s
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     develop:
       watch:
         - path: ../apps/api/src
@@ -70,6 +71,16 @@ services:
       - bun install --frozen-lockfile --ignore-scripts && bun --cwd packages/contracts build && bun --cwd apps/frontend next dev --hostname 0.0.0.0 --port 3001
     ports:
       - '3001:3001'
+    healthcheck:
+      test:
+        - CMD
+        - bun
+        - -e
+        - fetch('http://127.0.0.1:3001').then((response) => { if (!response.ok) { process.exit(1) } }).catch(() => process.exit(1))
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
     depends_on:
       api:
         condition: service_healthy
@@ -102,6 +113,15 @@ services:
     restart: unless-stopped
     ports:
       - '6379:6379'
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
     volumes:
       - redis-data:/data
 

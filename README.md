@@ -61,8 +61,12 @@ Useful root scripts:
 - `bun run docker:dev`: start the development Docker stack with mounted source code
 - `bun run docker:dev:down`: stop the development Docker stack
 - `bun run docker:watch`: start the development stack with Docker Compose watch enabled
+- `bun run dev`: same as watch mode, but with timestamped logs for better startup visibility
+- `bun run dev:status`: show service state and health (`running`, `healthy`, `unhealthy`)
+- `bun run dev:logs`: follow timestamped logs for all development services
 
 The development compose file also includes `develop.watch` rules, so Docker Desktop can enable watch mode for the API and frontend containers. Source changes are synced into the running containers, while `package.json` and lockfile changes trigger a rebuild.
+It now also includes health checks for API, frontend, and Redis so readiness is visible via `docker compose ps`.
 
 ## CI/CD
 

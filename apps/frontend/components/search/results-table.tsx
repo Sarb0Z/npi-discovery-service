@@ -17,11 +17,9 @@ function compareValues(left: string, right: string, direction: 'asc' | 'desc'): 
 }
 
 export function ResultsTable({ providers }: ResultsTableProps) {
-  const { sortField, sortDirection, setSort } = useSearchStore((state) => ({
-    sortField: state.sortField,
-    sortDirection: state.sortDirection,
-    setSort: state.setSort,
-  }))
+  const sortField = useSearchStore((state) => state.sortField)
+  const sortDirection = useSearchStore((state) => state.sortDirection)
+  const setSort = useSearchStore((state) => state.setSort)
   const [page, setPage] = useState(1)
   const pageSize = 10
 

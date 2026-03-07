@@ -12,10 +12,8 @@ interface ResultsHeaderProps {
 }
 
 export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
-  const { viewMode, setViewMode } = useSearchStore((state) => ({
-    viewMode: state.viewMode,
-    setViewMode: state.setViewMode,
-  }))
+  const viewMode = useSearchStore((state) => state.viewMode)
+  const setViewMode = useSearchStore((state) => state.setViewMode)
 
   const exportBaseName = buildExportFileName(
     locationLabel,
