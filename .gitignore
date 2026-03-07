@@ -1,0 +1,61 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# bun
+.bun/
+
+# builds
+dist/
+build/
+coverage/
+.nyc_output/
+.next/
+out/
+
+# generated output
+output/
+*.tsbuildinfo
+
+# logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# environment
+.env
+.env.*
+!.env.example
+
+# editor and OS files
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.project
+.classpath
+.settings/
+*.sublime-workspace
+
+# temp files
+.temp/
+.tmp/
+tmp/
+
+# runtime
+pids/
+*.pid
+*.seed
+*.pid.lock
+report.*.json
+
+# deployment
+.vercel/

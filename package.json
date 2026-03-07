@@ -1,0 +1,13 @@
+{
+  "name": "npi-discovery-service",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "bun --cwd packages/contracts run build && bun --cwd apps/api run build",
+    "test": "bun --cwd packages/contracts test && bun --cwd apps/api test",
+    "test:cov": "bun --cwd packages/contracts run test:cov && bun --cwd apps/api run test:cov"
+  }
+}
