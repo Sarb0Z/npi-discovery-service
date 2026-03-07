@@ -68,6 +68,7 @@ export function SearchForm({
       zipCode: defaultValues?.zipCode ?? '',
       city: defaultValues?.city ?? '',
       state: defaultValues?.state ?? '',
+      taxonomyCode: defaultValues?.taxonomyCode ?? '',
       taxonomyDescription: defaultValues?.taxonomyDescription ?? '',
       providerType: defaultValues?.providerType,
       batchSize: defaultValues?.batchSize ?? 200,
@@ -193,6 +194,24 @@ export function SearchForm({
             <div>
               <label
                 className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
+                htmlFor="taxonomyCode"
+              >
+                Taxonomy code
+              </label>
+              <Input
+                id="taxonomyCode"
+                maxLength={10}
+                placeholder="1223G0001X"
+                {...form.register('taxonomyCode')}
+              />
+              <p className="mt-2 text-xs text-[var(--danger-600)]">
+                {form.formState.errors.taxonomyCode?.message}
+              </p>
+            </div>
+
+            <div>
+              <label
+                className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
                 htmlFor="taxonomyDescription"
               >
                 Specialty focus
@@ -280,6 +299,7 @@ export function SearchForm({
                       zipCode: params.get('zipCode') ?? '',
                       city: params.get('city') ?? '',
                       state: params.get('state') ?? '',
+                      taxonomyCode: params.get('taxonomyCode') ?? '',
                       taxonomyDescription: params.get('taxonomyDescription') ?? '',
                       providerType: params.get('providerType')
                         ? (Number(params.get('providerType')) as 1 | 2)

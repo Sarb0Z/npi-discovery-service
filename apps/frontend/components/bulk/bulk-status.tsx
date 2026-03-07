@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  type BulkJobProgressDto,
-  type BulkJobResponseDto,
-} from '@npi/contracts'
+import { type BulkJobProgressDto, type BulkJobResponseDto } from '@npi/contracts'
 import { LoaderCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
@@ -73,11 +70,7 @@ export function BulkStatus({ job }: BulkStatusProps) {
           : 15
 
   const badgeVariant =
-    liveJob.status === 'COMPLETED'
-      ? 'success'
-      : liveJob.status === 'FAILED'
-        ? 'neutral'
-        : 'warning'
+    liveJob.status === 'COMPLETED' ? 'success' : liveJob.status === 'FAILED' ? 'neutral' : 'warning'
 
   return (
     <Card>
@@ -121,11 +114,14 @@ export function BulkStatus({ job }: BulkStatusProps) {
           </div>
           {liveJob.outputFileName ? (
             <p className="mt-3 text-sm text-[var(--ink-700)]">
-              Export file: <span className="font-medium text-[var(--ink-900)]">{liveJob.outputFileName}</span>
+              Export file:{' '}
+              <span className="font-medium text-[var(--ink-900)]">{liveJob.outputFileName}</span>
             </p>
           ) : null}
           {liveJob.error ? (
-            <p className="mt-3 text-sm text-[var(--warning-700)]">Failure details: {liveJob.error}</p>
+            <p className="mt-3 text-sm text-[var(--warning-700)]">
+              Failure details: {liveJob.error}
+            </p>
           ) : null}
         </div>
       </CardContent>

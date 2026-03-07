@@ -34,6 +34,7 @@ export function useProviderSearch() {
             zipCode: variables.zipCode,
             city: variables.city,
             state: variables.state,
+            taxonomyCode: variables.taxonomyCode,
             taxonomyDescription: variables.taxonomyDescription,
             providerType: variables.providerType?.toString(),
           }).filter(

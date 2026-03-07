@@ -46,8 +46,14 @@ describe('ResultsTable', () => {
     render(
       <ResultsTable
         providers={[
-          buildProvider(2, { name: 'Zulu Clinic', address: { ...buildProvider(2).address, city: 'Dallas' } }),
-          buildProvider(1, { name: 'Alpha Clinic', address: { ...buildProvider(1).address, city: 'Austin' } }),
+          buildProvider(2, {
+            name: 'Zulu Clinic',
+            address: { ...buildProvider(2).address, city: 'Dallas' },
+          }),
+          buildProvider(1, {
+            name: 'Alpha Clinic',
+            address: { ...buildProvider(1).address, city: 'Austin' },
+          }),
         ]}
       />,
     )
@@ -64,7 +70,11 @@ describe('ResultsTable', () => {
   })
 
   it('paginates through long result sets', () => {
-    render(<ResultsTable providers={Array.from({ length: 11 }, (_, index) => buildProvider(index + 1))} />)
+    render(
+      <ResultsTable
+        providers={Array.from({ length: 11 }, (_, index) => buildProvider(index + 1))}
+      />,
+    )
 
     expect(screen.getByText('Page 1 of 2')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Previous' })).toBeDisabled()
@@ -80,7 +90,11 @@ describe('ResultsTable', () => {
   })
 
   it('expands provider rows and supports page-size changes', () => {
-    render(<ResultsTable providers={Array.from({ length: 26 }, (_, index) => buildProvider(index + 1))} />)
+    render(
+      <ResultsTable
+        providers={Array.from({ length: 26 }, (_, index) => buildProvider(index + 1))}
+      />,
+    )
 
     const [expandButton] = screen.getAllByRole('button', { name: 'Show details' })
 

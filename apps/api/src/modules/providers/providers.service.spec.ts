@@ -9,16 +9,22 @@ import {
   createZipSearchDto,
 } from '../../../test/fixtures/search-params.fixture'
 import { UpstreamRateLimitedException } from '../../common/errors/nppes.exceptions'
+import { RedisService } from '../../common/redis/redis.service'
 import { ProviderSearchCollectorService } from './provider-search-collector.service'
 import { ProvidersService } from './providers.service'
 
 describe('ProvidersService', () => {
   let service: ProvidersService
   let providerSearchCollectorService: { collect: jest.Mock }
+  let redisService: { getJson: jest.Mock; setJson: jest.Mock }
 
   beforeEach(async () => {
     providerSearchCollectorService = {
       collect: jest.fn(),
+    }
+    redisService = {
+      getJson: jest.fn().mockResolvedValue(null),
+      setJson: jest.fn().mockResolvedValue(undefined),
     }
 
     const module = await Test.createTestingModule({
@@ -27,6 +33,10 @@ describe('ProvidersService', () => {
         {
           provide: ProviderSearchCollectorService,
           useValue: providerSearchCollectorService,
+        },
+        {
+          provide: RedisService,
+          useValue: redisService,
         },
       ],
     }).compile()

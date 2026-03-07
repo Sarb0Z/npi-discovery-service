@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common'
+import { Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common'
 import {
   ConnectedSocket,
   MessageBody,
@@ -8,10 +8,12 @@ import {
 } from '@nestjs/websockets'
 import type { BulkJobProgressDto } from '@npi/contracts'
 import type { Server, Socket } from 'socket.io'
+import { RedisService } from '../../common/redis/redis.service'
 
 export const BULK_JOB_NAMESPACE = 'bulk-jobs'
 export const BULK_JOB_PROGRESS_EVENT = 'bulk-job:progress'
 export const BULK_JOB_SUBSCRIBE_EVENT = 'bulk-job:subscribe'
+const BULK_JOB_PROGRESS_CHANNEL = 'bulk-job-progress'
 
 @WebSocketGateway({
   cors: {
@@ -20,11 +22,33 @@ export const BULK_JOB_SUBSCRIBE_EVENT = 'bulk-job:subscribe'
   },
   namespace: BULK_JOB_NAMESPACE,
 })
-export class BulkCollectionGateway {
+export class BulkCollectionGateway implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(BulkCollectionGateway.name)
+  private unsubscribeFromRedis?: () => Promise<void>
+
+  constructor(private readonly redisService: RedisService) {}
 
   @WebSocketServer()
   server?: Server
+
+  async onModuleInit(): Promise<void> {
+    this.unsubscribeFromRedis = await this.redisService.subscribe(
+      BULK_JOB_PROGRESS_CHANNEL,
+      (message) => {
+        try {
+          const progress = JSON.parse(message) as BulkJobProgressDto
+          this.emitProgress(progress)
+        } catch (error) {
+          const detail = error instanceof Error ? error.message : 'Unknown progress payload error'
+          this.logger.warn(`Ignoring malformed bulk progress payload: ${detail}`)
+        }
+      },
+    )
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.unsubscribeFromRedis?.()
+  }
 
   handleConnection(client: Socket): void {
     const jobId = this.extractJobId(client)
@@ -53,7 +77,16 @@ export class BulkCollectionGateway {
   }
 
   publishProgress(progress: BulkJobProgressDto): void {
-    this.server?.to(progress.jobId).emit(BULK_JOB_PROGRESS_EVENT, progress)
+    if (this.redisService.isEnabled()) {
+      void this.redisService.publishJson(BULK_JOB_PROGRESS_CHANNEL, progress).catch((error) => {
+        const detail = error instanceof Error ? error.message : 'Unknown Redis publish failure'
+        this.logger.warn(`Redis bulk progress publish failed, emitting locally: ${detail}`)
+        this.emitProgress(progress)
+      })
+      return
+    }
+
+    this.emitProgress(progress)
   }
 
   private extractJobId(client: Socket): string | null {
@@ -70,5 +103,9 @@ export class BulkCollectionGateway {
     }
 
     return null
+  }
+
+  private emitProgress(progress: BulkJobProgressDto): void {
+    this.server?.to(progress.jobId).emit(BULK_JOB_PROGRESS_EVENT, progress)
   }
 }

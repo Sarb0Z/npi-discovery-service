@@ -5,6 +5,10 @@
 - The backend now supports state-only searches by seeding the NPPES query with `postal_code` wildcard partitions instead of sending an invalid upstream `state`-only request.
 - Broad searches are collected with a partition-aware strategy: split by provider type first, then recursively refine oversized branches with postal wildcard prefixes until each leaf query fits within the NPPES retrieval ceiling.
 - If a fully refined branch still exceeds the upstream cap, the API returns the collected subset and reports the incomplete state explicitly through response metadata instead of silently truncating results.
+- Broad non-ZIP searches are cached through Redis when `REDIS_URL` is configured, with an in-memory fallback for local runs that do not have Redis available.
+- Bulk collection progress is fanned out over Redis-backed pub/sub when available, so websocket subscribers can keep receiving status updates across multiple API instances.
+- Every API response now includes an `x-correlation-id` header, and the backend logs each request with that correlation ID for traceability.
+- The search experience accepts either a taxonomy description or a raw taxonomy code such as `1223G0001X`.
 
 ## Local Infrastructure
 
@@ -53,6 +57,8 @@ Important variables:
 - `NEXT_PUBLIC_API_URL`: public browser-visible API origin
 - `PROVIDERS_OUTPUT_DIR`: directory for bulk JSON exports
 - `REDIS_URL`: Redis connection string for future cache and pub/sub integration
+- `THROTTLE_LIMIT`: maximum number of requests allowed per throttle window before the API starts rejecting excess traffic
+- `THROTTLE_TTL_MS`: throttle window duration in milliseconds
 
 The Docker Compose file loads values from `.env.example` by default and overrides service-specific values where needed.
 

@@ -15,6 +15,12 @@ export const searchSchema = z
       .regex(/^[A-Z]{2}$/, 'State must be a 2-letter uppercase code')
       .optional()
       .or(z.literal('')),
+    taxonomyCode: z
+      .string()
+      .trim()
+      .regex(/^[A-Z0-9]{10}$/, 'Taxonomy code must be a 10-character alphanumeric code')
+      .optional()
+      .or(z.literal('')),
     taxonomyDescription: z
       .string()
       .trim()

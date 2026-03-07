@@ -1,9 +1,18 @@
-import { ApiErrorCode, type BulkJobResponseDto, type SearchResponseDto, type StatisticsResponseDto } from '@npi/contracts'
+import {
+  ApiErrorCode,
+  type BulkJobResponseDto,
+  type SearchResponseDto,
+  type StatisticsResponseDto,
+} from '@npi/contracts'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { FrontendApiError } from '@/lib/api/providers'
-import { useBulkCollection, useProviderSearch, useStatistics } from '@/lib/hooks/use-provider-search'
+import {
+  useBulkCollection,
+  useProviderSearch,
+  useStatistics,
+} from '@/lib/hooks/use-provider-search'
 import { useSearchStore } from '@/lib/stores/search-store'
 
 const mockToastSuccess = jest.fn()
@@ -98,7 +107,12 @@ describe('use-provider-search hooks', () => {
 
     await act(async () => {
       await expect(
-        result.current.mutateAsync({ zipCode: '75201', city: '', state: '', taxonomyDescription: '' }),
+        result.current.mutateAsync({
+          zipCode: '75201',
+          city: '',
+          state: '',
+          taxonomyDescription: '',
+        }),
       ).rejects.toThrow('Registry unavailable')
     })
 
@@ -120,9 +134,7 @@ describe('use-provider-search hooks', () => {
       ],
       topSpecialties: [{ description: 'Dentist', count: 4, percentage: 40 }],
       topCities: [{ name: 'Austin', count: 3 }],
-      taxonomyBreakdown: [
-        { code: '1223G0001X', description: 'Dentist', count: 4, percentage: 40 },
-      ],
+      taxonomyBreakdown: [{ code: '1223G0001X', description: 'Dentist', count: 4, percentage: 40 }],
     }
     mockFetchStatistics.mockResolvedValue(statistics)
 

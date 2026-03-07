@@ -12,11 +12,15 @@ jest.mock('next/navigation', () => ({
 
 jest.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  PieChart: ({ children }: { children: React.ReactNode }) => <div data-testid="pie-chart">{children}</div>,
+  PieChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="pie-chart">{children}</div>
+  ),
   Pie: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Cell: () => <div />,
   Tooltip: () => <div data-testid="chart-tooltip" />,
-  BarChart: ({ children }: { children: React.ReactNode }) => <div data-testid="bar-chart">{children}</div>,
+  BarChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="bar-chart">{children}</div>
+  ),
   Bar: () => <div />,
   CartesianGrid: () => <div />,
   XAxis: () => <div />,
@@ -63,18 +67,30 @@ describe('StatisticsDashboard', () => {
 
   it('shows guidance when there is no active search', () => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams())
-    mockUseStatistics.mockReturnValue({ data: undefined, error: null, isLoading: false, refetch: mockRefetch })
+    mockUseStatistics.mockReturnValue({
+      data: undefined,
+      error: null,
+      isLoading: false,
+      refetch: mockRefetch,
+    })
 
     render(<StatisticsDashboard />)
 
     expect(
-      screen.getByText(/Start with a provider search, then open analytics to see market composition/i),
+      screen.getByText(
+        /Start with a provider search, then open analytics to see market composition/i,
+      ),
     ).toBeInTheDocument()
   })
 
   it('renders loading and error states for statistics requests', () => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams('state=TX'))
-    mockUseStatistics.mockReturnValueOnce({ data: undefined, error: null, isLoading: true, refetch: mockRefetch })
+    mockUseStatistics.mockReturnValueOnce({
+      data: undefined,
+      error: null,
+      isLoading: true,
+      refetch: mockRefetch,
+    })
 
     const { container, rerender } = render(<StatisticsDashboard />)
     expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
@@ -93,7 +109,9 @@ describe('StatisticsDashboard', () => {
     rerender(<StatisticsDashboard />)
 
     expect(
-      screen.getByText('The national provider registry is temporarily unavailable. Please retry in a moment.'),
+      screen.getByText(
+        'The national provider registry is temporarily unavailable. Please retry in a moment.',
+      ),
     ).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Retry search' }))

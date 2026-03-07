@@ -18,6 +18,7 @@ function getValues(searchParams: URLSearchParams): SearchFormValues | null {
     zipCode: searchParams.get('zipCode') ?? '',
     city: searchParams.get('city') ?? '',
     state: searchParams.get('state') ?? '',
+    taxonomyCode: searchParams.get('taxonomyCode') ?? '',
     taxonomyDescription: searchParams.get('taxonomyDescription') ?? '',
     providerType:
       providerType === '1' || providerType === '2' ? (Number(providerType) as 1 | 2) : undefined,

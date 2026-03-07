@@ -26,7 +26,13 @@ jest.mock('@/lib/hooks/use-provider-search', () => ({
 }))
 
 jest.mock('@/components/search/search-form', () => ({
-  SearchForm: ({ onSubmit, isSubmitting }: { isSubmitting?: boolean; onSubmit: (values: Record<string, string>) => void }) => (
+  SearchForm: ({
+    onSubmit,
+    isSubmitting,
+  }: {
+    isSubmitting?: boolean
+    onSubmit: (values: Record<string, string>) => void
+  }) => (
     <button
       disabled={isSubmitting}
       onClick={() => onSubmit({ zipCode: '75201', taxonomyDescription: 'Dentist' })}
@@ -96,7 +102,9 @@ describe('SearchExperience', () => {
     render(<SearchExperience />)
 
     expect(
-      screen.getByText('The upstream registry is rate limiting requests. Give it a few seconds, then retry.'),
+      screen.getByText(
+        'The upstream registry is rate limiting requests. Give it a few seconds, then retry.',
+      ),
     ).toBeInTheDocument()
 
     mockMutate.mockClear()

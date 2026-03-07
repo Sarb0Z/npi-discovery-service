@@ -59,10 +59,13 @@ export function ResultsTable({ providers }: ResultsTableProps) {
       <CardContent className="overflow-x-auto p-0">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--line)] px-6 py-4">
           <p className="text-sm text-[var(--ink-600)]">
-            Showing {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, sortedProviders.length)} of{' '}
-            {sortedProviders.length.toLocaleString()} providers
+            Showing {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, sortedProviders.length)}{' '}
+            of {sortedProviders.length.toLocaleString()} providers
           </p>
-          <label className="flex items-center gap-3 text-sm text-[var(--ink-600)]" htmlFor="results-page-size">
+          <label
+            className="flex items-center gap-3 text-sm text-[var(--ink-600)]"
+            htmlFor="results-page-size"
+          >
             Rows per page
             <select
               className="rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-sm text-[var(--ink-900)] outline-none transition focus:border-[var(--brand-400)]"
@@ -146,9 +149,12 @@ export function ResultsTable({ providers }: ResultsTableProps) {
                               </p>
                               <div className="mt-2 space-y-1 text-sm text-[var(--ink-700)]">
                                 <p>{provider.address.address1}</p>
-                                {provider.address.address2 ? <p>{provider.address.address2}</p> : null}
+                                {provider.address.address2 ? (
+                                  <p>{provider.address.address2}</p>
+                                ) : null}
                                 <p>
-                                  {provider.address.city}, {provider.address.state} {provider.address.zipCode}
+                                  {provider.address.city}, {provider.address.state}{' '}
+                                  {provider.address.zipCode}
                                 </p>
                               </div>
                             </div>

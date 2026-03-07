@@ -33,6 +33,7 @@ function normalizeSearchPayload(
     zipCode: normalizeValue(values.zipCode),
     city: normalizeValue(values.city),
     state: normalizeValue(values.state),
+    taxonomyCode: normalizeValue(values.taxonomyCode),
     taxonomyDescription: normalizeValue(values.taxonomyDescription),
     providerType: values.providerType,
   }

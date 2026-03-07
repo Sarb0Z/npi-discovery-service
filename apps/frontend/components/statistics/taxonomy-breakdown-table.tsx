@@ -81,10 +81,16 @@ export function TaxonomyBreakdownTable({ statistics }: TaxonomyBreakdownTablePro
           <tbody className="divide-y divide-[var(--line)] bg-white">
             {rows.map((taxonomy) => (
               <tr key={`${taxonomy.code}-${taxonomy.description}`}>
-                <td className="px-6 py-4 font-medium text-[var(--ink-900)]">{taxonomy.description}</td>
+                <td className="px-6 py-4 font-medium text-[var(--ink-900)]">
+                  {taxonomy.description}
+                </td>
                 <td className="px-6 py-4 text-[var(--ink-600)]">{taxonomy.code}</td>
-                <td className="px-6 py-4 text-[var(--ink-600)]">{taxonomy.count.toLocaleString()}</td>
-                <td className="px-6 py-4 text-[var(--ink-600)]">{taxonomy.percentage.toFixed(2)}%</td>
+                <td className="px-6 py-4 text-[var(--ink-600)]">
+                  {taxonomy.count.toLocaleString()}
+                </td>
+                <td className="px-6 py-4 text-[var(--ink-600)]">
+                  {taxonomy.percentage.toFixed(2)}%
+                </td>
               </tr>
             ))}
           </tbody>
