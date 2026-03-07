@@ -2,10 +2,25 @@ import { z } from 'zod'
 
 export const searchSchema = z
   .object({
-    zipCode: z.string().trim().regex(/^\d{5}$/, 'ZIP code must be a 5-digit string').optional().or(z.literal('')),
+    zipCode: z
+      .string()
+      .trim()
+      .regex(/^\d{5}$/, 'ZIP code must be a 5-digit string')
+      .optional()
+      .or(z.literal('')),
     city: z.string().trim().optional().or(z.literal('')),
-    state: z.string().trim().regex(/^[A-Z]{2}$/, 'State must be a 2-letter uppercase code').optional().or(z.literal('')),
-    taxonomyDescription: z.string().trim().max(120, 'Taxonomy must be 120 characters or fewer').optional().or(z.literal('')),
+    state: z
+      .string()
+      .trim()
+      .regex(/^[A-Z]{2}$/, 'State must be a 2-letter uppercase code')
+      .optional()
+      .or(z.literal('')),
+    taxonomyDescription: z
+      .string()
+      .trim()
+      .max(120, 'Taxonomy must be 120 characters or fewer')
+      .optional()
+      .or(z.literal('')),
     providerType: z.union([z.literal(1), z.literal(2)]).optional(),
   })
   .superRefine((value, context) => {

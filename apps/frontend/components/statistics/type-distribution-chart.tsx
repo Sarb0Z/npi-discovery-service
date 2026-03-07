@@ -13,7 +13,9 @@ export function TypeDistributionChart({ statistics }: TypeDistributionChartProps
     <Card>
       <CardHeader>
         <CardTitle>Provider type split</CardTitle>
-        <CardDescription>Individuals versus organizations in the current result set.</CardDescription>
+        <CardDescription>
+          Individuals versus organizations in the current result set.
+        </CardDescription>
       </CardHeader>
       <CardContent className="h-80">
         <ResponsiveContainer width="100%" height="100%">

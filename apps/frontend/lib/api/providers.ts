@@ -26,7 +26,9 @@ function normalizeValue(value: string | undefined): string | undefined {
   return value
 }
 
-function normalizeSearchPayload(values: SearchFormValues): Record<string, number | string | undefined> {
+function normalizeSearchPayload(
+  values: SearchFormValues,
+): Record<string, number | string | undefined> {
   return {
     zipCode: normalizeValue(values.zipCode),
     city: normalizeValue(values.city),
@@ -36,7 +38,10 @@ function normalizeSearchPayload(values: SearchFormValues): Record<string, number
   }
 }
 
-async function apiFetch<TResponse>(path: string, body: Record<string, number | string | undefined>): Promise<TResponse> {
+async function apiFetch<TResponse>(
+  path: string,
+  body: Record<string, number | string | undefined>,
+): Promise<TResponse> {
   const response = await fetch(path, {
     method: 'POST',
     headers: {

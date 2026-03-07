@@ -19,7 +19,11 @@ export function ProviderCard({ provider }: ProviderCardProps) {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--surface-200)] text-[var(--brand-700)]">
-                  {isIndividual ? <UserRound className="h-4 w-4" /> : <Building2 className="h-4 w-4" />}
+                  {isIndividual ? (
+                    <UserRound className="h-4 w-4" />
+                  ) : (
+                    <Building2 className="h-4 w-4" />
+                  )}
                 </span>
                 <Badge variant={isIndividual ? 'primary' : 'success'}>
                   {isIndividual ? 'Individual' : 'Organization'}
@@ -52,7 +56,10 @@ export function ProviderCard({ provider }: ProviderCardProps) {
             </div>
             <div className="flex items-center gap-3">
               <Phone className="h-4 w-4 text-[var(--ink-500)]" />
-              <a className="hover:text-[var(--brand-700)]" href={provider.phone ? `tel:${provider.phone}` : undefined}>
+              <a
+                className="hover:text-[var(--brand-700)]"
+                href={provider.phone ? `tel:${provider.phone}` : undefined}
+              >
                 {provider.phone ?? 'No phone on record'}
               </a>
             </div>

@@ -9,7 +9,11 @@ function downloadBlob(blob: Blob, fileName: string): void {
   URL.revokeObjectURL(href)
 }
 
-export function buildExportFileName(location: string, taxonomy?: string, extension = 'json'): string {
+export function buildExportFileName(
+  location: string,
+  taxonomy?: string,
+  extension = 'json',
+): string {
   const timestamp = new Date().toISOString().replaceAll(':', '-')
   const normalizedLocation = location.toLowerCase().replaceAll(/\s+/g, '-').replaceAll(',', '')
   const normalizedTaxonomy = taxonomy

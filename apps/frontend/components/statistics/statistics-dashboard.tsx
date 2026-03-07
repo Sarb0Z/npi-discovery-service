@@ -18,7 +18,8 @@ function getValues(searchParams: URLSearchParams): SearchFormValues | null {
     city: searchParams.get('city') ?? '',
     state: searchParams.get('state') ?? '',
     taxonomyDescription: searchParams.get('taxonomyDescription') ?? '',
-    providerType: providerType === '1' || providerType === '2' ? Number(providerType) as 1 | 2 : undefined,
+    providerType:
+      providerType === '1' || providerType === '2' ? (Number(providerType) as 1 | 2) : undefined,
   }
 
   if (!values.zipCode && !values.state) {
@@ -37,7 +38,8 @@ export function StatisticsDashboard() {
     return (
       <Card>
         <CardContent className="py-16 text-center text-[var(--ink-600)]">
-          Start with a provider search, then open analytics to see market composition and specialty concentration.
+          Start with a provider search, then open analytics to see market composition and specialty
+          concentration.
         </CardContent>
       </Card>
     )

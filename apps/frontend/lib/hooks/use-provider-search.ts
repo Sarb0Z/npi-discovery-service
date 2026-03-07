@@ -3,11 +3,7 @@
 import type { BulkJobResponseDto, SearchResponseDto, StatisticsResponseDto } from '@npi/contracts'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import {
-  fetchStatistics,
-  searchProviders,
-  startBulkCollection,
-} from '@/lib/api/providers'
+import { fetchStatistics, searchProviders, startBulkCollection } from '@/lib/api/providers'
 import type { FrontendApiError } from '@/lib/api/providers'
 import type { BulkFormValues, SearchFormValues } from '@/lib/schemas/search.schema'
 import { useSearchStore } from '@/lib/stores/search-store'
@@ -40,7 +36,10 @@ export function useProviderSearch() {
             state: variables.state,
             taxonomyDescription: variables.taxonomyDescription,
             providerType: variables.providerType?.toString(),
-          }).filter((entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1].length > 0),
+          }).filter(
+            (entry): entry is [string, string] =>
+              typeof entry[1] === 'string' && entry[1].length > 0,
+          ),
         ).toString(),
       })
     },

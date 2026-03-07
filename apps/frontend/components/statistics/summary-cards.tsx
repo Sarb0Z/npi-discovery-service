@@ -26,7 +26,9 @@ export function SummaryCards({ statistics }: SummaryCardsProps) {
             <CardContent className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm text-[var(--ink-500)]">{item.label}</p>
-                <p className="mt-3 text-3xl font-semibold text-[var(--ink-900)]">{value.toLocaleString()}</p>
+                <p className="mt-3 text-3xl font-semibold text-[var(--ink-900)]">
+                  {value.toLocaleString()}
+                </p>
               </div>
               <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--surface-200)] text-[var(--brand-700)]">
                 <Icon className="h-5 w-5" />

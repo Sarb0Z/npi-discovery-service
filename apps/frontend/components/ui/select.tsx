@@ -7,7 +7,11 @@ import { cn } from '@/lib/utils'
 export const Select = SelectPrimitive.Root
 export const SelectValue = SelectPrimitive.Value
 
-export function SelectTrigger({ className, children, ...props }: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
+export function SelectTrigger({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
   return (
     <SelectPrimitive.Trigger
       className={cn(
@@ -24,11 +28,18 @@ export function SelectTrigger({ className, children, ...props }: React.Component
   )
 }
 
-export function SelectContent({ className, children, ...props }: React.ComponentProps<typeof SelectPrimitive.Content>) {
+export function SelectContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Content>) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
-        className={cn('z-50 overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-2xl', className)}
+        className={cn(
+          'z-50 overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-2xl',
+          className,
+        )}
         {...props}
       >
         <SelectPrimitive.Viewport className="p-2">{children}</SelectPrimitive.Viewport>
@@ -37,7 +48,11 @@ export function SelectContent({ className, children, ...props }: React.Component
   )
 }
 
-export function SelectItem({ className, children, ...props }: React.ComponentProps<typeof SelectPrimitive.Item>) {
+export function SelectItem({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Item>) {
   return (
     <SelectPrimitive.Item
       className={cn(

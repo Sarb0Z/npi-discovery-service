@@ -8,7 +8,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-[var(--brand-600)] px-5 py-3 text-white shadow-[0_18px_50px_rgba(37,99,235,0.24)] hover:bg-[var(--brand-700)]',
+        primary:
+          'bg-[var(--brand-600)] px-5 py-3 text-white shadow-[0_18px_50px_rgba(37,99,235,0.24)] hover:bg-[var(--brand-700)]',
         secondary: 'bg-white/75 px-5 py-3 text-[var(--ink-900)] ring-1 ring-black/8 hover:bg-white',
         ghost: 'px-4 py-2 text-[var(--ink-700)] hover:bg-black/5',
         outline: 'px-5 py-3 text-[var(--ink-900)] ring-1 ring-[var(--line)] hover:bg-white/70',
@@ -28,8 +29,7 @@ const buttonVariants = cva(
 )
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean
 }
 

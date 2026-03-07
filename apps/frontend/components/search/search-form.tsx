@@ -8,11 +8,22 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { COMMON_SPECIALTIES } from '@/lib/constants/specialties'
 import { STATE_OPTIONS } from '@/lib/constants/states'
-import { bulkSchema, searchSchema, type BulkFormValues, type SearchFormValues } from '@/lib/schemas/search.schema'
+import {
+  bulkSchema,
+  searchSchema,
+  type BulkFormValues,
+  type SearchFormValues,
+} from '@/lib/schemas/search.schema'
 import type { SearchMode } from '@/lib/stores/search-store'
 import { useSearchStore } from '@/lib/stores/search-store'
 import { cn } from '@/lib/utils'
@@ -48,7 +59,9 @@ export function SearchForm({
   const setSearchMode = useSearchStore((state) => state.setSearchMode)
   const recentSearches = useSearchStore((state) => state.recentSearches)
 
-  const resolver = (variant === 'bulk' ? zodResolver(bulkSchema) : zodResolver(searchSchema)) as Resolver<BulkFormValues>
+  const resolver = (
+    variant === 'bulk' ? zodResolver(bulkSchema) : zodResolver(searchSchema)
+  ) as Resolver<BulkFormValues>
   const form = useForm<BulkFormValues>({
     resolver,
     defaultValues: {
@@ -102,9 +115,12 @@ export function SearchForm({
         <Badge className="relative w-fit" variant="primary">
           Search orchestration
         </Badge>
-        <CardTitle className="relative text-3xl sm:text-4xl">Discover providers without the friction.</CardTitle>
+        <CardTitle className="relative text-3xl sm:text-4xl">
+          Discover providers without the friction.
+        </CardTitle>
         <CardDescription className="relative max-w-2xl text-base">
-          Designed for broad state discovery, precise ZIP drilling, and specialty-focused network analysis.
+          Designed for broad state discovery, precise ZIP drilling, and specialty-focused network
+          analysis.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -124,15 +140,23 @@ export function SearchForm({
         >
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div className={cn(searchMode === 'zip' ? 'block' : 'hidden')}>
-              <label className="mb-2 block text-sm font-medium text-[var(--ink-700)]" htmlFor="zipCode">
+              <label
+                className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
+                htmlFor="zipCode"
+              >
                 ZIP code
               </label>
               <Input id="zipCode" maxLength={5} placeholder="75201" {...form.register('zipCode')} />
-              <p className="mt-2 text-xs text-[var(--danger-600)]">{form.formState.errors.zipCode?.message}</p>
+              <p className="mt-2 text-xs text-[var(--danger-600)]">
+                {form.formState.errors.zipCode?.message}
+              </p>
             </div>
 
             <div className={cn(searchMode === 'cityState' ? 'block' : 'hidden')}>
-              <label className="mb-2 block text-sm font-medium text-[var(--ink-700)]" htmlFor="city">
+              <label
+                className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
+                htmlFor="city"
+              >
                 City
               </label>
               <Input id="city" placeholder="Austin" {...form.register('city')} />
@@ -161,23 +185,44 @@ export function SearchForm({
                   </Select>
                 )}
               />
-              <p className="mt-2 text-xs text-[var(--danger-600)]">{form.formState.errors.state?.message}</p>
+              <p className="mt-2 text-xs text-[var(--danger-600)]">
+                {form.formState.errors.state?.message}
+              </p>
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-[var(--ink-700)]" htmlFor="taxonomyDescription">
+              <label
+                className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
+                htmlFor="taxonomyDescription"
+              >
                 Specialty focus
               </label>
-              <Input id="taxonomyDescription" placeholder="Dentist" {...form.register('taxonomyDescription')} />
+              <Input
+                id="taxonomyDescription"
+                placeholder="Dentist"
+                {...form.register('taxonomyDescription')}
+              />
             </div>
 
             {variant === 'bulk' ? (
               <div>
-                <label className="mb-2 block text-sm font-medium text-[var(--ink-700)]" htmlFor="batchSize">
+                <label
+                  className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
+                  htmlFor="batchSize"
+                >
                   Batch size
                 </label>
-                <Input id="batchSize" inputMode="numeric" min={50} max={200} type="number" {...form.register('batchSize', { valueAsNumber: true })} />
-                <p className="mt-2 text-xs text-[var(--danger-600)]">{form.formState.errors.batchSize?.message}</p>
+                <Input
+                  id="batchSize"
+                  inputMode="numeric"
+                  min={50}
+                  max={200}
+                  type="number"
+                  {...form.register('batchSize', { valueAsNumber: true })}
+                />
+                <p className="mt-2 text-xs text-[var(--danger-600)]">
+                  {form.formState.errors.batchSize?.message}
+                </p>
               </div>
             ) : null}
           </div>
@@ -192,7 +237,9 @@ export function SearchForm({
                     ? 'bg-[var(--ink-900)] text-white'
                     : 'bg-[var(--surface-200)] text-[var(--ink-700)] hover:bg-[var(--surface-300)]',
                 )}
-                onClick={() => form.setValue('providerType', value as 1 | 2 | undefined, { shouldDirty: true })}
+                onClick={() =>
+                  form.setValue('providerType', value as 1 | 2 | undefined, { shouldDirty: true })
+                }
                 type="button"
               >
                 {value === 1 ? 'Individuals' : value === 2 ? 'Organizations' : 'All providers'}
@@ -210,7 +257,9 @@ export function SearchForm({
                 <button
                   key={specialty}
                   className="rounded-full border border-[var(--line)] bg-white px-3 py-1.5 text-sm text-[var(--ink-700)] transition hover:border-[var(--brand-400)] hover:text-[var(--brand-700)]"
-                  onClick={() => form.setValue('taxonomyDescription', specialty, { shouldDirty: true })}
+                  onClick={() =>
+                    form.setValue('taxonomyDescription', specialty, { shouldDirty: true })
+                  }
                   type="button"
                 >
                   {specialty}
@@ -232,7 +281,9 @@ export function SearchForm({
                       city: params.get('city') ?? '',
                       state: params.get('state') ?? '',
                       taxonomyDescription: params.get('taxonomyDescription') ?? '',
-                      providerType: params.get('providerType') ? Number(params.get('providerType')) as 1 | 2 : undefined,
+                      providerType: params.get('providerType')
+                        ? (Number(params.get('providerType')) as 1 | 2)
+                        : undefined,
                     }
                     form.reset({ ...form.getValues(), ...nextValues })
                     startTransition(() => setSearchMode(getModeFromValues(nextValues)))
@@ -245,7 +296,10 @@ export function SearchForm({
             </div>
             <Button className="min-w-44" disabled={isSubmitting} size="lg" type="submit">
               <Search className="h-4 w-4" />
-              {isSubmitting ? 'Working…' : (submitLabel ?? (variant === 'bulk' ? 'Start bulk collection' : 'Search providers'))}
+              {isSubmitting
+                ? 'Working…'
+                : (submitLabel ??
+                  (variant === 'bulk' ? 'Start bulk collection' : 'Search providers'))}
             </Button>
           </div>
         </form>

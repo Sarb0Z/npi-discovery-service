@@ -14,7 +14,10 @@ export function TabsList({ className, ...props }: React.ComponentProps<typeof Ta
   )
 }
 
-export function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+export function TabsTrigger({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
     <TabsPrimitive.Trigger
       className={cn(

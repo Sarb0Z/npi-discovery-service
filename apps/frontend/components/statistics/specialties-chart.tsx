@@ -15,7 +15,11 @@ export function SpecialtiesChart({ statistics }: SpecialtiesChartProps) {
       </CardHeader>
       <CardContent className="h-96">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={statistics.topSpecialties} layout="vertical" margin={{ left: 18, right: 16 }}>
+          <BarChart
+            data={statistics.topSpecialties}
+            layout="vertical"
+            margin={{ left: 18, right: 16 }}
+          >
             <CartesianGrid horizontal={false} stroke="rgba(148, 163, 184, 0.25)" />
             <XAxis type="number" allowDecimals={false} />
             <YAxis dataKey="description" type="category" width={140} />

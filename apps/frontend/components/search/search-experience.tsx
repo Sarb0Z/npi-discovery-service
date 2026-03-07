@@ -23,7 +23,8 @@ function getInitialValues(searchParams: URLSearchParams): Partial<SearchFormValu
     city: searchParams.get('city') ?? '',
     state: searchParams.get('state') ?? '',
     taxonomyDescription: searchParams.get('taxonomyDescription') ?? '',
-    providerType: providerType === '1' || providerType === '2' ? Number(providerType) as 1 | 2 : undefined,
+    providerType:
+      providerType === '1' || providerType === '2' ? (Number(providerType) as 1 | 2) : undefined,
   }
 }
 
@@ -81,7 +82,8 @@ export function SearchExperience() {
             Search the national provider registry with a frontend people will actually want to use.
           </h1>
           <p className="max-w-2xl text-lg leading-8 text-[var(--ink-600)]">
-            Move from state-wide market scans to exact ZIP-level provider discovery, then pivot into analytics without leaving the flow.
+            Move from state-wide market scans to exact ZIP-level provider discovery, then pivot into
+            analytics without leaving the flow.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
@@ -90,7 +92,10 @@ export function SearchExperience() {
             ['Fast', 'Optimized for exploration with recent searches and export paths'],
             ['Clear', 'Strong state, specialty, and provider-type controls with analytics'],
           ].map(([title, description]) => (
-            <div key={title} className="rounded-[28px] border border-[var(--line)] bg-white/80 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+            <div
+              key={title}
+              className="rounded-[28px] border border-[var(--line)] bg-white/80 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)]"
+            >
               <p className="text-sm font-semibold text-[var(--ink-900)]">{title}</p>
               <p className="mt-2 text-sm leading-6 text-[var(--ink-600)]">{description}</p>
             </div>
@@ -104,10 +109,16 @@ export function SearchExperience() {
 
       {apiError ? <ErrorState error={apiError} onRetry={() => mutate(initialValues)} /> : null}
 
-      {!isPending && data?.providers.length === 0 ? <EmptyState onReset={() => router.replace('/search')} /> : null}
+      {!isPending && data?.providers.length === 0 ? (
+        <EmptyState onReset={() => router.replace('/search')} />
+      ) : null}
 
       {!isPending && data?.providers.length ? (
-        <motion.section className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.section
+          className="space-y-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
           <ResultsHeader locationLabel={locationLabel} response={data} />
           {viewMode === 'table' ? (
             <ResultsTable providers={data.providers} />

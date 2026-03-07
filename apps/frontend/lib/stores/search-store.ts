@@ -34,7 +34,10 @@ export const useSearchStore = create<SearchStore>()(
       setSearchMode: (searchMode) => set({ searchMode }),
       addRecentSearch: (search) =>
         set((state) => ({
-          recentSearches: [search, ...state.recentSearches.filter((entry) => entry.query !== search.query)].slice(0, 5),
+          recentSearches: [
+            search,
+            ...state.recentSearches.filter((entry) => entry.query !== search.query),
+          ].slice(0, 5),
         })),
       setViewMode: (viewMode) => set({ viewMode }),
       setSort: (field) =>

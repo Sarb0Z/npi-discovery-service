@@ -44,7 +44,9 @@ export function Navbar() {
                 key={item.href}
                 className={cn(
                   'relative rounded-full px-4 py-2 text-sm font-medium transition',
-                  isActive ? 'text-[var(--ink-900)]' : 'text-[var(--ink-600)] hover:text-[var(--ink-900)]',
+                  isActive
+                    ? 'text-[var(--ink-900)]'
+                    : 'text-[var(--ink-600)] hover:text-[var(--ink-900)]',
                 )}
                 href={item.href}
               >

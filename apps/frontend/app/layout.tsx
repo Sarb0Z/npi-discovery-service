@@ -30,7 +30,9 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} app-shell antialiased`}>
         <Providers>
           <Navbar />
-          <main className="mx-auto min-h-[calc(100vh-88px)] max-w-7xl px-6 py-10 sm:px-8">{children}</main>
+          <main className="mx-auto min-h-[calc(100vh-88px)] max-w-7xl px-6 py-10 sm:px-8">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>

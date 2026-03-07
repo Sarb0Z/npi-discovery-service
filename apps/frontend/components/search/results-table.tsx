@@ -61,7 +61,11 @@ export function ResultsTable({ providers }: ResultsTableProps) {
                 ['state', 'State'],
               ].map(([field, label]) => (
                 <th key={field} className="px-6 py-4 font-medium">
-                  <button className="inline-flex items-center gap-2" onClick={() => setSort(field as never)} type="button">
+                  <button
+                    className="inline-flex items-center gap-2"
+                    onClick={() => setSort(field as never)}
+                    type="button"
+                  >
                     {label}
                     <ArrowDownUp className="h-3.5 w-3.5" />
                   </button>
@@ -79,7 +83,9 @@ export function ResultsTable({ providers }: ResultsTableProps) {
                 <td className="px-6 py-4 text-[var(--ink-600)]">{provider.address.city}</td>
                 <td className="px-6 py-4 text-[var(--ink-600)]">{provider.address.state}</td>
                 <td className="px-6 py-4">
-                  <Badge variant={provider.type === ProviderType.Individual ? 'primary' : 'success'}>
+                  <Badge
+                    variant={provider.type === ProviderType.Individual ? 'primary' : 'success'}
+                  >
                     {provider.type === ProviderType.Individual ? 'Individual' : 'Organization'}
                   </Badge>
                 </td>
@@ -92,10 +98,20 @@ export function ResultsTable({ providers }: ResultsTableProps) {
             Page {page} of {pageCount}
           </p>
           <div className="flex items-center gap-2">
-            <Button disabled={page === 1} size="sm" variant="secondary" onClick={() => setPage((value) => value - 1)}>
+            <Button
+              disabled={page === 1}
+              size="sm"
+              variant="secondary"
+              onClick={() => setPage((value) => value - 1)}
+            >
               Previous
             </Button>
-            <Button disabled={page === pageCount} size="sm" variant="secondary" onClick={() => setPage((value) => value + 1)}>
+            <Button
+              disabled={page === pageCount}
+              size="sm"
+              variant="secondary"
+              onClick={() => setPage((value) => value + 1)}
+            >
               Next
             </Button>
           </div>

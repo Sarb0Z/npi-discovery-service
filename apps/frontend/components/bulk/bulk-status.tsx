@@ -17,7 +17,9 @@ export function BulkStatus({ job }: BulkStatusProps) {
       <CardContent className="space-y-4">
         <div className="flex flex-wrap items-center gap-3">
           <Badge variant="warning">{job.status}</Badge>
-          <code className="rounded-full bg-[var(--surface-200)] px-3 py-1 text-sm text-[var(--ink-700)]">{job.jobId}</code>
+          <code className="rounded-full bg-[var(--surface-200)] px-3 py-1 text-sm text-[var(--ink-700)]">
+            {job.jobId}
+          </code>
         </div>
         <div className="rounded-3xl bg-[var(--surface-100)] p-4">
           <div className="mb-3 flex items-center gap-3 text-sm text-[var(--ink-700)]">

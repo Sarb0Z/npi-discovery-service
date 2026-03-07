@@ -34,7 +34,9 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
         </div>
         <div className="space-y-2">
           <h3 className="text-2xl font-semibold text-[var(--ink-900)]">Search unavailable</h3>
-          <p className="max-w-xl text-sm leading-6 text-[var(--ink-600)]">{getErrorMessage(error)}</p>
+          <p className="max-w-xl text-sm leading-6 text-[var(--ink-600)]">
+            {getErrorMessage(error)}
+          </p>
         </div>
         <Button onClick={onRetry}>Retry search</Button>
       </CardContent>

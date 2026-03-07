@@ -17,7 +17,10 @@ export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
     setViewMode: state.setViewMode,
   }))
 
-  const exportBaseName = buildExportFileName(locationLabel, String(response.metadata.searchParams.taxonomyDescription ?? ''))
+  const exportBaseName = buildExportFileName(
+    locationLabel,
+    String(response.metadata.searchParams.taxonomyDescription ?? ''),
+  )
 
   return (
     <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -28,7 +31,9 @@ export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
           <Badge variant={response.metadata.complete ? 'success' : 'warning'}>
             {response.metadata.complete ? 'Complete coverage' : 'Partial coverage'}
           </Badge>
-          {response.metadata.partitioned ? <Badge>Partitioned x{response.metadata.partitionCount}</Badge> : null}
+          {response.metadata.partitioned ? (
+            <Badge>Partitioned x{response.metadata.partitionCount}</Badge>
+          ) : null}
         </div>
         <div>
           <h2 className="text-3xl font-semibold tracking-tight text-[var(--ink-900)]">
@@ -41,11 +46,17 @@ export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button variant={viewMode === 'table' ? 'primary' : 'secondary'} onClick={() => setViewMode('table')}>
+        <Button
+          variant={viewMode === 'table' ? 'primary' : 'secondary'}
+          onClick={() => setViewMode('table')}
+        >
           <TableProperties className="h-4 w-4" />
           Table
         </Button>
-        <Button variant={viewMode === 'card' ? 'primary' : 'secondary'} onClick={() => setViewMode('card')}>
+        <Button
+          variant={viewMode === 'card' ? 'primary' : 'secondary'}
+          onClick={() => setViewMode('card')}
+        >
           <LayoutGrid className="h-4 w-4" />
           Cards
         </Button>
@@ -53,12 +64,17 @@ export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
           <Download className="h-4 w-4" />
           JSON
         </Button>
-        <Button variant="secondary" onClick={() => downloadCsv(response.providers, exportBaseName.replace('.json', '.csv'))}>
+        <Button
+          variant="secondary"
+          onClick={() => downloadCsv(response.providers, exportBaseName.replace('.json', '.csv'))}
+        >
           <Download className="h-4 w-4" />
           CSV
         </Button>
         <Button asChild variant="outline">
-          <Link href={`/statistics?${new URLSearchParams(response.metadata.searchParams as Record<string, string>).toString()}`}>
+          <Link
+            href={`/statistics?${new URLSearchParams(response.metadata.searchParams as Record<string, string>).toString()}`}
+          >
             View analytics
           </Link>
         </Button>
