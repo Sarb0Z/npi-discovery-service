@@ -36,7 +36,7 @@ describe('ProviderSearchCollectorService', () => {
 
   it('splits state-only searches by provider type and postal prefix', async () => {
     nppesClientService.searchProviders.mockImplementation(
-      async ({ providerType, zipCode }: { providerType?: number; zipCode?: string }) => {
+      ({ providerType, zipCode }: { providerType?: number; zipCode?: string }) => {
         if (providerType === ProviderType.Individual && zipCode?.startsWith('75')) {
           return createNppesResponse([createRawIndividualProvider({ number: '1234567890' })], 1)
         }
@@ -75,7 +75,7 @@ describe('ProviderSearchCollectorService', () => {
 
   it('deduplicates providers returned from different partitions', async () => {
     nppesClientService.searchProviders.mockImplementation(
-      async ({ zipCode }: { zipCode?: string }) => {
+      ({ zipCode }: { zipCode?: string }) => {
         if (zipCode === '75*' || zipCode === '76*') {
           return createNppesResponse([], 1400)
         }
@@ -100,7 +100,7 @@ describe('ProviderSearchCollectorService', () => {
   })
 
   it('flags unresolved overflow when an exact ZIP still exceeds the upstream cap', async () => {
-    nppesClientService.searchProviders.mockImplementation(async ({ page }: { page?: number }) =>
+    nppesClientService.searchProviders.mockImplementation(({ page }: { page?: number }) =>
       createNppesResponse(
         Array.from({ length: 200 }, (_, index) =>
           createRawIndividualProvider({

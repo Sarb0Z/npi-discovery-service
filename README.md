@@ -6,6 +6,90 @@
 - Broad searches are collected with a partition-aware strategy: split by provider type first, then recursively refine oversized branches with postal wildcard prefixes until each leaf query fits within the NPPES retrieval ceiling.
 - If a fully refined branch still exceeds the upstream cap, the API returns the collected subset and reports the incomplete state explicitly through response metadata instead of silently truncating results.
 
+## Local Infrastructure
+
+The repository now includes a Docker-based local stack under `docker/`:
+
+- `docker/api.Dockerfile`: multi-stage build for the NestJS API
+- `docker/frontend.Dockerfile`: multi-stage build for the Next.js frontend
+- `docker/docker-compose.yml`: API, frontend, and Redis orchestration
+
+Start the stack with Docker Compose:
+
+```bash
+cd docker
+docker compose up --build
+```
+
+The services start at:
+
+- API: `http://localhost:3000/api`
+- Swagger: `http://localhost:3000/api/docs`
+- Frontend: `http://localhost:3001`
+- Redis: `redis://localhost:6379`
+
+The API writes bulk-export files to a named Docker volume mounted at `/app/output` inside the API container.
+
+## Environment Configuration
+
+Use the root `.env.example` as the baseline environment contract.
+
+```bash
+cp .env.example .env
+```
+
+Important variables:
+
+- `PORT`: backend port used by NestJS
+- `API_URL`: internal frontend-to-API base URL used by Next.js rewrites
+- `NEXT_PUBLIC_API_URL`: public browser-visible API origin
+- `PROVIDERS_OUTPUT_DIR`: directory for bulk JSON exports
+- `REDIS_URL`: Redis connection string for future cache and pub/sub integration
+
+The Docker Compose file loads values from `.env.example` by default and overrides service-specific values where needed.
+
+## CI/CD
+
+GitHub Actions workflows are now defined under `.github/workflows/`:
+
+- `ci.yml`: installs dependencies with Bun, then runs lint, typecheck, coverage tests, and build
+- `deploy.yml`: deploys the API to Render and the frontend to Vercel after successful CI on `main`
+
+Required GitHub secrets:
+
+- `RENDER_API_KEY`
+- `RENDER_API_SERVICE_ID`
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+Current branch mapping:
+
+- `main` -> production deployment
+
+If a `develop` branch is introduced later, the deploy workflow can be extended to support a separate staging environment.
+
+## Architecture
+
+```mermaid
+graph TD
+    Browser[Next.js Frontend] -->|/api rewrite| Api[NestJS API]
+    Api --> NPPES[CMS NPPES API]
+    Api --> Output[Provider export volume]
+    Api --> Redis[(Redis)]
+    GitHub[GitHub Actions] --> Render[Render API Service]
+    GitHub --> Vercel[Vercel Frontend Project]
+```
+
+## Deep Pagination Mitigation
+
+The NPPES API cannot paginate beyond `skip <= 1000` with a maximum page size of `200`, and it rejects state-only searches unless another supported selector is present. The backend handles this with a partition-aware collector:
+
+1. It splits broad searches by provider type when `providerType` is omitted.
+2. It seeds state-only searches with `postal_code` wildcard partitions so every upstream request remains valid.
+3. It recursively refines oversized branches with narrower postal prefixes until each leaf query fits under the NPPES retrieval ceiling.
+4. If a fully refined leaf still exceeds the upstream cap, the API returns explicit overflow metadata instead of silently truncating the dataset.
+
 # Story Statement
 
 As a healthcare platform, I want to discover and collect healthcare provider information from the national NPI

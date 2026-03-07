@@ -11,15 +11,18 @@ import {
 import { ProvidersController } from './providers.controller'
 import { ProvidersService } from './providers.service'
 import type { INestApplication } from '@nestjs/common'
+import type { SearchResponseDto } from '@npi/contracts'
 
 describe('ProvidersController', () => {
   let controller: ProvidersController
-  let providersService: { search: jest.Mock }
+  let providersService: { search: jest.Mock<Promise<SearchResponseDto>, [unknown]> }
   let app: INestApplication
 
   beforeEach(async () => {
+    const searchMock = jest.fn<Promise<SearchResponseDto>, [unknown]>()
+
     providersService = {
-      search: jest.fn(),
+      search: searchMock,
     }
 
     const module = await Test.createTestingModule({
@@ -120,11 +123,9 @@ describe('ProvidersController', () => {
       },
     })
 
-    await expect(controller.search(createCityStateSearchDto())).resolves.toEqual(
-      expect.objectContaining({
-        metadata: expect.objectContaining({ totalCount: 1 }),
-      }),
-    )
+    const response = await controller.search(createCityStateSearchDto())
+
+    expect(response.metadata.totalCount).toBe(1)
   })
 
   it('forwards providerType filters to the service layer', async () => {
@@ -178,14 +179,18 @@ describe('ProvidersController', () => {
   })
 
   it('returns 400 for an invalid ZIP code', async () => {
-    await request(app.getHttpServer())
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0]
+
+    await request(httpServer)
       .post('/providers/search')
       .send({ zipCode: 'ABCDE', page: 1, limit: 50 })
       .expect(400)
   })
 
   it('returns 400 for an invalid state code', async () => {
-    await request(app.getHttpServer())
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0]
+
+    await request(httpServer)
       .post('/providers/search')
       .send({ city: 'Austin', state: 'Texas', page: 1, limit: 50 })
       .expect(400)
@@ -210,17 +215,17 @@ describe('ProvidersController', () => {
       },
     })
 
-    await expect(controller.search(createStateOnlySearchDto())).resolves.toEqual(
-      expect.objectContaining({
-        metadata: expect.objectContaining({ partitioned: true }),
-      }),
-    )
+    const response = await controller.search(createStateOnlySearchDto())
+
+    expect(response.metadata.partitioned).toBe(true)
   })
 
   it('propagates upstream failures as 502 responses', async () => {
     providersService.search.mockRejectedValue(new BadGatewayException('NPPES unavailable'))
 
-    await request(app.getHttpServer())
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0]
+
+    await request(httpServer)
       .post('/providers/search')
       .send({ zipCode: '75201', page: 1, limit: 50 })
       .expect(502)

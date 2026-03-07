@@ -44,7 +44,10 @@ graph TD
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `PORT` | No | `3000` | API port |
+| `API_URL` | No | `http://localhost:3000` | Internal API origin used by the frontend server rewrite |
+| `NEXT_PUBLIC_API_URL` | No | `http://localhost:3000` | Public browser-facing API origin |
 | `PROVIDERS_OUTPUT_DIR` | No | `apps/api/output` at runtime cwd | Output directory for bulk JSON exports |
+| `REDIS_URL` | No | `redis://redis:6379` | Redis endpoint reserved for cache and pub/sub integration |
 
 ### Install Dependencies
 
@@ -67,7 +70,41 @@ bun --cwd apps/frontend dev
 
 ### Docker
 
-The repository requirements call for running the stack through `docker-compose up --build` from the `docker/` directory once Docker assets are in place.
+The repository includes a Docker Compose stack under `docker/`.
+
+```bash
+cd docker
+docker compose up --build
+```
+
+The compose stack starts:
+
+- API on `http://localhost:3000`
+- Swagger on `http://localhost:3000/api/docs`
+- Frontend on `http://localhost:3001`
+- Redis on `localhost:6379`
+
+The backend and frontend images use multi-stage builds. The frontend runs with Next.js standalone output so the production container only includes the compiled server bundle and required runtime assets.
+
+## CI/CD
+
+GitHub Actions workflows are defined in `.github/workflows/`:
+
+- `ci.yml`: runs lint, typecheck, test coverage, and build on pushes and pull requests to `main`
+- `deploy.yml`: triggers production deployment after a successful `CI` workflow run on `main`
+
+Production deployment targets:
+
+- Render for the NestJS API
+- Vercel for the Next.js frontend
+
+Required GitHub repository secrets:
+
+- `RENDER_API_KEY`
+- `RENDER_API_SERVICE_ID`
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
 
 ## API Reference
 

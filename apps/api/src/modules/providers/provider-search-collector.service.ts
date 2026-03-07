@@ -239,7 +239,7 @@ function getPostalPrefix(zipCode: string): string | undefined {
     return zipCode
   }
 
-  const match = zipCode.match(/^([0-9]{2,4})\*$/)
+  const match = /^([0-9]{2,4})\*$/.exec(zipCode)
 
   return match?.[1]
 }

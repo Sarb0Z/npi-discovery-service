@@ -1,0 +1,55 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+
+jobs:
+  deploy-api:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deployment
+        env:
+          RENDER_API_KEY: ${{ secrets['RENDER_API_KEY'] }}
+          RENDER_API_SERVICE_ID: ${{ secrets['RENDER_API_SERVICE_ID'] }}
+        run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_API_SERVICE_ID" ]; then
+            echo "Missing Render deployment secrets"
+            exit 1
+          fi
+
+          curl --fail-with-body --request POST \
+            --url "https://api.render.com/v1/services/${RENDER_API_SERVICE_ID}/deploys" \
+            --header "accept: application/json" \
+            --header "authorization: Bearer ${RENDER_API_KEY}"
+
+  deploy-frontend:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.22
+
+      - run: bun install --frozen-lockfile
+
+      - name: Pull Vercel environment
+        env:
+          VERCEL_TOKEN: ${{ secrets['VERCEL_TOKEN'] }}
+        run: bunx vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Build Vercel output
+        env:
+          VERCEL_TOKEN: ${{ secrets['VERCEL_TOKEN'] }}
+        run: bunx vercel build --prod --token="$VERCEL_TOKEN"
+
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets['VERCEL_TOKEN'] }}
+        run: bunx vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"

@@ -2,6 +2,7 @@ import 'reflect-metadata'
 
 import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import type { OpenAPIObject } from '@nestjs/swagger'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AppModule } from './app.module'
 import { ApiExceptionFilter } from './common/filters/api-exception.filter'
@@ -22,11 +23,28 @@ describe('main bootstrap', () => {
     setTitleMock.mockReturnThis()
     setDescriptionMock.mockReturnThis()
     setVersionMock.mockReturnThis()
-    buildMock.mockReturnValue({ openapi: '3.0.0' })
+    buildMock.mockReturnValue({
+      openapi: '3.0.0',
+      info: {
+        title: 'Healthcare Provider Discovery Service',
+        version: '1.0.0',
+      },
+    })
     setupMock.mockImplementation(() => undefined)
   })
 
   it('bootstraps Nest with validation, filters, swagger, and listening port', async () => {
+    const swaggerConfig = {
+      openapi: '3.0.0',
+      info: {
+        title: 'Healthcare Provider Discovery Service',
+        version: '1.0.0',
+      },
+    }
+    const swaggerDocument: OpenAPIObject = {
+      ...swaggerConfig,
+      paths: {},
+    }
     const app = {
       enableCors: jest.fn(),
       setGlobalPrefix: jest.fn(),
@@ -35,7 +53,7 @@ describe('main bootstrap', () => {
       listen: jest.fn().mockResolvedValue(undefined),
     }
     createMock.mockResolvedValue(app as never)
-    createDocumentMock.mockReturnValue({ paths: {} })
+    createDocumentMock.mockReturnValue(swaggerDocument)
 
     await bootstrap()
 
@@ -49,8 +67,8 @@ describe('main bootstrap', () => {
     expect(app.useGlobalFilters).toHaveBeenCalledTimes(1)
     const [exceptionFilter] = app.useGlobalFilters.mock.calls[0] as [ApiExceptionFilter]
     expect(exceptionFilter).toBeInstanceOf(ApiExceptionFilter)
-    expect(createDocumentMock).toHaveBeenCalledWith(app, { openapi: '3.0.0' })
-    expect(setupMock).toHaveBeenCalledWith('api/docs', app, { paths: {} })
+    expect(createDocumentMock).toHaveBeenCalledWith(app, swaggerConfig)
+    expect(setupMock).toHaveBeenCalledWith('api/docs', app, swaggerDocument)
     expect(app.listen).toHaveBeenCalledWith(3000)
   })
 })

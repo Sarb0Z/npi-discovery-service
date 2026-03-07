@@ -1,0 +1,46 @@
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    env_file:
+      - ../.env.example
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      REDIS_URL: redis://redis:6379
+      PROVIDERS_OUTPUT_DIR: /app/output
+    ports:
+      - '3000:3000'
+    depends_on:
+      - redis
+    volumes:
+      - provider-output:/app/output
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend.Dockerfile
+    env_file:
+      - ../.env.example
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      API_URL: http://api:3000
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+    ports:
+      - '3001:3001'
+    depends_on:
+      - api
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
+  provider-output:

@@ -61,14 +61,23 @@ describe('NppesClientService', () => {
   })
 
   it('registers axios-retry against the shared axios instance', () => {
-    expect(axiosRetry).toHaveBeenCalledWith(
-      httpService.axiosRef,
-      expect.objectContaining({
-        retries: 3,
-        retryDelay: expect.any(Function),
-        retryCondition: expect.any(Function),
-      }),
-    )
+    expect(axiosRetry).toHaveBeenCalledTimes(1)
+
+    const retryCalls = (axiosRetry as jest.Mock).mock.calls as [
+      Record<string, unknown>,
+      {
+        retries: number
+        retryDelay: (retryCount: number) => number
+        retryCondition: (error: unknown) => boolean
+      },
+    ][]
+    const retryConfig = retryCalls[0]?.[1]
+
+    expect(retryCalls[0]?.[0]).toBe(httpService.axiosRef)
+    expect(retryConfig).toBeDefined()
+    expect(retryConfig?.retries).toBe(3)
+    expect(retryConfig?.retryDelay).toEqual(expect.any(Function))
+    expect(retryConfig?.retryCondition).toEqual(expect.any(Function))
   })
 
   it('builds correct query params for ZIP searches', async () => {
