@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { createIndividualProvider } from '../../../test/fixtures/provider.fixture'
 import { createBulkCollectionDto } from '../../../test/fixtures/search-params.fixture'
 import { ProvidersService } from '../providers/providers.service'
+import { BulkCollectionGateway } from './bulk-collection.gateway'
 import { BulkCollectionService } from './bulk-collection.service'
 
 jest.mock('node:fs/promises', () => ({
@@ -19,6 +20,7 @@ jest.mock('node:crypto', () => ({
 describe('BulkCollectionService', () => {
   let service: BulkCollectionService
   let providersService: { search: jest.Mock }
+  let bulkCollectionGateway: { publishProgress: jest.Mock }
 
   async function flushMicrotasks(): Promise<void> {
     await Promise.resolve()
@@ -45,6 +47,9 @@ describe('BulkCollectionService', () => {
         },
       }),
     }
+    bulkCollectionGateway = {
+      publishProgress: jest.fn(),
+    }
     ;(randomUUID as jest.Mock).mockReturnValue('job-123')
 
     const module = await Test.createTestingModule({
@@ -53,6 +58,10 @@ describe('BulkCollectionService', () => {
         {
           provide: ProvidersService,
           useValue: providersService,
+        },
+        {
+          provide: BulkCollectionGateway,
+          useValue: bulkCollectionGateway,
         },
       ],
     }).compile()
@@ -71,6 +80,14 @@ describe('BulkCollectionService', () => {
       message:
         'Bulk collection initiated. Results will be saved to the configured output directory.',
     })
+    expect(bulkCollectionGateway.publishProgress).toHaveBeenCalledWith({
+      jobId: 'job-123',
+      status: 'PROCESSING',
+      message: 'Bulk collection queued. Collecting providers from the registry.',
+      totalProvidersFound: 0,
+      collectedProviders: 0,
+      estimatedRemainingProviders: 0,
+    })
   })
 
   it('writes the collected results to disk asynchronously', async () => {
@@ -87,6 +104,13 @@ describe('BulkCollectionService', () => {
       expect.stringContaining('"jobId": "job-123"'),
       'utf8',
     )
+    expect(bulkCollectionGateway.publishProgress).toHaveBeenCalledWith(
+      expect.objectContaining({
+        jobId: 'job-123',
+        status: 'COMPLETED',
+        outputFileName: expect.stringContaining('providers_75201_dentist_'),
+      }),
+    )
   })
 
   it('logs and swallows collection failures', async () => {
@@ -97,6 +121,13 @@ describe('BulkCollectionService', () => {
     await flushMicrotasks()
 
     expect(loggerSpy).toHaveBeenCalledWith('Bulk collection job job-123 failed', expect.any(Error))
+    expect(bulkCollectionGateway.publishProgress).toHaveBeenCalledWith(
+      expect.objectContaining({
+        jobId: 'job-123',
+        status: 'FAILED',
+        error: 'boom',
+      }),
+    )
   })
 
   it('includes serialized search metadata in the exported payload', async () => {

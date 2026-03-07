@@ -18,6 +18,14 @@ describe('csv provider typing', () => {
       name: 'Dr. Jane Smith',
       primarySpecialty: 'Dentist',
       specialties: ['Dentist'],
+      taxonomies: [
+        {
+          code: '1223G0001X',
+          description: 'Dentist',
+          primary: true,
+          state: 'TX',
+        },
+      ],
       address: {
         address1: '100 Main St',
         address2: null,

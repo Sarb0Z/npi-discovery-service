@@ -63,6 +63,14 @@ describe('AppController (e2e)', () => {
           name: 'Jane Doe, MD',
           primarySpecialty: 'General Practice Dentistry',
           specialties: ['General Practice Dentistry'],
+          taxonomies: [
+            {
+              code: '1223G0001X',
+              description: 'General Practice Dentistry',
+              primary: true,
+              state: 'TX',
+            },
+          ],
           address: {
             address1: '123 Main St',
             address2: null,
@@ -123,6 +131,14 @@ describe('AppController (e2e)', () => {
       providerTypeDistribution: [{ name: 'Individual', value: 1 }],
       topSpecialties: [{ description: 'General Practice Dentistry', count: 1, percentage: 100 }],
       topCities: [{ name: 'Austin', count: 1 }],
+      taxonomyBreakdown: [
+        {
+          code: '1223G0001X',
+          description: 'General Practice Dentistry',
+          count: 1,
+          percentage: 100,
+        },
+      ],
     })
 
     await request(getHttpServer())

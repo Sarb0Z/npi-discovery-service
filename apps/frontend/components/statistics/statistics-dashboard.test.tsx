@@ -48,6 +48,10 @@ function buildStatistics(): StatisticsResponseDto {
       { name: 'Austin', count: 15 },
       { name: 'Dallas', count: 11 },
     ],
+    taxonomyBreakdown: [
+      { code: '1223G0001X', description: 'Dentist', count: 30, percentage: 24 },
+      { code: '207Q00000X', description: 'Family Medicine', count: 22, percentage: 17.6 },
+    ],
   }
 }
 
@@ -111,7 +115,10 @@ describe('StatisticsDashboard', () => {
     expect(screen.getByText('Provider type split')).toBeInTheDocument()
     expect(screen.getByText('Top cities')).toBeInTheDocument()
     expect(screen.getByText('Top specialties')).toBeInTheDocument()
+    expect(screen.getByText('Taxonomy breakdown')).toBeInTheDocument()
     expect(screen.getAllByTestId('bar-chart')).toHaveLength(2)
     expect(screen.getByTestId('pie-chart')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /count/i }))
+    expect(screen.getByText('1223G0001X')).toBeInTheDocument()
   })
 })

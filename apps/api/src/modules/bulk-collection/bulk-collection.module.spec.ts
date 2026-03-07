@@ -3,6 +3,7 @@ import 'reflect-metadata'
 import { MODULE_METADATA } from '@nestjs/common/constants'
 import { ProvidersModule } from '../providers/providers.module'
 import { BulkCollectionController } from './bulk-collection.controller'
+import { BulkCollectionGateway } from './bulk-collection.gateway'
 import { BulkCollectionModule } from './bulk-collection.module'
 import { BulkCollectionService } from './bulk-collection.service'
 
@@ -20,6 +21,6 @@ describe('BulkCollectionModule', () => {
 
     expect(imports).toEqual([ProvidersModule])
     expect(controllers).toEqual([BulkCollectionController])
-    expect(providers).toEqual([BulkCollectionService])
+    expect(providers).toEqual([BulkCollectionService, BulkCollectionGateway])
   })
 })

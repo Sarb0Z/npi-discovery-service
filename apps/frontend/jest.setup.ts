@@ -3,6 +3,7 @@ import type * as Undici from 'undici'
 import { ReadableStream, TransformStream } from 'node:stream/web'
 import { TextDecoder, TextEncoder } from 'node:util'
 import { MessageChannel, MessagePort } from 'node:worker_threads'
+import { act } from '@testing-library/react'
 import { useSearchStore } from '@/lib/stores/search-store'
 
 Object.assign(globalThis, {
@@ -25,11 +26,13 @@ Object.assign(globalThis, {
   Response,
 })
 afterEach(() => {
-  useSearchStore.setState({
-    recentSearches: [],
-    searchMode: 'zip',
-    viewMode: 'table',
-    sortField: 'name',
-    sortDirection: 'asc',
+  act(() => {
+    useSearchStore.setState({
+      recentSearches: [],
+      searchMode: 'zip',
+      viewMode: 'table',
+      sortField: 'name',
+      sortDirection: 'asc',
+    })
   })
 })

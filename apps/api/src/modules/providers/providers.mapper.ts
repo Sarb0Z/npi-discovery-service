@@ -3,6 +3,7 @@ import {
   FALLBACK_SPECIALTY,
   type NppesRawAddress,
   NppesEnumerationType,
+  type ProviderTaxonomy,
   ProviderType,
   type NppesRawProvider,
   type ProviderAddress,
@@ -15,10 +16,11 @@ export function mapNppesProviders(rawProviders: NppesRawProvider[] | undefined):
 
 export function mapNppesProvider(rawProvider: NppesRawProvider): ProviderDto {
   const practiceAddress = rawProvider.addresses?.[0]
-  const specialties = (rawProvider.taxonomies ?? [])
-    .map((taxonomy) => taxonomy.desc?.trim())
+  const taxonomies = buildTaxonomies(rawProvider)
+  const specialties = taxonomies
+    .map((taxonomy) => taxonomy.description)
     .filter((specialty): specialty is string => Boolean(specialty))
-  const primaryTaxonomy = rawProvider.taxonomies?.find((taxonomy) => taxonomy.primary)
+  const primaryTaxonomy = taxonomies.find((taxonomy) => taxonomy.primary)
   const type =
     rawProvider.enumeration_type === NppesEnumerationType.Organization
       ? ProviderType.Organization
@@ -28,8 +30,9 @@ export function mapNppesProvider(rawProvider: NppesRawProvider): ProviderDto {
     npi: rawProvider.number ?? '',
     type,
     name: buildProviderName(rawProvider),
-    primarySpecialty: primaryTaxonomy?.desc?.trim() ?? specialties[0] ?? FALLBACK_SPECIALTY,
+    primarySpecialty: primaryTaxonomy?.description ?? specialties[0] ?? FALLBACK_SPECIALTY,
     specialties,
+    taxonomies,
     address: buildAddress(practiceAddress),
     phone: practiceAddress?.telephone_number?.trim() ?? null,
   }
@@ -91,4 +94,15 @@ function buildAddress(practiceAddress: NppesRawAddress | undefined): ProviderAdd
     state: practiceAddress?.state?.trim() ?? '',
     zipCode: practiceAddress?.postal_code?.trim() ?? '',
   }
+}
+
+function buildTaxonomies(rawProvider: NppesRawProvider): ProviderTaxonomy[] {
+  return (rawProvider.taxonomies ?? [])
+    .map((taxonomy) => ({
+      code: taxonomy.code?.trim() ?? '',
+      description: taxonomy.desc?.trim() ?? '',
+      primary: Boolean(taxonomy.primary),
+      state: taxonomy.state?.trim() ?? null,
+    }))
+    .filter((taxonomy) => taxonomy.code.length > 0 || taxonomy.description.length > 0)
 }

@@ -62,6 +62,12 @@ describe('StatisticsService', () => {
       { name: 'Individual', value: 2 },
       { name: 'Organization', value: 1 },
     ])
+    expect(result.taxonomyBreakdown[0]).toEqual({
+      code: '1223G0001X',
+      description: 'General Practice Dentistry',
+      count: 2,
+      percentage: 66.67,
+    })
   })
 
   it('returns top specialties and cities sorted by count', async () => {
@@ -92,5 +98,14 @@ describe('StatisticsService', () => {
       name: 'Austin',
       count: 3,
     })
+    expect(result.taxonomyBreakdown).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: '261QF0400X',
+          description: 'Federally Qualified Health Center (FQHC)',
+          count: 1,
+        }),
+      ]),
+    )
   })
 })

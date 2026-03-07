@@ -41,6 +41,7 @@ export class StatisticsService {
       ],
       topSpecialties: buildTopSpecialties(providers),
       topCities: buildTopCities(providers),
+      taxonomyBreakdown: buildTaxonomyBreakdown(providers),
     }
   }
 }
@@ -81,4 +82,44 @@ function buildTopCities(providers: ProviderDto[]): StatisticsResponseDto['topCit
     .map(([name, count]) => ({ name, count }))
     .sort((left, right) => right.count - left.count)
     .slice(0, 10)
+}
+
+function buildTaxonomyBreakdown(
+  providers: ProviderDto[],
+): StatisticsResponseDto['taxonomyBreakdown'] {
+  const totalProviders = providers.length || 1
+  const taxonomyCounts = new Map<string, { code: string; description: string; count: number }>()
+
+  for (const provider of providers) {
+    for (const taxonomy of provider.taxonomies) {
+      const code = taxonomy.code || 'UNKNOWN'
+      const description = taxonomy.description || provider.primarySpecialty
+      const key = `${code}:${description}`
+      const current = taxonomyCounts.get(key)
+
+      if (current) {
+        current.count += 1
+        continue
+      }
+
+      taxonomyCounts.set(key, {
+        code,
+        description,
+        count: 1,
+      })
+    }
+  }
+
+  return Array.from(taxonomyCounts.values())
+    .map((item) => ({
+      ...item,
+      percentage: Number(((item.count / totalProviders) * 100).toFixed(2)),
+    }))
+    .sort((left, right) => {
+      if (right.count !== left.count) {
+        return right.count - left.count
+      }
+
+      return left.description.localeCompare(right.description)
+    })
 }

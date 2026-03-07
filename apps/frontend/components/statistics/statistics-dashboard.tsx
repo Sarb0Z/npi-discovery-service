@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import { CitiesChart } from '@/components/statistics/cities-chart'
 import { SpecialtiesChart } from '@/components/statistics/specialties-chart'
 import { SummaryCards } from '@/components/statistics/summary-cards'
+import { TaxonomyBreakdownTable } from '@/components/statistics/taxonomy-breakdown-table'
 import { TypeDistributionChart } from '@/components/statistics/type-distribution-chart'
 import { ErrorState } from '@/components/search/error-state'
 import { SearchSkeleton } from '@/components/search/search-skeleton'
@@ -65,6 +66,7 @@ export function StatisticsDashboard() {
         <CitiesChart statistics={data} />
       </div>
       <SpecialtiesChart statistics={data} />
+      <TaxonomyBreakdownTable statistics={data} />
     </div>
   )
 }

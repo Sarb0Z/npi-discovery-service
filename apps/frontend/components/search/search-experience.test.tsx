@@ -135,6 +135,20 @@ describe('SearchExperience', () => {
           name: 'Dr. Ada Lovelace',
           primarySpecialty: 'Dentist',
           specialties: ['Dentist', 'Orthodontics'],
+          taxonomies: [
+            {
+              code: '1223G0001X',
+              description: 'Dentist',
+              primary: true,
+              state: 'TX',
+            },
+            {
+              code: '1223X0400X',
+              description: 'Orthodontics',
+              primary: false,
+              state: 'TX',
+            },
+          ],
           address: {
             address1: '123 Health Ave',
             address2: null,

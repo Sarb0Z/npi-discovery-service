@@ -120,6 +120,9 @@ describe('use-provider-search hooks', () => {
       ],
       topSpecialties: [{ description: 'Dentist', count: 4, percentage: 40 }],
       topCities: [{ name: 'Austin', count: 3 }],
+      taxonomyBreakdown: [
+        { code: '1223G0001X', description: 'Dentist', count: 4, percentage: 40 },
+      ],
     }
     mockFetchStatistics.mockResolvedValue(statistics)
 

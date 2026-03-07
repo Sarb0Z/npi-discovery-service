@@ -17,6 +17,20 @@ describe('providers.mapper', () => {
       name: 'Jane Doe, MD',
       primarySpecialty: 'General Practice Dentistry',
       specialties: ['General Practice Dentistry', 'Pediatric Dentistry'],
+      taxonomies: [
+        {
+          code: '1223G0001X',
+          description: 'General Practice Dentistry',
+          primary: true,
+          state: 'TX',
+        },
+        {
+          code: '1223P0300X',
+          description: 'Pediatric Dentistry',
+          primary: false,
+          state: 'TX',
+        },
+      ],
       address: {
         address1: '123 Main St',
         address2: 'Suite 100',
@@ -53,6 +67,7 @@ describe('providers.mapper', () => {
       state: '',
       zipCode: '',
     })
+    expect(provider.taxonomies).toEqual([])
     expect(provider.phone).toBeNull()
   })
 

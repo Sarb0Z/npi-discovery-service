@@ -9,6 +9,14 @@ const searchResponse: SearchResponseDto = {
       name: 'Dr. Jane Smith',
       primarySpecialty: 'Dentist',
       specialties: ['Dentist'],
+      taxonomies: [
+        {
+          code: '1223G0001X',
+          description: 'Dentist',
+          primary: true,
+          state: 'TX',
+        },
+      ],
       address: {
         address1: '100 Main St',
         address2: null,
@@ -46,6 +54,7 @@ const statisticsResponse: StatisticsResponseDto = {
   providerTypeDistribution: [{ name: 'Individual', value: 1 }],
   topSpecialties: [{ description: 'Dentist', count: 1, percentage: 100 }],
   topCities: [{ name: 'Austin', count: 1 }],
+  taxonomyBreakdown: [{ code: '1223G0001X', description: 'Dentist', count: 1, percentage: 100 }],
 }
 
 export const handlers = [

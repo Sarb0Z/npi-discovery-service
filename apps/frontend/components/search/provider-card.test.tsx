@@ -15,6 +15,20 @@ function buildProvider(overrides: Partial<ProviderDto> = {}): ProviderDto {
     name: 'Dr. Ada Lovelace',
     primarySpecialty: 'Family Medicine',
     specialties: ['Family Medicine', 'Internal Medicine', 'Geriatrics'],
+    taxonomies: [
+      {
+        code: '207Q00000X',
+        description: 'Family Medicine',
+        primary: true,
+        state: 'TX',
+      },
+      {
+        code: '207R00000X',
+        description: 'Internal Medicine',
+        primary: false,
+        state: 'TX',
+      },
+    ],
     address: {
       address1: '123 Health Ave',
       address2: 'Suite 100',

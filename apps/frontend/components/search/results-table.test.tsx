@@ -9,6 +9,14 @@ function buildProvider(index: number, overrides: Partial<ProviderDto> = {}): Pro
     name: `Provider ${String(index).padStart(2, '0')}`,
     primarySpecialty: index % 2 === 0 ? 'Dentist' : 'Cardiology',
     specialties: [index % 2 === 0 ? 'Dentist' : 'Cardiology'],
+    taxonomies: [
+      {
+        code: index % 2 === 0 ? '1223G0001X' : '207R00000X',
+        description: index % 2 === 0 ? 'Dentist' : 'Cardiology',
+        primary: true,
+        state: index % 2 === 0 ? 'TX' : 'CA',
+      },
+    ],
     address: {
       address1: `${index} Main St`,
       address2: null,
@@ -25,6 +33,14 @@ function getBodyRows() {
   return screen.getAllByRole('row').slice(1)
 }
 
+function getFirstBodyRow() {
+  const [firstRow] = getBodyRows()
+
+  expect(firstRow).toBeDefined()
+
+  return firstRow as HTMLElement
+}
+
 describe('ResultsTable', () => {
   it('sorts rows and renders provider type badges', () => {
     render(
@@ -36,15 +52,15 @@ describe('ResultsTable', () => {
       />,
     )
 
-    expect(within(getBodyRows()[0]).getByText('Alpha Clinic')).toBeInTheDocument()
+    expect(within(getFirstBodyRow()).getByText('Alpha Clinic')).toBeInTheDocument()
     expect(screen.getByText('Individual')).toBeInTheDocument()
     expect(screen.getByText('Organization')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /name/i }))
-    expect(within(getBodyRows()[0]).getByText('Zulu Clinic')).toBeInTheDocument()
+    expect(within(getFirstBodyRow()).getByText('Zulu Clinic')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /city/i }))
-    expect(within(getBodyRows()[0]).getByText('Austin')).toBeInTheDocument()
+    expect(within(getFirstBodyRow()).getByText('Austin')).toBeInTheDocument()
   })
 
   it('paginates through long result sets', () => {
@@ -61,5 +77,23 @@ describe('ResultsTable', () => {
     expect(screen.getByText('Provider 11')).toBeInTheDocument()
     expect(screen.queryByText('Provider 01')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
+  })
+
+  it('expands provider rows and supports page-size changes', () => {
+    render(<ResultsTable providers={Array.from({ length: 26 }, (_, index) => buildProvider(index + 1))} />)
+
+    const [expandButton] = screen.getAllByRole('button', { name: 'Show details' })
+
+    expect(expandButton).toBeDefined()
+
+    fireEvent.click(expandButton as HTMLElement)
+
+    expect(screen.getByText('Practice location')).toBeInTheDocument()
+    expect(screen.getByText('Cardiology (207R00000X)')).toBeInTheDocument()
+
+    fireEvent.change(screen.getByLabelText('Rows per page'), { target: { value: '25' } })
+
+    expect(screen.getByText('Page 1 of 2')).toBeInTheDocument()
+    expect(screen.getByText('Provider 25')).toBeInTheDocument()
   })
 })

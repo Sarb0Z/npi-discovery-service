@@ -21,6 +21,7 @@ export interface ProviderDto {
   name: string
   primarySpecialty: string
   specialties: string[]
+  taxonomies: ProviderTaxonomy[]
   address: ProviderAddress
   phone: string | null
 }
