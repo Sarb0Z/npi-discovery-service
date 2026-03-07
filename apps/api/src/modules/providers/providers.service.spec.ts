@@ -1,34 +1,32 @@
-import { BadRequestException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import {
-  createNppesResponse,
   createRawIndividualProvider,
   createRawOrganizationProvider,
 } from '../../../test/fixtures/nppes-response.fixture'
 import {
   createCityStateSearchDto,
-  createStateTaxonomySearchDto,
+  createStateOnlySearchDto,
   createZipSearchDto,
 } from '../../../test/fixtures/search-params.fixture'
 import { UpstreamRateLimitedException } from '../../common/errors/nppes.exceptions'
-import { NppesClientService } from '../nppes-client/nppes-client.service'
+import { ProviderSearchCollectorService } from './provider-search-collector.service'
 import { ProvidersService } from './providers.service'
 
 describe('ProvidersService', () => {
   let service: ProvidersService
-  let nppesClientService: { searchProviders: jest.Mock }
+  let providerSearchCollectorService: { collect: jest.Mock }
 
   beforeEach(async () => {
-    nppesClientService = {
-      searchProviders: jest.fn(),
+    providerSearchCollectorService = {
+      collect: jest.fn(),
     }
 
     const module = await Test.createTestingModule({
       providers: [
         ProvidersService,
         {
-          provide: NppesClientService,
-          useValue: nppesClientService,
+          provide: ProviderSearchCollectorService,
+          useValue: providerSearchCollectorService,
         },
       ],
     }).compile()
@@ -36,56 +34,9 @@ describe('ProvidersService', () => {
     service = module.get(ProvidersService)
   })
 
-  it('collects providers across paginated NPPES responses', async () => {
-    nppesClientService.searchProviders
-      .mockResolvedValueOnce(
-        createNppesResponse(
-          Array.from({ length: 50 }, (_, index) =>
-            createRawIndividualProvider({ number: `${index}`.padStart(10, '0') }),
-          ),
-          60,
-        ),
-      )
-      .mockResolvedValueOnce(
-        createNppesResponse(
-          [
-            createRawOrganizationProvider({ number: '9999999999' }),
-            createRawOrganizationProvider({ number: '8888888888' }),
-          ],
-          60,
-        ),
-      )
-
-    const result = await service.search(createZipSearchDto({ limit: 50 }))
-
-    expect(result.providers).toHaveLength(52)
-    expect(nppesClientService.searchProviders).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({ page: 2, limit: 50 }),
-    )
-  })
-
-  it('stops collecting once the skip limit is reached', async () => {
-    nppesClientService.searchProviders.mockResolvedValue(
-      createNppesResponse(
-        Array.from({ length: 200 }, (_, index) =>
-          createRawIndividualProvider({ number: `${index}`.padStart(10, '0') }),
-        ),
-        5000,
-      ),
-    )
-
-    await service.search(createZipSearchDto({ limit: 200 }))
-
-    expect(nppesClientService.searchProviders).toHaveBeenCalledTimes(6)
-    expect(nppesClientService.searchProviders).toHaveBeenLastCalledWith(
-      expect.objectContaining({ page: 6, limit: 200 }),
-    )
-  })
-
   it('filters by primary taxonomy description', async () => {
-    nppesClientService.searchProviders.mockResolvedValue(
-      createNppesResponse([createRawIndividualProvider(), createRawOrganizationProvider()]),
+    providerSearchCollectorService.collect.mockResolvedValue(
+      createCollectionResult([createRawIndividualProvider(), createRawOrganizationProvider()]),
     )
 
     const result = await service.search(
@@ -96,28 +47,30 @@ describe('ProvidersService', () => {
     expect(result.providers[0]?.primarySpecialty).toBe('General Practice Dentistry')
   })
 
-  it('rejects a pure state-only search', async () => {
-    await expect(service.search({ state: 'TX', page: 1, limit: 50 })).rejects.toBeInstanceOf(
-      BadRequestException,
-    )
-  })
-
-  it('allows state searches when taxonomy criteria are present', async () => {
-    nppesClientService.searchProviders.mockResolvedValue(
-      createNppesResponse([createRawIndividualProvider()]),
+  it('allows pure state-only searches through the partition collector', async () => {
+    providerSearchCollectorService.collect.mockResolvedValue(
+      createCollectionResult([createRawIndividualProvider()]),
     )
 
-    const result = await service.search(createStateTaxonomySearchDto())
+    const result = await service.search(createStateOnlySearchDto())
 
     expect(result.providers).toHaveLength(1)
-    expect(nppesClientService.searchProviders).toHaveBeenCalledWith(
-      expect.objectContaining({ state: 'TX', taxonomyDescription: 'Dentist' }),
+    expect(providerSearchCollectorService.collect).toHaveBeenCalledWith(
+      expect.objectContaining({ state: 'TX', page: 1, limit: 50 }),
+      expect.objectContaining({}),
     )
   })
 
-  it('returns response metadata with normalized search params', async () => {
-    nppesClientService.searchProviders.mockResolvedValue(
-      createNppesResponse([createRawIndividualProvider()]),
+  it('returns response metadata with partition collection details', async () => {
+    providerSearchCollectorService.collect.mockResolvedValue(
+      createCollectionResult([createRawIndividualProvider()], {
+        partitioned: true,
+        partitionCount: 8,
+        complete: false,
+        overflowedPartitionCount: 1,
+        estimatedRemainingProviders: 25,
+        upstreamLimitUsed: 200,
+      }),
     )
 
     const result = await service.search(createZipSearchDto({ limit: 25 }))
@@ -127,6 +80,12 @@ describe('ProvidersService', () => {
         totalCount: 1,
         page: 1,
         limit: 25,
+        upstreamLimitUsed: 200,
+        partitioned: true,
+        partitionCount: 8,
+        complete: false,
+        overflowedPartitionCount: 1,
+        estimatedRemainingProviders: 25,
       }),
     )
     expect(result.metadata.searchParams.zipCode).toBe('75201')
@@ -135,10 +94,33 @@ describe('ProvidersService', () => {
   })
 
   it('propagates upstream rate limiting errors', async () => {
-    nppesClientService.searchProviders.mockRejectedValue(new UpstreamRateLimitedException())
+    providerSearchCollectorService.collect.mockRejectedValue(new UpstreamRateLimitedException())
 
     await expect(service.search(createZipSearchDto())).rejects.toBeInstanceOf(
       UpstreamRateLimitedException,
     )
   })
 })
+
+function createCollectionResult(
+  rawProviders: ReturnType<typeof createRawIndividualProvider>[],
+  overrides: Partial<{
+    upstreamLimitUsed: number
+    partitioned: boolean
+    partitionCount: number
+    complete: boolean
+    overflowedPartitionCount: number
+    estimatedRemainingProviders: number
+  }> = {},
+) {
+  return {
+    rawProviders,
+    upstreamLimitUsed: 50,
+    partitioned: false,
+    partitionCount: 1,
+    complete: true,
+    overflowedPartitionCount: 0,
+    estimatedRemainingProviders: 0,
+    ...overrides,
+  }
+}

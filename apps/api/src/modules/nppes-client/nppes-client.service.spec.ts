@@ -143,6 +143,26 @@ describe('NppesClientService', () => {
     })
   })
 
+  it('passes wildcard postal partitions through to the upstream API params', async () => {
+    httpService.get.mockReturnValue(
+      of({ data: createNppesResponse([createRawIndividualProvider()]) }),
+    )
+
+    await service.searchProviders({ state: 'TX', zipCode: '75*', page: 1, limit: 200 })
+
+    const [, requestConfig] = httpService.get.mock.calls[0] as [
+      string,
+      { params: Record<string, string | number | undefined> },
+    ]
+
+    expect(requestConfig.params).toMatchObject({
+      state: 'TX',
+      postal_code: '75*',
+      limit: 200,
+      skip: 0,
+    })
+  })
+
   it('maps upstream 429 responses to UpstreamRateLimitedException', async () => {
     const error = {
       response: { status: 429 },

@@ -1,5 +1,11 @@
 # Healthcare Provider Discovery Service
 
+## Current Implementation Notes
+
+- The backend now supports state-only searches by seeding the NPPES query with `postal_code` wildcard partitions instead of sending an invalid upstream `state`-only request.
+- Broad searches are collected with a partition-aware strategy: split by provider type first, then recursively refine oversized branches with postal wildcard prefixes until each leaf query fits within the NPPES retrieval ceiling.
+- If a fully refined branch still exceeds the upstream cap, the API returns the collected subset and reports the incomplete state explicitly through response metadata instead of silently truncating results.
+
 # Story Statement
 
 As a healthcare platform, I want to discover and collect healthcare provider information from the national NPI

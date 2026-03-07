@@ -4,6 +4,8 @@
 
 The Healthcare Provider Discovery Service exposes a NestJS API for searching the public NPPES registry, mapping raw CMS payloads into a stable provider contract, generating summary statistics, and starting asynchronous bulk collection jobs.
 
+The backend now includes a partition-aware collector for broad searches. When a query risks exceeding the NPPES `skip <= 1000` ceiling, the service splits the request by provider type and then recursively refines it with `postal_code` wildcard partitions so state-only and other wide searches can continue safely instead of truncating silently.
+
 ```mermaid
 graph TD
     Client[Frontend / API Consumer] --> Search[ProvidersController]
@@ -71,7 +73,7 @@ The repository requirements call for running the stack through `docker-compose u
 
 ### POST /api/providers/search
 
-Search for healthcare providers by ZIP code or city/state, optionally filtered by taxonomy or provider type.
+Search for healthcare providers by ZIP code, city/state, or state-only, optionally filtered by taxonomy or provider type.
 
 **Request Body**
 
@@ -129,10 +131,25 @@ Search for healthcare providers by ZIP code or city/state, optionally filtered b
     "timestamp": "2026-03-07T12:00:00.000Z",
     "duration": 12,
     "page": 1,
-    "limit": 50
+    "limit": 50,
+    "upstreamLimitUsed": 50,
+    "partitioned": false,
+    "partitionCount": 1,
+    "complete": true,
+    "overflowedPartitionCount": 0,
+    "estimatedRemainingProviders": 0
   }
 }
 ```
+
+**Partition-aware metadata**
+
+- `upstreamLimitUsed`: The actual NPPES page size used for collection.
+- `partitioned`: Whether the backend had to split the query into smaller upstream searches.
+- `partitionCount`: Number of partition leaf queries executed.
+- `complete`: Whether every matching partition was fully collected.
+- `overflowedPartitionCount`: Number of leaf partitions that still exceeded the upstream cap.
+- `estimatedRemainingProviders`: Best-effort count of providers that could not be retrieved because a leaf partition remained larger than the NPPES maximum retrievable window.
 
 ### POST /api/statistics
 
@@ -246,9 +263,10 @@ Simple health-check endpoint.
 
 ## NPPES Deep Pagination Mitigation
 
-The current implementation applies two protections against known NPPES search constraints:
+The current implementation applies three protections against known NPPES search constraints:
 
-1. The synchronous search endpoint rejects pure state-only requests unless taxonomy criteria are provided, because the upstream API does not support state as the only input.
-2. Upstream pagination is clamped to the documented NPPES bounds of `limit <= 200` and `skip <= 1000`, preventing invalid deep-pagination requests.
+1. Upstream pagination is clamped to the documented NPPES bounds of `limit <= 200` and `skip <= 1000`.
+2. When `providerType` is omitted, the collector splits the request into `NPI-1` and `NPI-2` branches before collecting results.
+3. For state-only searches, and for any branch whose `result_count` exceeds the maximum retrievable NPPES window, the collector recursively partitions the query with `postal_code` wildcard prefixes. Pure state-only searches are seeded with postal partitions immediately so the backend never sends an upstream request that violates the NPPES rule that `state` cannot be the only criterion besides enumeration type.
 
-The bulk collection flow currently paginates within those upstream bounds and writes the collected dataset to disk. Query subdivision for state-wide bulk collection beyond the `skip = 1000` ceiling is still a follow-up enhancement.
+If a leaf branch is still larger than the NPPES retrieval ceiling after the deepest supported postal refinement, the API returns partial results and surfaces that condition through `complete`, `overflowedPartitionCount`, and `estimatedRemainingProviders` instead of silently truncating the dataset.

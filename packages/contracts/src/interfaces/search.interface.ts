@@ -7,6 +7,12 @@ export interface SearchMetadata {
   duration: number
   page: number
   limit: number
+  upstreamLimitUsed: number
+  partitioned: boolean
+  partitionCount: number
+  complete: boolean
+  overflowedPartitionCount: number
+  estimatedRemainingProviders: number
 }
 
 export interface SearchResponseDto {

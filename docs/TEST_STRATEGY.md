@@ -176,11 +176,18 @@ const module = await Test.createTestingModule({
 | Test Case | Description | Key Assertion |
 |-----------|-------------|---------------|
 | should return 202 Accepted with jobId | Verify async kickoff | Status 202, response has `jobId` |
-| should partition query when total > 1000 | Verify partitioning algo | Multiple sub-queries issued |
+| should partition query when total > 1000 | Verify partitioning algo | Multiple provider-type and postal sub-queries issued |
 | should emit WebSocket progress events | Verify pub/sub | `gateway.emit()` called with `{ total, collected, remaining }` |
 | should save results to correctly named JSON file | Verify file I/O | File matches `providers_{location}_{taxonomy}_{timestamp}.json` |
 | should include collection metadata in output | Verify metadata | File contains searchParams, totalCount, duration |
 | should preserve partial results on failure | Verify fault tolerance | Already-collected data is saved before throwing |
+
+The current backend implementation covers the partitioning algorithm primarily through `provider-search-collector.service.spec.ts`, where the collector is tested directly for:
+
+- provider-type fan-out when `providerType` is omitted
+- recursive `postal_code` wildcard partitioning for state-only and oversized branches
+- deduplication across partitions
+- explicit overflow metadata when an exact ZIP still exceeds the upstream cap
 
 #### Statistics Service Tests (`modules/statistics/`)
 

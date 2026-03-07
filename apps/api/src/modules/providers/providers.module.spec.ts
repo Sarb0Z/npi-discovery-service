@@ -2,6 +2,7 @@ import 'reflect-metadata'
 
 import { MODULE_METADATA } from '@nestjs/common/constants'
 import { NppesClientModule } from '../nppes-client/nppes-client.module'
+import { ProviderSearchCollectorService } from './provider-search-collector.service'
 import { ProvidersController } from './providers.controller'
 import { ProvidersModule } from './providers.module'
 import { ProvidersService } from './providers.service'
@@ -21,7 +22,7 @@ describe('ProvidersModule', () => {
 
     expect(imports).toEqual([NppesClientModule])
     expect(controllers).toEqual([ProvidersController])
-    expect(providers).toEqual([ProvidersService])
-    expect(exportsMetadata).toEqual([ProvidersService])
+    expect(providers).toEqual([ProvidersService, ProviderSearchCollectorService])
+    expect(exportsMetadata).toEqual([ProvidersService, ProviderSearchCollectorService])
   })
 })

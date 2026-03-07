@@ -1,35 +1,31 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import {
   SEARCH_LIMITS,
   normalizeSearchInput,
-  type NppesRawProvider,
   type SearchProvidersDto,
   type SearchResponseDto,
 } from '@npi/contracts'
-import { NppesClientService } from '../nppes-client/nppes-client.service'
 import { mapNppesProviders, matchesPrimaryTaxonomy } from './providers.mapper'
+import { ProviderSearchCollectorService } from './provider-search-collector.service'
+
+interface SearchExecutionOptions {
+  upstreamLimit?: number
+}
 
 @Injectable()
 export class ProvidersService {
-  constructor(private readonly nppesClientService: NppesClientService) {}
+  constructor(private readonly providerSearchCollectorService: ProviderSearchCollectorService) {}
 
-  async search(searchDto: SearchProvidersDto): Promise<SearchResponseDto> {
+  async search(
+    searchDto: SearchProvidersDto,
+    options: SearchExecutionOptions = {},
+  ): Promise<SearchResponseDto> {
     const startedAt = Date.now()
     const normalizedSearch = normalizeSearchInput(searchDto)
-    const hasStateOnlySearch =
-      normalizedSearch.state &&
-      !normalizedSearch.city &&
-      !normalizedSearch.zipCode &&
-      !normalizedSearch.taxonomyCode &&
-      !normalizedSearch.taxonomyDescription
-
-    if (hasStateOnlySearch) {
-      throw new BadRequestException(
-        'State-only searches should use the bulk collection endpoint or include a taxonomy filter.',
-      )
-    }
-
-    const rawProviders = await this.collectProviders(normalizedSearch)
+    const collectionResult = await this.providerSearchCollectorService.collect(normalizedSearch, {
+      upstreamLimit: options.upstreamLimit,
+    })
+    const rawProviders = collectionResult.rawProviders
     const filteredProviders = rawProviders.filter((rawProvider) =>
       matchesPrimaryTaxonomy(
         rawProvider,
@@ -55,39 +51,13 @@ export class ProvidersService {
         duration: Date.now() - startedAt,
         page: normalizedSearch.page ?? 1,
         limit: normalizedSearch.limit ?? SEARCH_LIMITS.defaultLimit,
+        upstreamLimitUsed: collectionResult.upstreamLimitUsed,
+        partitioned: collectionResult.partitioned,
+        partitionCount: collectionResult.partitionCount,
+        complete: collectionResult.complete,
+        overflowedPartitionCount: collectionResult.overflowedPartitionCount,
+        estimatedRemainingProviders: collectionResult.estimatedRemainingProviders,
       },
     }
-  }
-
-  private async collectProviders(searchDto: SearchProvidersDto): Promise<NppesRawProvider[]> {
-    const providers: NppesRawProvider[] = []
-    const limit = searchDto.limit ?? SEARCH_LIMITS.defaultLimit
-    let page = 1
-    let totalCount = Number.POSITIVE_INFINITY
-
-    while (providers.length < totalCount) {
-      const response = await this.nppesClientService.searchProviders({
-        ...searchDto,
-        page,
-        limit,
-      })
-      const responseProviders = response.results ?? []
-
-      totalCount = response.result_count ?? responseProviders.length
-      providers.push(...responseProviders)
-
-      if (responseProviders.length < limit) {
-        break
-      }
-
-      const nextSkip = page * limit
-      if (nextSkip > SEARCH_LIMITS.maxSkip) {
-        break
-      }
-
-      page += 1
-    }
-
-    return providers
   }
 }

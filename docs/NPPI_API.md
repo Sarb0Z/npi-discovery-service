@@ -8,6 +8,17 @@
 
 ---
 
+### Implemented Mitigation Strategy
+
+The backend now handles the first two constraints with a partition-aware collector:
+
+1.  **Provider type split first:** If `providerType` is omitted, the service fans the request into separate `NPI-1` and `NPI-2` collection branches.
+2.  **Postal wildcard partitioning for broad searches:** If a branch is state-only or its `result_count` exceeds the NPPES maximum retrievable window, the backend recursively refines that branch with `postal_code` wildcard prefixes such as `75*`, `750*`, and `7500*` until each leaf branch can be collected safely.
+3.  **State-only seed behavior:** Pure state-only searches are never sent upstream as `state + enumeration_type` alone. They are seeded immediately with `postal_code` partitions so every upstream request remains valid under the documented NPPES rule.
+4.  **Explicit overflow metadata:** If an exact ZIP or fully refined postal branch still exceeds the NPPES cap, the service preserves the collected subset and marks the response metadata as incomplete instead of silently truncating.
+
+---
+
 ### Part 1: The Upstream Request (Backend to NPPES)
 
 When your NestJS `NppesClientModule` (located at `apps/api/src/modules/nppes-client/`) constructs the Axios GET request, it must format the parameters exactly like this:

@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import {
   buildProviderExportFileName,
   type BulkCollectionDto,
+  type BulkCollectionMetadata,
   type BulkJobResponseDto,
 } from '@npi/contracts'
 import { mkdir, writeFile } from 'node:fs/promises'
@@ -29,11 +30,30 @@ export class BulkCollectionService {
   }
 
   private async collect(jobId: string, searchDto: BulkCollectionDto): Promise<void> {
+    const startedAt = Date.now()
+
     try {
-      const searchResponse = await this.providersService.search(searchDto)
+      const searchResponse = await this.providersService.search(searchDto, {
+        upstreamLimit: searchDto.batchSize,
+      })
       const outputDirectory = process.env.PROVIDERS_OUTPUT_DIR ?? join(process.cwd(), 'output')
       const fileName = buildProviderExportFileName(searchDto)
       const outputPath = join(outputDirectory, fileName)
+      const completedAt = Date.now()
+      const collectionMetadata: BulkCollectionMetadata = {
+        totalProvidersFound:
+          searchResponse.providers.length + searchResponse.metadata.estimatedRemainingProviders,
+        collectedProviders: searchResponse.providers.length,
+        estimatedRemainingProviders: searchResponse.metadata.estimatedRemainingProviders,
+        partitioned: searchResponse.metadata.partitioned,
+        partitionCount: searchResponse.metadata.partitionCount,
+        complete: searchResponse.metadata.complete,
+        overflowedPartitionCount: searchResponse.metadata.overflowedPartitionCount,
+        upstreamLimitUsed: searchResponse.metadata.upstreamLimitUsed,
+        startedAt: new Date(startedAt).toISOString(),
+        completedAt: new Date(completedAt).toISOString(),
+        durationMs: completedAt - startedAt,
+      }
 
       await mkdir(outputDirectory, { recursive: true })
       await writeFile(
@@ -41,7 +61,10 @@ export class BulkCollectionService {
         JSON.stringify(
           {
             jobId,
-            metadata: searchResponse.metadata,
+            metadata: {
+              ...searchResponse.metadata,
+              ...collectionMetadata,
+            },
             providers: searchResponse.providers,
           },
           null,

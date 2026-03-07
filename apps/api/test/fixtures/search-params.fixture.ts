@@ -36,6 +36,17 @@ export function createStateTaxonomySearchDto(
   }
 }
 
+export function createStateOnlySearchDto(
+  overrides: Partial<SearchProvidersDto> = {},
+): SearchProvidersDto {
+  return {
+    state: 'TX',
+    page: 1,
+    limit: 50,
+    ...overrides,
+  }
+}
+
 export function createBulkCollectionDto(
   overrides: Partial<BulkCollectionDto> = {},
 ): BulkCollectionDto {

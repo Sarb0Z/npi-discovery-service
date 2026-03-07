@@ -25,6 +25,7 @@ export const SEARCH_LIMITS = {
   minBatchSize: 50,
   maxBatchSize: 200,
   maxSkip: 1000,
+  maxRetrievableResults: 1200,
 } as const
 
 export const EXPORT_FILE_PREFIX = 'providers'

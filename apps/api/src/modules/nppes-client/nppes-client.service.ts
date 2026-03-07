@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios'
 import { HttpException, Injectable } from '@nestjs/common'
-import type { SearchProvidersDto, NppesRawResponse } from '@npi/contracts'
+import type { NppesRawResponse, SearchInputShape } from '@npi/contracts'
 import { buildNppesSearchParams } from '@npi/contracts'
 import axiosRetry, { exponentialDelay, isNetworkError } from 'axios-retry'
 import type { AxiosError } from 'axios'
@@ -24,7 +24,7 @@ export class NppesClientService {
     })
   }
 
-  async searchProviders(searchDto: SearchProvidersDto): Promise<NppesRawResponse> {
+  async searchProviders(searchDto: SearchInputShape): Promise<NppesRawResponse> {
     const params = buildNppesSearchParams(searchDto)
 
     try {

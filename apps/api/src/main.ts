@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { ApiExceptionFilter } from './common/filters/api-exception.filter'
 
-async function bootstrap() {
+export async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   app.enableCors()
@@ -32,4 +32,6 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000)
 }
 
-void bootstrap()
+if (require.main === module) {
+  void bootstrap()
+}

@@ -1,29 +1,29 @@
 import 'reflect-metadata'
 
+import { ValidationPipe } from '@nestjs/common'
+import { NestFactory } from '@nestjs/core'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { AppModule } from './app.module'
+import { ApiExceptionFilter } from './common/filters/api-exception.filter'
+import { bootstrap } from './main'
+
 describe('main bootstrap', () => {
-  const createDocumentMock = jest.fn()
-  const setupMock = jest.fn()
-  const decoratorFactoryMock = jest.fn(() => () => undefined)
-  const setTitleMock = jest.fn()
-  const setDescriptionMock = jest.fn()
-  const setVersionMock = jest.fn()
-  const buildMock = jest.fn()
-  const createMock = jest.fn()
+  const createDocumentMock = jest.spyOn(SwaggerModule, 'createDocument')
+  const setupMock = jest.spyOn(SwaggerModule, 'setup')
+  const setTitleMock = jest.spyOn(DocumentBuilder.prototype, 'setTitle')
+  const setDescriptionMock = jest.spyOn(DocumentBuilder.prototype, 'setDescription')
+  const setVersionMock = jest.spyOn(DocumentBuilder.prototype, 'setVersion')
+  const buildMock = jest.spyOn(DocumentBuilder.prototype, 'build')
+  const createMock = jest.spyOn(NestFactory, 'create')
 
   beforeEach(() => {
-    jest.resetModules()
     jest.clearAllMocks()
 
-    setTitleMock.mockReturnValue({
-      setDescription: setDescriptionMock,
-    })
-    setDescriptionMock.mockReturnValue({
-      setVersion: setVersionMock,
-    })
-    setVersionMock.mockReturnValue({
-      build: buildMock,
-    })
+    setTitleMock.mockReturnThis()
+    setDescriptionMock.mockReturnThis()
+    setVersionMock.mockReturnThis()
     buildMock.mockReturnValue({ openapi: '3.0.0' })
+    setupMock.mockImplementation(() => undefined)
   })
 
   it('bootstraps Nest with validation, filters, swagger, and listening port', async () => {
@@ -34,46 +34,21 @@ describe('main bootstrap', () => {
       useGlobalFilters: jest.fn(),
       listen: jest.fn().mockResolvedValue(undefined),
     }
-    createMock.mockResolvedValue(app)
+    createMock.mockResolvedValue(app as never)
     createDocumentMock.mockReturnValue({ paths: {} })
 
-    jest.doMock('@nestjs/core', () => ({
-      NestFactory: {
-        create: createMock,
-      },
-    }))
-    jest.doMock('@nestjs/swagger', () => ({
-      ApiAcceptedResponse: decoratorFactoryMock,
-      ApiBody: decoratorFactoryMock,
-      ApiOkResponse: decoratorFactoryMock,
-      ApiOperation: decoratorFactoryMock,
-      ApiPropertyOptional: decoratorFactoryMock,
-      ApiTags: decoratorFactoryMock,
-      DocumentBuilder: jest.fn().mockImplementation(() => ({
-        setTitle: setTitleMock,
-      })),
-      SwaggerModule: {
-        createDocument: createDocumentMock,
-        setup: setupMock,
-      },
-    }))
-    jest.doMock('./app.module', () => ({
-      AppModule: class AppModule {},
-    }))
-
-    jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-dynamic-require, global-require
-      require('./main')
-    })
-
-    await Promise.resolve()
-    await Promise.resolve()
+    await bootstrap()
 
     expect(createMock).toHaveBeenCalledTimes(1)
+    expect(createMock).toHaveBeenCalledWith(AppModule)
     expect(app.enableCors).toHaveBeenCalledTimes(1)
     expect(app.setGlobalPrefix).toHaveBeenCalledWith('api')
     expect(app.useGlobalPipes).toHaveBeenCalledTimes(1)
+    const [validationPipe] = app.useGlobalPipes.mock.calls[0] as [ValidationPipe]
+    expect(validationPipe).toBeInstanceOf(ValidationPipe)
     expect(app.useGlobalFilters).toHaveBeenCalledTimes(1)
+    const [exceptionFilter] = app.useGlobalFilters.mock.calls[0] as [ApiExceptionFilter]
+    expect(exceptionFilter).toBeInstanceOf(ApiExceptionFilter)
     expect(createDocumentMock).toHaveBeenCalledWith(app, { openapi: '3.0.0' })
     expect(setupMock).toHaveBeenCalledWith('api/docs', app, { paths: {} })
     expect(app.listen).toHaveBeenCalledWith(3000)

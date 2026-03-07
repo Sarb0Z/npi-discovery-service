@@ -36,6 +36,12 @@ describe('BulkCollectionService', () => {
           duration: 10,
           page: 1,
           limit: 50,
+          upstreamLimitUsed: 200,
+          partitioned: false,
+          partitionCount: 1,
+          complete: true,
+          overflowedPartitionCount: 0,
+          estimatedRemainingProviders: 0,
         },
       }),
     }
@@ -71,6 +77,10 @@ describe('BulkCollectionService', () => {
     await service.startCollection(createBulkCollectionDto({ taxonomyDescription: 'Dentist' }))
     await flushMicrotasks()
 
+    expect(providersService.search).toHaveBeenCalledWith(
+      expect.objectContaining({ taxonomyDescription: 'Dentist' }),
+      { upstreamLimit: 200 },
+    )
     expect(mkdir).toHaveBeenCalledWith(expect.any(String), { recursive: true })
     expect(writeFile).toHaveBeenCalledWith(
       expect.stringContaining('providers_75201_dentist_'),
@@ -96,6 +106,11 @@ describe('BulkCollectionService', () => {
     expect(writeFile).toHaveBeenCalledWith(
       expect.any(String),
       expect.stringContaining('"metadata": {'),
+      'utf8',
+    )
+    expect(writeFile).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.stringContaining('"upstreamLimitUsed": 200'),
       'utf8',
     )
   })

@@ -5,6 +5,7 @@ import request from 'supertest'
 import { createIndividualProvider } from '../../../test/fixtures/provider.fixture'
 import {
   createCityStateSearchDto,
+  createStateOnlySearchDto,
   createZipSearchDto,
 } from '../../../test/fixtures/search-params.fixture'
 import { ProvidersController } from './providers.controller'
@@ -60,6 +61,12 @@ describe('ProvidersController', () => {
         duration: 10,
         page: 1,
         limit: 50,
+        upstreamLimitUsed: 50,
+        partitioned: false,
+        partitionCount: 1,
+        complete: true,
+        overflowedPartitionCount: 0,
+        estimatedRemainingProviders: 0,
       },
     })
 
@@ -78,6 +85,12 @@ describe('ProvidersController', () => {
         duration: 0,
         page: 1,
         limit: 50,
+        upstreamLimitUsed: 50,
+        partitioned: false,
+        partitionCount: 1,
+        complete: true,
+        overflowedPartitionCount: 0,
+        estimatedRemainingProviders: 0,
       },
     })
 
@@ -98,6 +111,12 @@ describe('ProvidersController', () => {
         duration: 10,
         page: 1,
         limit: 50,
+        upstreamLimitUsed: 50,
+        partitioned: false,
+        partitionCount: 1,
+        complete: true,
+        overflowedPartitionCount: 0,
+        estimatedRemainingProviders: 0,
       },
     })
 
@@ -118,6 +137,12 @@ describe('ProvidersController', () => {
         duration: 10,
         page: 1,
         limit: 50,
+        upstreamLimitUsed: 50,
+        partitioned: false,
+        partitionCount: 1,
+        complete: true,
+        overflowedPartitionCount: 0,
+        estimatedRemainingProviders: 0,
       },
     })
 
@@ -138,6 +163,12 @@ describe('ProvidersController', () => {
         duration: 10,
         page: 1,
         limit: 50,
+        upstreamLimitUsed: 50,
+        partitioned: false,
+        partitionCount: 1,
+        complete: true,
+        overflowedPartitionCount: 0,
+        estimatedRemainingProviders: 0,
       },
     })
 
@@ -158,6 +189,32 @@ describe('ProvidersController', () => {
       .post('/providers/search')
       .send({ city: 'Austin', state: 'Texas', page: 1, limit: 50 })
       .expect(400)
+  })
+
+  it('accepts state-only requests when the service succeeds', async () => {
+    providersService.search.mockResolvedValue({
+      providers: [createIndividualProvider()],
+      metadata: {
+        totalCount: 1,
+        searchParams: { state: 'TX' },
+        timestamp: new Date().toISOString(),
+        duration: 10,
+        page: 1,
+        limit: 50,
+        upstreamLimitUsed: 200,
+        partitioned: true,
+        partitionCount: 4,
+        complete: true,
+        overflowedPartitionCount: 0,
+        estimatedRemainingProviders: 0,
+      },
+    })
+
+    await expect(controller.search(createStateOnlySearchDto())).resolves.toEqual(
+      expect.objectContaining({
+        metadata: expect.objectContaining({ partitioned: true }),
+      }),
+    )
   })
 
   it('propagates upstream failures as 502 responses', async () => {

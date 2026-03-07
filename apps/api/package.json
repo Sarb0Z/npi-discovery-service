@@ -73,6 +73,9 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "moduleNameMapper": {
+      "^@npi/contracts$": "<rootDir>/../../packages/contracts/src/index.ts"
+    },
     "collectCoverageFrom": [
       "src/**/*.ts"
     ],
