@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Search, Sparkles } from 'lucide-react'
-import { startTransition, useDeferredValue, useMemo } from 'react'
+import { startTransition, useDeferredValue, useEffect, useMemo } from 'react'
 import { Controller, useForm, useWatch, type Resolver } from 'react-hook-form'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -37,6 +37,10 @@ interface SearchFormProps {
 }
 
 function getModeFromValues(values: Partial<SearchFormValues>): SearchMode {
+  if (values.npi) {
+    return 'npi'
+  }
+
   if (values.zipCode) {
     return 'zip'
   }
@@ -65,6 +69,7 @@ export function SearchForm({
   const form = useForm<BulkFormValues>({
     resolver,
     defaultValues: {
+      npi: defaultValues?.npi ?? '',
       zipCode: defaultValues?.zipCode ?? '',
       city: defaultValues?.city ?? '',
       state: defaultValues?.state ?? '',
@@ -90,22 +95,52 @@ export function SearchForm({
 
   const providerType = useWatch({ control: form.control, name: 'providerType' })
 
+  useEffect(() => {
+    if (!defaultValues) {
+      return
+    }
+
+    const nextMode = getModeFromValues(defaultValues)
+
+    setSearchMode(nextMode)
+    form.reset({
+      ...form.getValues(),
+      npi: defaultValues.npi ?? '',
+      zipCode: defaultValues.zipCode ?? '',
+      city: defaultValues.city ?? '',
+      state: defaultValues.state ?? '',
+      taxonomyCode: defaultValues.taxonomyCode ?? '',
+      taxonomyDescription: defaultValues.taxonomyDescription ?? '',
+      providerType: defaultValues.providerType,
+      batchSize: defaultValues.batchSize ?? form.getValues('batchSize') ?? 200,
+    })
+  }, [defaultValues, form, setSearchMode])
+
   const handleModeChange = (mode: string) => {
     const nextMode = mode as SearchMode
     setSearchMode(nextMode)
 
     if (nextMode === 'zip') {
+      form.setValue('npi', '')
       form.setValue('city', '')
       form.setValue('state', '')
     }
 
     if (nextMode === 'cityState') {
+      form.setValue('npi', '')
       form.setValue('zipCode', '')
     }
 
     if (nextMode === 'stateOnly') {
+      form.setValue('npi', '')
       form.setValue('zipCode', '')
       form.setValue('city', '')
+    }
+
+    if (nextMode === 'npi') {
+      form.setValue('zipCode', '')
+      form.setValue('city', '')
+      form.setValue('state', '')
     }
   }
 
@@ -127,6 +162,7 @@ export function SearchForm({
       <CardContent className="space-y-6">
         <Tabs onValueChange={handleModeChange} value={searchMode}>
           <TabsList>
+            <TabsTrigger value="npi">NPI</TabsTrigger>
             <TabsTrigger value="zip">ZIP Code</TabsTrigger>
             <TabsTrigger value="cityState">City + State</TabsTrigger>
             <TabsTrigger value="stateOnly">State Only</TabsTrigger>
@@ -140,6 +176,16 @@ export function SearchForm({
           }}
         >
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className={cn(searchMode === 'npi' ? 'block' : 'hidden')}>
+              <label className="mb-2 block text-sm font-medium text-[var(--ink-700)]" htmlFor="npi">
+                NPI
+              </label>
+              <Input id="npi" inputMode="numeric" maxLength={10} placeholder="1234567893" {...form.register('npi')} />
+              <p className="mt-2 text-xs text-[var(--danger-600)]">
+                {form.formState.errors.npi?.message}
+              </p>
+            </div>
+
             <div className={cn(searchMode === 'zip' ? 'block' : 'hidden')}>
               <label
                 className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
@@ -163,7 +209,7 @@ export function SearchForm({
               <Input id="city" placeholder="Austin" {...form.register('city')} />
             </div>
 
-            <div className={cn(searchMode !== 'zip' ? 'block' : 'hidden')}>
+            <div className={cn(searchMode !== 'zip' && searchMode !== 'npi' ? 'block' : 'hidden')}>
               <label className="mb-2 block text-sm font-medium text-[var(--ink-700)]">State</label>
               <Controller
                 control={form.control}
@@ -296,6 +342,7 @@ export function SearchForm({
                   onClick={() => {
                     const params = new URLSearchParams(search.query)
                     const nextValues: Partial<BulkFormValues> = {
+                      npi: params.get('npi') ?? '',
                       zipCode: params.get('zipCode') ?? '',
                       city: params.get('city') ?? '',
                       state: params.get('state') ?? '',

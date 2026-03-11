@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type SearchMode = 'zip' | 'cityState' | 'stateOnly'
+export type SearchMode = 'npi' | 'zip' | 'cityState' | 'stateOnly'
 export type ResultsViewMode = 'table' | 'card'
 export type SortField = 'name' | 'npi' | 'primarySpecialty' | 'city' | 'state'
 export type SortDirection = 'asc' | 'desc'

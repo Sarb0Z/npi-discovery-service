@@ -8,7 +8,9 @@
 - Broad non-ZIP searches are cached through Redis when `REDIS_URL` is configured, with an in-memory fallback for local runs that do not have Redis available.
 - Bulk collection progress is fanned out over Redis-backed pub/sub when available, so websocket subscribers can keep receiving status updates across multiple API instances.
 - Every API response now includes an `x-correlation-id` header, and the backend logs each request with that correlation ID for traceability.
+- The API and frontend now support exact NPI lookup with checksum validation.
 - The search experience accepts either a taxonomy description or a raw taxonomy code such as `1223G0001X`.
+- Search results include a Leaflet-based provider footprint map rendered from ZIP-code centroids so broad queries can be visualized without a separate geocoding service.
 
 ## Local Infrastructure
 

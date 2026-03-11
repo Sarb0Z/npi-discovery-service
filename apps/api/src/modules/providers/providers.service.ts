@@ -63,6 +63,7 @@ export class ProvidersService {
       metadata: {
         totalCount: providers.length,
         searchParams: {
+          npi: normalizedSearch.npi,
           zipCode: normalizedSearch.zipCode,
           city: normalizedSearch.city,
           state: normalizedSearch.state,
@@ -100,6 +101,7 @@ function buildSearchCacheKey(
   options: SearchExecutionOptions,
 ): string {
   return `providers:search:${JSON.stringify({
+    npi: searchDto.npi,
     zipCode: searchDto.zipCode,
     city: searchDto.city,
     state: searchDto.state,

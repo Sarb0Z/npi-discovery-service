@@ -47,7 +47,7 @@ graph TD
 | `API_URL` | No | `http://localhost:3000` | Internal API origin used by the frontend server rewrite |
 | `NEXT_PUBLIC_API_URL` | No | `http://localhost:3000` | Public browser-facing API origin |
 | `PROVIDERS_OUTPUT_DIR` | No | `apps/api/output` at runtime cwd | Output directory for bulk JSON exports |
-| `REDIS_URL` | No | `redis://redis:6379` | Redis endpoint reserved for cache and pub/sub integration |
+| `REDIS_URL` | No | `redis://redis:6379` | Redis endpoint used for broad-search cache and bulk-progress pub/sub, with in-memory fallback when unavailable |
 
 ### Install Dependencies
 
@@ -110,12 +110,13 @@ Required GitHub repository secrets:
 
 ### POST /api/providers/search
 
-Search for healthcare providers by ZIP code, city/state, or state-only, optionally filtered by taxonomy or provider type.
+Search for healthcare providers by exact NPI, ZIP code, city/state, or state-only, optionally filtered by taxonomy or provider type.
 
 **Request Body**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| `npi` | string | No | Exact 10-digit NPI lookup |
 | `zipCode` | string | No | 5-digit ZIP code |
 | `city` | string | No | City name |
 | `state` | string | No | 2-letter uppercase state code |
@@ -129,6 +130,7 @@ Search for healthcare providers by ZIP code, city/state, or state-only, optional
 
 ```json
 {
+  "npi": "1234567893",
   "zipCode": "75201",
   "taxonomyDescription": "Dentist",
   "providerType": 1,
@@ -161,6 +163,7 @@ Search for healthcare providers by ZIP code, city/state, or state-only, optional
   "metadata": {
     "totalCount": 1,
     "searchParams": {
+      "npi": "1234567893",
       "zipCode": "75201",
       "taxonomyDescription": "Dentist",
       "providerType": 1
@@ -216,6 +219,14 @@ Same as `POST /api/providers/search`.
   ],
   "topCities": [
     { "name": "Austin", "count": 7 }
+  ],
+  "taxonomyBreakdown": [
+    {
+      "code": "1223G0001X",
+      "description": "General Practice Dentistry",
+      "count": 5,
+      "percentage": 41.67
+    }
   ]
 }
 ```
@@ -277,6 +288,7 @@ Simple health-check endpoint.
 | `summary.organizationCount` | number | Count of type 2 providers |
 | `summary.multipleTaxonomiesCount` | number | Providers with more than one specialty |
 | `summary.uniqueCitiesCount` | number | Distinct non-empty city count |
+| `taxonomyBreakdown` | array | Sortable per-taxonomy distribution including code, description, count, and percentage |
 
 ### Error Response
 
@@ -307,3 +319,7 @@ The current implementation applies three protections against known NPPES search 
 3. For state-only searches, and for any branch whose `result_count` exceeds the maximum retrievable NPPES window, the collector recursively partitions the query with `postal_code` wildcard prefixes. Pure state-only searches are seeded with postal partitions immediately so the backend never sends an upstream request that violates the NPPES rule that `state` cannot be the only criterion besides enumeration type.
 
 If a leaf branch is still larger than the NPPES retrieval ceiling after the deepest supported postal refinement, the API returns partial results and surfaces that condition through `complete`, `overflowedPartitionCount`, and `estimatedRemainingProviders` instead of silently truncating the dataset.
+
+## Frontend Map
+
+The search UI now includes a Leaflet-based provider footprint map. Providers are plotted from ZIP-code centroids using a local ZIP dataset, which avoids per-request geocoding dependencies while still giving users a usable geographic distribution view for the current result set.

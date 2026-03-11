@@ -38,6 +38,7 @@ export interface NppesRawResponse {
 
 export interface NppesSearchParams {
   version: string
+  number?: string
   postal_code?: string
   city?: string
   state?: string

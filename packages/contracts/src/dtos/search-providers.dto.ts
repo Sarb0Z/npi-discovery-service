@@ -2,9 +2,18 @@ import { Type } from 'class-transformer'
 import { IsIn, IsInt, IsOptional, IsString, Matches, Max, Min } from 'class-validator'
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { ProviderType, SEARCH_LIMITS } from '../constants/provider.constants'
+import { IsNpi } from '../validators/npi.validator'
 import { IsValidSearchCriteria } from '../validators/search-criteria.validator'
 
 export class SearchProvidersDto {
+  @ApiPropertyOptional({
+    description: 'Exact 10-digit National Provider Identifier lookup.',
+    example: '1234567893',
+  })
+  @IsOptional()
+  @IsNpi()
+  npi?: string
+
   @ApiPropertyOptional({
     description: '5-digit ZIP code used to search providers by postal code.',
     example: '75201',

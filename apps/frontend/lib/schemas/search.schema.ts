@@ -1,7 +1,15 @@
+import { isValidNpi } from '@npi/contracts'
 import { z } from 'zod'
 
 export const searchSchema = z
   .object({
+    npi: z
+      .string()
+      .trim()
+      .regex(/^\d{10}$/, 'NPI must be a 10-digit string')
+      .refine((value) => value.length === 0 || isValidNpi(value), 'NPI checksum is invalid')
+      .optional()
+      .or(z.literal('')),
     zipCode: z
       .string()
       .trim()
@@ -30,15 +38,16 @@ export const searchSchema = z
     providerType: z.union([z.literal(1), z.literal(2)]).optional(),
   })
   .superRefine((value, context) => {
+    const hasNpi = Boolean(value.npi)
     const hasZipCode = Boolean(value.zipCode)
     const hasCity = Boolean(value.city)
     const hasState = Boolean(value.state)
 
-    if (!hasZipCode && !hasState) {
+    if (!hasNpi && !hasZipCode && !hasState) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Provide a ZIP code, or a state, or a city together with a state.',
-        path: ['zipCode'],
+        message: 'Provide an NPI, or a ZIP code, or a state, or a city together with a state.',
+        path: ['npi'],
       })
     }
 

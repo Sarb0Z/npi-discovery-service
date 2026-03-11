@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
 
 :root {
   --background: #f5f8fc;
@@ -131,4 +132,27 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.provider-map .leaflet-control-zoom a {
+  color: var(--ink-900);
+}
+
+.provider-map .leaflet-popup-content-wrapper,
+.provider-map .leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--ink-900);
+}
+
+.provider-map-popup {
+  min-width: 220px;
+}
+
+.provider-map-popup p,
+.provider-map-popup ul {
+  margin: 0.5rem 0 0;
+}
+
+.provider-map-popup ul {
+  padding-left: 1rem;
 }

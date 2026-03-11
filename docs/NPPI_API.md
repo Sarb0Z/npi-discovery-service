@@ -27,6 +27,7 @@ When your NestJS `NppesClientModule` (located at `apps/api/src/modules/nppes-cli
 
 **Upstream Query Parameters:**
 *   `version`: **Must** be `"2.1"` [1].
+*   `number`: The exact 10-digit NPI number for a direct provider lookup [1].
 *   `postal_code`: 5-digit or 9-digit zip code (wildcards allowed, e.g., "902*") [1].
 *   `city`: String (Allows special characters) [1].
 *   `state`: 2-letter uppercase code [1]. *(Must be paired with another parameter)* [1].
@@ -71,7 +72,7 @@ interface NppesRawResponse {
 
 ### Part 2: Your Internal API (Backend ↔ Frontend Contract)
 
-This is the API your NestJS backend (`apps/api/`) exposes to your Next.js frontend (`apps/web/`). These DTOs must reside in `packages/contracts` (published as `@npi/contracts`) to ensure strict, drift-free synergy between API and clients.
+This is the API your NestJS backend (`apps/api/`) exposes to your Next.js frontend (`apps/frontend/`). These DTOs must reside in `packages/contracts` (published as `@npi/contracts`) to ensure strict, drift-free synergy between API and clients.
 
 #### 1. Search Providers Endpoint
 *   **POST** `/api/providers/search`
@@ -83,6 +84,10 @@ import { IsOptional, IsString, Matches, IsIn, IsNumber, Min, Max } from 'class-v
 
 export class SearchProvidersDto {
   @IsOptional()
+  @Matches(/^\d{10}$/, { message: 'npi must be a 10-digit string' })
+  npi?: string;
+
+  @IsOptional()
   @Matches(/^[0-9]{5}$/, { message: 'zipCode must be a 5-digit string' })
   zipCode?: string;
 
@@ -93,6 +98,10 @@ export class SearchProvidersDto {
   @IsOptional()
   @Matches(/^[A-Z]{2}$/, { message: 'state must be a 2-letter uppercase code' })
   state?: string;
+
+  @IsOptional()
+  @Matches(/^[A-Z0-9]{10}$/, { message: 'taxonomyCode must be a 10-character alphanumeric code' })
+  taxonomyCode?: string;
 
   @IsOptional()
   @IsString()
@@ -136,6 +145,12 @@ export interface ProviderDto {
   name: string;                // Computed: "first_name last_name, credential" OR "organization_name"
   primarySpecialty: string;    // Plucked from taxonomies where primary=true
   specialties: string[];       // Array of all taxonomy desc strings
+  taxonomies: Array<{
+    code: string;
+    description: string;
+    primary: boolean;
+    state: string | null;
+  }>;
   address: {
     address1: string;
     address2: string | null;
@@ -165,6 +180,12 @@ export interface StatisticsResponseDto {
   providerTypeDistribution: Array<{ name: string; value: number }>; 
   topSpecialties: Array<{ description: string; count: number; percentage: number }>;
   topCities: Array<{ name: string; count: number }>;
+  taxonomyBreakdown: Array<{
+    code: string;
+    description: string;
+    count: number;
+    percentage: number;
+  }>;
 }
 ```
 

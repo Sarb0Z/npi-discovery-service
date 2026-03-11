@@ -175,7 +175,7 @@ export class ProviderSearchCollectorService {
   }
 
   private buildRootQueries(searchInput: InternalSearchQuery): InternalSearchQuery[] {
-    const baseQueries = searchInput.providerType
+    const baseQueries = searchInput.providerType || searchInput.npi
       ? [searchInput]
       : [
           {

@@ -7,6 +7,7 @@ import {
 } from 'class-validator'
 
 interface SearchCriteriaHost {
+  npi?: string
   zipCode?: string
   city?: string
   state?: string
@@ -16,11 +17,12 @@ interface SearchCriteriaHost {
 export class SearchCriteriaConstraint implements ValidatorConstraintInterface {
   validate(_: unknown, validationArguments: ValidationArguments): boolean {
     const object = validationArguments.object as SearchCriteriaHost
+    const hasNpi = typeof object.npi === 'string' && object.npi.trim().length > 0
     const hasZipCode = typeof object.zipCode === 'string' && object.zipCode.trim().length > 0
     const hasCity = typeof object.city === 'string' && object.city.trim().length > 0
     const hasState = typeof object.state === 'string' && object.state.trim().length > 0
 
-    if (!hasZipCode && !hasState) {
+    if (!hasNpi && !hasZipCode && !hasState) {
       return false
     }
 
@@ -32,7 +34,7 @@ export class SearchCriteriaConstraint implements ValidatorConstraintInterface {
   }
 
   defaultMessage(): string {
-    return 'Provide zipCode, or state, or city together with state.'
+    return 'Provide npi, or zipCode, or state, or city together with state.'
   }
 }
 

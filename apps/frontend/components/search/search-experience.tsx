@@ -6,6 +6,7 @@ import { useEffect, useMemo } from 'react'
 import { EmptyState } from '@/components/search/empty-state'
 import { ErrorState } from '@/components/search/error-state'
 import { ProviderCard } from '@/components/search/provider-card'
+import { ProviderMap } from '@/components/search/provider-map'
 import { ResultsHeader } from '@/components/search/results-header'
 import { ResultsTable } from '@/components/search/results-table'
 import { SearchForm } from '@/components/search/search-form'
@@ -19,6 +20,7 @@ function getInitialValues(searchParams: URLSearchParams): Partial<SearchFormValu
   const providerType = searchParams.get('providerType')
 
   return {
+    npi: searchParams.get('npi') ?? '',
     zipCode: searchParams.get('zipCode') ?? '',
     city: searchParams.get('city') ?? '',
     state: searchParams.get('state') ?? '',
@@ -30,6 +32,10 @@ function getInitialValues(searchParams: URLSearchParams): Partial<SearchFormValu
 }
 
 function buildLocationLabel(values: Partial<SearchFormValues>): string {
+  if (values.npi) {
+    return `NPI ${values.npi}`
+  }
+
   if (values.zipCode) {
     return `ZIP ${values.zipCode}`
   }
@@ -49,7 +55,7 @@ export function SearchExperience() {
   const initialValues = useMemo(() => getInitialValues(searchParams), [searchParams])
 
   useEffect(() => {
-    if (initialValues.zipCode || initialValues.state) {
+    if (initialValues.npi || initialValues.zipCode || initialValues.state) {
       mutate(initialValues)
     }
   }, [initialValues, mutate])
@@ -121,6 +127,7 @@ export function SearchExperience() {
           animate={{ opacity: 1, y: 0 }}
         >
           <ResultsHeader locationLabel={locationLabel} response={data} />
+          <ProviderMap providers={data.providers} />
           {viewMode === 'table' ? (
             <ResultsTable providers={data.providers} />
           ) : (

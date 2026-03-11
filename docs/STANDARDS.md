@@ -6,7 +6,7 @@
 ## 🏗️ 1. Architecture & Tech Stack
 **Pattern:** Contract-Driven Monorepo (Turborepo with Bun workspaces).
 *   **Backend (`apps/api/`):** Bun 1.0+, TypeScript 5+, NestJS (built-in DI, class-validator, Swagger, WebSockets).
-*   **Frontend (`apps/web/`):** Next.js 14+ (App Router), TypeScript 5+, TailwindCSS + CVA + Radix UI (shadcn-style), TanStack Query (server state), Zustand (client state), React Hook Form (forms), Recharts.
+*   **Frontend (`apps/frontend/`):** Next.js 14+ (App Router), TypeScript 5+, TailwindCSS + CVA + Radix UI (shadcn-style), TanStack Query (server state), Zustand (client state), React Hook Form (forms), Recharts.
 *   **Shared Contract (`packages/contracts/`):** `@npi/contracts` — central schema ownership. OpenAPI (Swagger) generation from NestJS DTOs → automatically typed hooks. No manual `fetch` writing on the frontend.
 *   **Package Manager:** Bun with Turbo workspaces.
 *   **Caching:** TanStack Query (client-side), Redis (server-side pub/sub, rate-limiting, cache).
@@ -20,7 +20,7 @@ npi-discovery-service/
 │   │   └── src/
 │   │       ├── modules/<feature>/  # Feature-bounded modules
 │   │       └── common/             # Decorators, guards, plugins, scheduler, pubsub
-│   └── web/                      # Next.js frontend
+│   └── frontend/                 # Next.js frontend
 │       └── src/
 │           ├── app/               # App Router route structure
 │           ├── components/
@@ -85,7 +85,7 @@ All modules live under `apps/api/src/modules/<feature>/`. Shared infrastructure 
 
 ---
 
-## 🖥️ 4. FRONTEND EXECUTION PLAN (Next.js — `apps/web/`)
+## 🖥️ 4. FRONTEND EXECUTION PLAN (Next.js — `apps/frontend/`)
 
 ### Data Access (Strict Rule):
 *   Generate the API client using the Backend's Swagger JSON.
@@ -117,7 +117,7 @@ All modules live under `apps/api/src/modules/<feature>/`. Shared infrastructure 
     *   "Download CSV" button (Bonus).
     *   Live progress bar listening to WebSockets (Redis pub/sub backed) for Bulk Collection.
     *   Mapbox/Leaflet provider location map (Bonus).
-*   **Agent File:** Maintain `apps/web/CLAUDE.md` with component/routing conventions.
+*   **Agent File:** Maintain `apps/frontend/CLAUDE.md` with component/routing conventions.
 
 ---
 
@@ -192,7 +192,7 @@ Generate the required `package.json` scripts EXACTLY as requested:
 Maintain `CLAUDE.md` files at:
 *   Root (`./CLAUDE.md`) — global repo conventions
 *   `apps/api/CLAUDE.md` — backend module patterns, NestJS specifics
-*   `apps/web/CLAUDE.md` — Next.js routing, component conventions
+*   `apps/frontend/CLAUDE.md` — Next.js routing, component conventions
 *   `packages/contracts/CLAUDE.md` — schema/DTO ownership rules
 
 Additional agent metadata in `.claude/` and `.agent/` directories at root.

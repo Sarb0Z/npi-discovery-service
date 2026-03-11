@@ -14,10 +14,23 @@ interface ResultsHeaderProps {
 export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
   const viewMode = useSearchStore((state) => state.viewMode)
   const setViewMode = useSearchStore((state) => state.setViewMode)
+  const analyticsQuery = new URLSearchParams(
+    Object.entries(response.metadata.searchParams).flatMap(([key, value]) => {
+      if (value === undefined || value === null || value === '') {
+        return []
+      }
+
+      return [[key, String(value)]]
+    }),
+  ).toString()
 
   const exportBaseName = buildExportFileName(
     locationLabel,
-    String(response.metadata.searchParams.taxonomyDescription ?? ''),
+    String(
+      response.metadata.searchParams.taxonomyDescription ??
+        response.metadata.searchParams.taxonomyCode ??
+        '',
+    ),
   )
 
   return (
@@ -70,9 +83,7 @@ export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
           CSV
         </Button>
         <Button asChild variant="outline">
-          <Link
-            href={`/statistics?${new URLSearchParams(response.metadata.searchParams as Record<string, string>).toString()}`}
-          >
+          <Link href={`/statistics?${analyticsQuery}`}>
             View analytics
           </Link>
         </Button>

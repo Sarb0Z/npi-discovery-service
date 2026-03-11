@@ -9,6 +9,7 @@ import type { SearchProvidersDto } from '../dtos/search-providers.dto'
 import { toNppesEnumerationType } from './provider-type'
 
 export interface SearchInputShape {
+  npi?: string
   zipCode?: string
   city?: string
   state?: string
@@ -87,6 +88,7 @@ export function buildNppesSearchParams(input: SearchInputShape): NppesSearchPara
 
   return {
     version: NPPES_API_VERSION,
+    number: normalizedInput.npi,
     postal_code: normalizedInput.zipCode,
     city: normalizedInput.city,
     state: normalizedInput.state,
@@ -103,6 +105,10 @@ export function buildLocationLabel(input: SearchInputShape): string {
 
   if (normalizedInput.zipCode) {
     return normalizedInput.zipCode
+  }
+
+  if (normalizedInput.npi) {
+    return `npi_${normalizedInput.npi}`
   }
 
   if (normalizedInput.city && normalizedInput.state) {

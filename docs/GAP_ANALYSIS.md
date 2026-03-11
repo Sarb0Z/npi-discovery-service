@@ -32,13 +32,15 @@
 | Frontend Test Coverage | ❌ 24.5% (target ≥70%) | Only 2 test files, 4 tests |
 | Contracts Test Coverage | ✅ 83.22% | 10 tests pass |
 | E2E Tests | ✅ 5/5 Pass | `supertest` integration tests |
-| WebSocket Gateway | ❌ Missing | Spec requires for bulk progress |
-| Redis Integration | ❌ Missing | No caching/pub-sub/rate-limiting |
-| Expandable Table Rows | ❌ Missing | Spec requires detail expansion |
-| Pagination Size Selector | ❌ Missing | Hardcoded to 10 |
-| Taxonomy Breakdown Table | ❌ Missing | Stats page lacks sortable taxonomy table |
-| Taxonomy Code Direct Input | ❌ Missing | Only autocomplete, no raw code entry |
-| CLAUDE.md Agent Files | ❌ Missing | None of the 4 required files exist |
+| WebSocket Gateway | ✅ Implemented | `bulk-collection.gateway.ts` publishes live job progress over Socket.IO |
+| Redis Integration | ✅ Implemented | `RedisService` backs broad-search caching and websocket pub/sub with in-memory fallback |
+| Expandable Table Rows | ✅ Implemented | Results table includes inline detail expansion with taxonomy and contact info |
+| Pagination Size Selector | ✅ Implemented | Results table offers 10 / 25 / 50 rows per page |
+| Taxonomy Breakdown Table | ✅ Implemented | Statistics dashboard includes sortable taxonomy breakdown table |
+| Taxonomy Code Direct Input | ✅ Implemented | Search form includes raw `taxonomyCode` input alongside description search |
+| CLAUDE.md Agent Files | ✅ Implemented | Root, API, frontend, and contracts guides are present |
+| Exact NPI Lookup | ✅ Implemented | Public search contract accepts `npi` with checksum validation |
+| Leaflet Provider Map | ✅ Implemented | Search results render a ZIP-centroid provider footprint map |
 | Playwright E2E | ❌ Missing | No Playwright config or tests |
 
 ---
@@ -78,70 +80,41 @@ But `main.ts` calls `app.listen(port, host)` which resolves to `app.listen(3000,
 
 **Fix:** Update the assertion to `expect(app.listen).toHaveBeenCalledWith(3000, '0.0.0.0')`.
 
-### 1.3 WebSocket Gateway for Bulk Progress
+### 1.3 Implemented Backend Runtime Features
 
-**Spec Reference:** STANDARDS.md §3 (BulkCollectionModule)
+The following items previously marked missing are already present in the codebase:
 
-> "Implement a WebSocketGateway to emit `{ total, collected, remaining }` events to the frontend."
-
-The current `BulkCollectionService` runs fire-and-forget async with UUID job tracking, but has no WebSocket Gateway. The frontend's `bulk-status.tsx` shows a static animated progress bar, not live WebSocket-driven updates.
-
-**Test Reference:** TEST_STRATEGY.md §2.3 (Bulk Collection Tests)
-
-> "should emit WebSocket progress events — `gateway.emit()` called with `{ total, collected, remaining }`"
-
-### 1.4 Redis Integration
-
-**Spec Reference:** STANDARDS.md §1
-
-> "Caching: TanStack Query (client-side), Redis (server-side pub/sub, rate-limiting, cache)"
-
-Redis is listed in `docker-compose.dev.yml` and the `.env.example` has `REDIS_URL`, but no application code references Redis. The backend does not use:
-- `cache-manager` with Redis store
-- Redis pub/sub for WebSocket events
-- Redis-backed rate limiting
+- Bulk job progress is handled by `BulkCollectionGateway`, which publishes Socket.IO events and bridges them through Redis pub/sub when Redis is available.
+- Redis is wired through `RedisService`, which provides JSON caching for broad searches and pub/sub transport for bulk progress updates, with an in-memory fallback for local runs without Redis.
+- API throttling is enabled through `@nestjs/throttler` in `AppModule`.
+- Request correlation IDs are attached and logged by `CorrelationIdMiddleware`.
 
 ---
 
 ## 2. Significant Gaps (High Priority)
 
-### 2.1 Missing Agent Instruction Files (CLAUDE.md)
+### 2.1 Agent Instruction Files
 
 **Spec Reference:** STANDARDS.md §7
 
 Required files:
 | File | Status |
 |------|--------|
-| `./CLAUDE.md` (root) | ❌ Missing |
-| `apps/api/CLAUDE.md` | ❌ Missing |
-| `apps/web/CLAUDE.md` | ❌ Missing |
-| `packages/contracts/CLAUDE.md` | ❌ Missing |
+| `./CLAUDE.md` (root) | ✅ Present |
+| `apps/api/CLAUDE.md` | ✅ Present |
+| `apps/frontend/CLAUDE.md` | ✅ Present |
+| `packages/contracts/CLAUDE.md` | ✅ Present |
 
-The spec also mentions `.claude/` and `.agent/` directories at root — neither exists. Note: `.github/copilot-instructions.md` exists as a VS Code Copilot context file but does not fulfill the CLAUDE.md requirement.
+The spec text still references `apps/web/CLAUDE.md`, but the actual frontend workspace path in this repository is `apps/frontend/CLAUDE.md`.
 
-### 2.2 Expandable Table Rows
+### 2.2 Search And Analytics UI
 
-**Spec Reference:** TEST_STRATEGY.md §3.3 (ResultsTable tests)
+The following UI items previously marked missing are already implemented:
 
-> "expands row to show full details — Click row → expanded panel"
-
-The current `results-table.tsx` renders flat rows with no expand/collapse mechanism. No detail panel is shown when clicking a row.
-
-### 2.3 Pagination Size Selector (10/25/50)
-
-**Spec Reference:** TEST_STRATEGY.md §3.3
-
-> "paginates correctly (10/25/50 per page) — Page controls change visible rows"
-
-The current `results-table.tsx` hardcodes `const pageSize = 10` with no user-selectable page-size control.
-
-### 2.4 Taxonomy Breakdown Table (Statistics)
-
-**Spec Reference:** TEST_STRATEGY.md §3.3 (StatsDashboard tests)
-
-> "taxonomy table is sortable by count — Click header → sorted"
-
-The statistics dashboard has 5 summary cards + 3 charts (donut, cities bar, specialties bar) but no sortable taxonomy breakdown table.
+- `results-table.tsx` supports inline row expansion for address, phone, and taxonomy details.
+- `results-table.tsx` exposes a rows-per-page selector with 10 / 25 / 50 options.
+- `taxonomy-breakdown-table.tsx` renders a sortable taxonomy table inside the statistics dashboard.
+- `search-form.tsx` includes both raw taxonomy code input and taxonomy description input.
 
 ### 2.5 Playwright E2E Tests
 
@@ -151,7 +124,7 @@ No `playwright.config.ts` or `tests/e2e/` directory exists. The spec defines 10 
 
 ### 2.6 Taxonomy Code Direct Input
 
-**Spec Reference:** Not explicitly in STANDARDS.md but implied by the search modes. The search form supports debounced autocomplete for taxonomy selection but does not allow entering a raw taxonomy code (e.g., `207Q00000X`) directly.
+Resolved in the product UI. `search-form.tsx` includes a dedicated `taxonomyCode` field, so this is no longer a product gap.
 
 ---
 
@@ -163,7 +136,7 @@ No `playwright.config.ts` or `tests/e2e/` directory exists. The spec defines 10 
 
 > "Use `@nestjs/throttler` to protect the backend endpoints."
 
-Not implemented. The external NPPES rate-limiting is handled via `axios-retry`, but there's no throttling on the service's own endpoints.
+Implemented in `AppModule` via `ThrottlerModule` and `APP_GUARD` with `ThrottlerGuard`.
 
 ### 3.2 Luhn NPI Checksum Validator
 
@@ -171,7 +144,7 @@ Not implemented. The external NPPES rate-limiting is handled via `axios-retry`, 
 
 > "Implement a strict NPI checksum validator utility for incoming requests."
 
-Not implemented. NPI numbers in search params are accepted without Luhn checksum validation.
+Implemented. The shared contracts package includes `isValidNpi` and `@IsNpi()`, and `SearchProvidersDto` now exposes an `npi` field for exact provider lookup.
 
 ### 3.3 `x-correlation-id` Request Logging
 
@@ -179,7 +152,7 @@ Not implemented. NPI numbers in search params are accepted without Luhn checksum
 
 > "Implement middleware to attach and log a `x-correlation-id` for every request."
 
-No correlation-ID middleware exists.
+Implemented by `CorrelationIdMiddleware`, which propagates or generates `x-correlation-id` and logs it with each completed request.
 
 ### 3.4 Redis Cache (Bonus)
 
@@ -187,7 +160,7 @@ No correlation-ID middleware exists.
 
 > "Use Redis via `cache-manager` to cache taxonomy descriptions and state-wide searches."
 
-Redis is provisioned in Docker but not used in the application layer.
+Implemented through the custom `RedisService` rather than Nest `cache-manager`. Broad state searches are cached, and bulk progress events use Redis pub/sub when available.
 
 ### 3.5 Mapbox/Leaflet Provider Map (Bonus)
 
@@ -195,7 +168,7 @@ Redis is provisioned in Docker but not used in the application layer.
 
 > "Mapbox/Leaflet provider location map (Bonus)."
 
-Not implemented.
+Implemented. The search experience now renders a Leaflet map that plots result-set density by ZIP centroid.
 
 ### 3.6 Frontend Directory Naming
 
@@ -211,7 +184,7 @@ The Zustand store has `recentSearches` state with `addRecentSearch` logic, the h
 
 **Spec Reference:** STANDARDS.md §3
 
-The spec lists decorators, guards, plugins, scheduler, and pubsub under `common/`. Currently only `errors/` and `filters/` exist. The project doesn't use auth guards, custom decorators, cron scheduling, or Redis pub/sub.
+The spec lists decorators, guards, plugins, scheduler, and pubsub under `common/`. The repository does now use additional shared infrastructure, including `common/http/correlation-id.middleware.ts` and `common/redis/redis.service.ts`. Custom decorators, auth guards, and cron scheduling remain out of scope for the current feature set.
 
 ---
 
@@ -279,31 +252,13 @@ The spec lists decorators, guards, plugins, scheduler, and pubsub under `common/
 
 ### P1 — Should Fix (Spec-required features)
 
-3. **Implement WebSocket Gateway** — Add a `BulkCollectionGateway` using `@nestjs/websockets` that emits progress events (`{ total, collected, remaining }`) during bulk collection jobs.
-
-4. **Add expandable table rows** — Modify `results-table.tsx` to support click-to-expand for full provider details (all taxonomies, full address, phone).
-
-5. **Add pagination size selector** — Replace the hardcoded `pageSize = 10` with a `<Select>` component offering 10/25/50 options.
-
-6. **Add taxonomy breakdown table** — Create a `taxonomy-table.tsx` component for the statistics dashboard showing taxonomy description, code, count, and percentage with sortable columns.
-
-7. **Create CLAUDE.md files** — Generate the 4 required agent instruction files at root, `apps/api/`, `apps/frontend/`, and `packages/contracts/`.
+3. **Update stale documentation references** — Replace `apps/web` references with `apps/frontend` where the spec is documenting this repository layout.
 
 ### P2 — Nice to Have (Bonus features)
 
 8. **Add Playwright E2E tests** — Set up `playwright.config.ts` and implement the 10 specified E2E test cases.
 
-9. **Integrate Redis** — Connect `cache-manager` with Redis store for caching taxonomy descriptions and broad search results. Wire it to the `BulkCollectionGateway` via pub/sub.
-
-10. **Add `@nestjs/throttler`** — Protect public endpoints from abuse.
-
-11. **Implement Luhn NPI validator** — Custom `class-validator` decorator that validates NPI checksum.
-
-12. **Add `x-correlation-id` middleware** — Generate/propagate correlation IDs for request tracing.
-
-13. **Add taxonomy code direct input** — Allow users to enter a taxonomy code string directly alongside the autocomplete.
-
-14. **Increase contracts coverage** — Add tests for `provider-type.ts` utility functions to reach higher coverage.
+9. **Increase contracts coverage** — Add tests for `provider-type.ts` utility functions to reach higher coverage.
 
 ---
 
@@ -313,33 +268,34 @@ The spec lists decorators, guards, plugins, scheduler, and pubsub under `common/
 |-----------------|---------|-------------|-----|
 | NppesClientModule with axios-retry | §3 | ✅ | — |
 | ProvidersModule with search/filter | §3 | ✅ | — |
-| BulkCollectionModule with partitioning | §3 | ✅ | Missing WebSocket |
-| StatisticsModule | §3 | ✅ | Missing taxonomy table |
+| BulkCollectionModule with partitioning | §3 | ✅ | — |
+| StatisticsModule | §3 | ✅ | — |
 | Deep pagination mitigation | §2.1 | ✅ | — |
 | Messy data mapping | §2.2 | ✅ | — |
 | Rate limiting backoff | §2.3 | ✅ | — |
-| WebSocketGateway for bulk | §3 | ❌ | Not implemented |
-| Redis server-side | §1 | ❌ | Provisioned but unused |
-| Luhn NPI validator | §3 Bonus | ❌ | Not implemented |
-| Redis cache-manager | §3 Bonus | ❌ | Not implemented |
-| @nestjs/throttler | §3 Bonus | ❌ | Not implemented |
-| x-correlation-id | §3 Bonus | ❌ | Not implemented |
-| CLAUDE.md files | §7 | ❌ | None exist |
+| WebSocketGateway for bulk | §3 | ✅ | Implemented via `bulk-collection.gateway.ts` |
+| Redis server-side | §1 | ✅ | Broad-search cache plus bulk progress pub/sub |
+| Luhn NPI validator | §3 Bonus | ✅ | Wired into `SearchProvidersDto.npi` |
+| Redis cache-manager | §3 Bonus | ⚠️ Alternative implementation | Custom `RedisService` is used instead of Nest `cache-manager` |
+| @nestjs/throttler | §3 Bonus | ✅ | Configured in `AppModule` |
+| x-correlation-id | §3 Bonus | ✅ | Implemented by middleware |
+| CLAUDE.md files | §7 | ✅ | Present at root, API, frontend, and contracts |
 | Search tabs (ZIP/City/State) | §4.1 | ✅ | — |
-| Taxonomy autocomplete | §4.1 | ✅ | No raw code input |
+| Taxonomy autocomplete | §4.1 | ✅ | Raw taxonomy code input is also implemented |
+| Exact NPI search | §4.1 extension | ✅ | Implemented via dedicated `npi` field and UI mode |
 | Recent searches (localStorage) | §4.1 Bonus | ✅ | Implemented in store + form |
 | Skeleton/Empty/Error states | §4.2 | ✅ | — |
 | Table/Card view toggle | §4.2 | ✅ | — |
 | Sortable table columns | §4.2 | ✅ | — |
-| Expandable table rows | §4.2 | ❌ | Not implemented |
-| Pagination 10/25/50 | TEST_STRATEGY §3.3 | ❌ | Hardcoded 10 |
+| Expandable table rows | §4.2 | ✅ | Implemented in results table |
+| Pagination 10/25/50 | TEST_STRATEGY §3.3 | ✅ | Rows-per-page selector implemented |
 | Individual vs Org badges | §4.2 | ✅ | — |
 | Recharts donut + bar charts | §4.3 | ✅ | — |
-| Taxonomy table sortable | TEST_STRATEGY §3.3 | ❌ | Not implemented |
+| Taxonomy table sortable | TEST_STRATEGY §3.3 | ✅ | Implemented in statistics dashboard |
 | JSON download | §4.4 | ✅ | — |
 | CSV download | §4.4 Bonus | ✅ | — |
-| Live WebSocket progress bar | §4.4 | ❌ | Static bar only |
-| Mapbox/Leaflet map | §4.4 Bonus | ❌ | Not implemented |
+| Live WebSocket progress bar | §4.4 | ✅ | Bulk status subscribes to Socket.IO progress events |
+| Mapbox/Leaflet map | §4.4 Bonus | ✅ | Leaflet provider footprint map is rendered in search results |
 | Backend ≥85% coverage | §6 | ✅ 97.49% | 1 failing test |
 | Frontend ≥70% coverage | §6 | ❌ 24.5% | 45.5% gap |
 | Playwright E2E | §6 Bonus | ❌ | Not implemented |

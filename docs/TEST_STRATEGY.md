@@ -13,7 +13,7 @@ graph TD
         A1[Unit Tests - Jest] --> A2[Module Tests]
         A2 --> A3[Integration Tests]
     end
-    subgraph "apps/web/ (Next.js)"
+    subgraph "apps/frontend/ (Next.js)"
         W1[Component Tests - RTL] --> W2[Hook Tests]
         W2 --> W3[Page Tests]
     end
@@ -35,7 +35,7 @@ graph TD
 | Layer | Runner | Mocking | Coverage |
 |-------|--------|---------|----------|
 | `apps/api/` | Jest (NestJS preset) | `@nestjs/testing`, manual mocks | `jest --coverage` |
-| `apps/web/` | Jest (next/jest) | MSW (Mock Service Worker) | `jest --coverage` |
+| `apps/frontend/` | Jest (next/jest) | MSW (Mock Service Worker) | `jest --coverage` |
 | `packages/contracts/` | Jest | None (pure type/schema validation) | `jest --coverage` |
 | E2E | Playwright | MSW (network layer) or Playwright route mocking | Playwright built-in |
 
@@ -245,12 +245,12 @@ describe('ProvidersController (e2e)', () => {
 
 ---
 
-## 3. Frontend Test Strategy (`apps/web/`)
+## 3. Frontend Test Strategy (`apps/frontend/`)
 
 ### 3.1 Test File Organization
 
 ```
-apps/web/
+apps/frontend/
 ├── src/
 │   ├── components/
 │   │   ├── providers/
@@ -550,7 +550,7 @@ export default {
 }
 ```
 
-### Frontend (`apps/web/jest.config.ts`)
+### Frontend (`apps/frontend/jest.config.ts`)
 
 ```typescript
 import nextJest from 'next/jest'

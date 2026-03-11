@@ -15,6 +15,10 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": {
+      "@npi/contracts": ["../../packages/contracts/src/index.ts"],
+      "@npi/contracts/*": ["../../packages/contracts/src/*"]
+    },
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true
   }

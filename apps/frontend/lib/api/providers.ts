@@ -30,6 +30,7 @@ function normalizeSearchPayload(
   values: SearchFormValues,
 ): Record<string, number | string | undefined> {
   return {
+    npi: normalizeValue(values.npi),
     zipCode: normalizeValue(values.zipCode),
     city: normalizeValue(values.city),
     state: normalizeValue(values.state),

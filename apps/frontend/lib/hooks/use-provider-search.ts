@@ -9,6 +9,10 @@ import type { BulkFormValues, SearchFormValues } from '@/lib/schemas/search.sche
 import { useSearchStore } from '@/lib/stores/search-store'
 
 function formatSearchLabel(values: SearchFormValues): string {
+  if (values.npi) {
+    return `NPI ${values.npi}`
+  }
+
   if (values.zipCode) {
     return `ZIP ${values.zipCode}`
   }
@@ -31,6 +35,7 @@ export function useProviderSearch() {
         label: formatSearchLabel(variables),
         query: new URLSearchParams(
           Object.entries({
+            npi: variables.npi,
             zipCode: variables.zipCode,
             city: variables.city,
             state: variables.state,
