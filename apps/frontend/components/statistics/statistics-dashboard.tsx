@@ -52,7 +52,9 @@ export function StatisticsDashboard() {
   }
 
   if (error) {
-    return <ErrorState error={error as never} onRetry={() => void refetch()} />
+    return (
+      <ErrorState error={error.payload} onRetry={() => void refetch()} />
+    )
   }
 
   if (!data) {

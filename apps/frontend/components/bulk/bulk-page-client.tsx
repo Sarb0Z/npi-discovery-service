@@ -17,13 +17,13 @@ export function BulkPageClient() {
   }
 
   return (
-    <div className="space-y-8">
-      <section className="max-w-3xl space-y-4">
-        <span className="inline-flex rounded-full bg-[var(--warning-soft)] px-3 py-1 text-sm font-medium text-[var(--warning-700)]">
+    <div className="space-y-8 animate-page-enter">
+      <section className="glass-panel max-w-4xl space-y-5 rounded-[32px] p-8 sm:p-10">
+        <span className="inline-flex rounded-full bg-[var(--warning-soft)] px-4 py-2 text-sm font-medium text-[var(--warning-700)]">
           Bulk collection writes files asynchronously on the API host
         </span>
-        <h1 className="text-5xl font-semibold tracking-tight text-[var(--ink-900)]">
-          Capture provider datasets for downstream analysis.
+        <h1 className="text-display-lg text-[var(--ink-900)]">
+          Capture provider datasets for <span className="text-gradient-brand">downstream analysis at scale.</span>
         </h1>
         <p className="text-lg leading-8 text-[var(--ink-600)]">
           Use the same discovery filters, then hand the backend a large collection job optimized for
@@ -31,7 +31,7 @@ export function BulkPageClient() {
         </p>
       </section>
 
-      <Card className="border-[var(--warning-soft)] bg-[linear-gradient(135deg,rgba(245,158,11,0.12),rgba(255,255,255,0.82))]">
+      <Card className="border-[hsl(var(--warning)/0.2)] bg-[linear-gradient(135deg,hsl(var(--warning)/0.16),hsl(var(--card)/0.9))]">
         <CardContent className="py-5 text-sm leading-7 text-[var(--ink-700)]">
           Large state-wide collections can take several minutes and may return partial coverage when
           the upstream registry still exceeds its retrievable ceiling on fully refined branches.

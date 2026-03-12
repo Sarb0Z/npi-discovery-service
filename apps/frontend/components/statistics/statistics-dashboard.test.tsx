@@ -1,6 +1,7 @@
 import { ApiErrorCode, type StatisticsResponseDto } from '@npi/contracts'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { StatisticsDashboard } from '@/components/statistics/statistics-dashboard'
+import { FrontendApiError } from '@/lib/api/providers'
 import type { useStatistics as useStatisticsHook } from '@/lib/hooks/use-provider-search'
 
 const mockUseSearchParams = jest.fn<URLSearchParams, []>()
@@ -13,15 +14,11 @@ jest.mock('next/navigation', () => ({
 
 jest.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  PieChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="pie-chart">{children}</div>
-  ),
-  Pie: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PieChart: () => <div data-testid="pie-chart" />,
+  Pie: () => <div />,
   Cell: () => <div />,
   Tooltip: () => <div data-testid="chart-tooltip" />,
-  BarChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="bar-chart">{children}</div>
-  ),
+  BarChart: () => <div data-testid="bar-chart" />,
   Bar: () => <div />,
   CartesianGrid: () => <div />,
   XAxis: () => <div />,
@@ -60,6 +57,44 @@ function buildStatistics(): StatisticsResponseDto {
   }
 }
 
+function buildStatisticsResult(
+  overrides: Partial<ReturnType<typeof useStatisticsHook>>,
+): ReturnType<typeof useStatisticsHook> {
+  return {
+    data: undefined,
+    dataUpdatedAt: 0,
+    error: null,
+    errorUpdateCount: 0,
+    errorUpdatedAt: 0,
+    failureCount: 0,
+    failureReason: null,
+    fetchStatus: 'idle',
+    isError: false,
+    isFetched: true,
+    isFetchedAfterMount: true,
+    isFetching: false,
+    isInitialLoading: false,
+    isLoading: false,
+    isLoadingError: false,
+    isPaused: false,
+    isPending: false,
+    isPlaceholderData: false,
+    isRefetchError: false,
+    isRefetching: false,
+    isStale: false,
+    isSuccess: false,
+    refetch: mockRefetch,
+    remove: jest.fn(),
+    status: 'pending',
+    fetchNextPage: undefined,
+    fetchPreviousPage: undefined,
+    hasNextPage: undefined,
+    hasPreviousPage: undefined,
+    promise: Promise.resolve(undefined),
+    ...overrides,
+  } as unknown as ReturnType<typeof useStatisticsHook>
+}
+
 describe('StatisticsDashboard', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -68,12 +103,7 @@ describe('StatisticsDashboard', () => {
 
   it('shows guidance when there is no active search', () => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams())
-    mockUseStatistics.mockReturnValue({
-      data: undefined,
-      error: null,
-      isLoading: false,
-      refetch: mockRefetch,
-    })
+    mockUseStatistics.mockReturnValue(buildStatisticsResult({ status: 'pending' }))
 
     render(<StatisticsDashboard />)
 
@@ -86,26 +116,25 @@ describe('StatisticsDashboard', () => {
 
   it('renders loading and error states for statistics requests', () => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams('state=TX'))
-    mockUseStatistics.mockReturnValueOnce({
-      data: undefined,
-      error: null,
-      isLoading: true,
-      refetch: mockRefetch,
-    })
+    mockUseStatistics.mockReturnValueOnce(
+      buildStatisticsResult({ isLoading: true, isPending: true, isFetching: true, status: 'pending' }),
+    )
 
-    const { container, rerender } = render(<StatisticsDashboard />)
-    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
+    const { rerender } = render(<StatisticsDashboard />)
+    expect(screen.getByTestId('search-skeleton')).toBeInTheDocument()
 
-    mockUseStatistics.mockReturnValue({
-      data: undefined,
-      error: {
-        code: ApiErrorCode.NppesUnavailable,
-        message: 'Downstream failure',
-        timestamp: '2026-03-07T00:00:00.000Z',
-      },
-      isLoading: false,
-      refetch: mockRefetch,
-    })
+    mockUseStatistics.mockReturnValue(
+      buildStatisticsResult({
+        error: new FrontendApiError({
+          code: ApiErrorCode.NppesUnavailable,
+          message: 'Downstream failure',
+          timestamp: '2026-03-07T00:00:00.000Z',
+        }),
+        isError: true,
+        isLoading: false,
+        status: 'error',
+      }),
+    )
 
     rerender(<StatisticsDashboard />)
 
@@ -121,12 +150,13 @@ describe('StatisticsDashboard', () => {
 
   it('renders summary cards and charts when statistics load successfully', () => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams('state=TX&providerType=1'))
-    mockUseStatistics.mockReturnValue({
-      data: buildStatistics(),
-      error: null,
-      isLoading: false,
-      refetch: mockRefetch,
-    })
+    mockUseStatistics.mockReturnValue(
+      buildStatisticsResult({
+        data: buildStatistics(),
+        isSuccess: true,
+        status: 'success',
+      }),
+    )
 
     render(<StatisticsDashboard />)
 

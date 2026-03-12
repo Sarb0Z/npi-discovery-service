@@ -77,20 +77,20 @@ export function BulkStatus({ job }: BulkStatusProps) {
       <CardContent className="space-y-4">
         <div className="flex flex-wrap items-center gap-3">
           <Badge variant={badgeVariant}>{liveJob.status}</Badge>
-          <code className="rounded-full bg-[var(--surface-200)] px-3 py-1 text-sm text-[var(--ink-700)]">
+          <code className="rounded-full bg-[hsl(var(--surface-hover))] px-3 py-1 text-sm text-[var(--ink-700)] ring-1 ring-[hsl(var(--border)/0.8)]">
             {liveJob.jobId}
           </code>
         </div>
-        <div className="rounded-3xl bg-[var(--surface-100)] p-4">
+        <div className="rounded-3xl bg-[linear-gradient(180deg,hsl(var(--surface)/0.88),hsl(var(--surface-hover)/0.92))] p-4">
           <div className="mb-3 flex items-center gap-3 text-sm text-[var(--ink-700)]">
             {liveJob.status === 'PROCESSING' ? (
               <LoaderCircle className="h-4 w-4 animate-spin" />
             ) : null}
             {liveJob.message}
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-white">
+          <div className="h-3 overflow-hidden rounded-full bg-[hsl(var(--card)/0.9)]">
             <div
-              className="h-full rounded-full bg-[linear-gradient(90deg,var(--brand-600),var(--accent-500))] transition-[width] duration-500"
+              className="relative h-full rounded-full bg-[linear-gradient(90deg,hsl(var(--primary)),hsl(var(--secondary)))] transition-[width] duration-500 after:absolute after:inset-y-0 after:left-0 after:w-1/2 after:bg-[linear-gradient(90deg,transparent,hsl(0_0%_100%/0.6),transparent)] after:animate-shimmer-sweep"
               style={{ width: `${progressPercent}%` }}
             />
           </div>

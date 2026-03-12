@@ -6,8 +6,6 @@ interface TypeDistributionChartProps {
   statistics: StatisticsResponseDto
 }
 
-const COLORS = ['#2563eb', '#0f9f74']
-
 export function TypeDistributionChart({ statistics }: TypeDistributionChartProps) {
   return (
     <Card>
@@ -20,6 +18,16 @@ export function TypeDistributionChart({ statistics }: TypeDistributionChartProps
       <CardContent className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
+            <defs>
+              <linearGradient id="typeIndividual" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="hsl(var(--primary))" />
+                <stop offset="100%" stopColor="hsl(var(--info))" />
+              </linearGradient>
+              <linearGradient id="typeOrg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="hsl(var(--secondary))" />
+                <stop offset="100%" stopColor="hsl(var(--tertiary))" />
+              </linearGradient>
+            </defs>
             <Pie
               data={statistics.providerTypeDistribution}
               dataKey="value"
@@ -29,7 +37,7 @@ export function TypeDistributionChart({ statistics }: TypeDistributionChartProps
               paddingAngle={4}
             >
               {statistics.providerTypeDistribution.map((entry, index) => (
-                <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+                <Cell key={entry.name} fill={index === 0 ? 'url(#typeIndividual)' : 'url(#typeOrg)'} />
               ))}
             </Pie>
             <Tooltip />

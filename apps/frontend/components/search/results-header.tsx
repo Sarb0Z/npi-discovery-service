@@ -34,7 +34,7 @@ export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
   )
 
   return (
-    <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+    <div className="flex flex-col gap-5 rounded-[30px] border border-[hsl(var(--border)/0.85)] bg-[linear-gradient(180deg,hsl(var(--card)/0.86),hsl(var(--card)/0.68))] p-6 shadow-[var(--shadow-md)] backdrop-blur-xl lg:flex-row lg:items-end lg:justify-between">
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="primary">{response.metadata.totalCount.toLocaleString()} providers</Badge>
@@ -47,7 +47,7 @@ export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
           ) : null}
         </div>
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight text-[var(--ink-900)]">
+          <h2 className="text-display-sm text-[var(--ink-900)]">
             Results for {locationLabel}
           </h2>
           <p className="text-sm text-[var(--ink-600)]">
@@ -57,20 +57,24 @@ export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button
-          variant={viewMode === 'table' ? 'primary' : 'secondary'}
-          onClick={() => setViewMode('table')}
-        >
-          <TableProperties className="h-4 w-4" />
-          Table
-        </Button>
-        <Button
-          variant={viewMode === 'card' ? 'primary' : 'secondary'}
-          onClick={() => setViewMode('card')}
-        >
-          <LayoutGrid className="h-4 w-4" />
-          Cards
-        </Button>
+        <div className="flex items-center gap-2 rounded-full border border-[hsl(var(--border)/0.8)] bg-[hsl(var(--surface)/0.82)] p-1 shadow-[var(--shadow-sm)]">
+          <Button
+            size="sm"
+            variant={viewMode === 'table' ? 'gradient' : 'ghost'}
+            onClick={() => setViewMode('table')}
+          >
+            <TableProperties className="h-4 w-4" />
+            Table
+          </Button>
+          <Button
+            size="sm"
+            variant={viewMode === 'card' ? 'gradient' : 'ghost'}
+            onClick={() => setViewMode('card')}
+          >
+            <LayoutGrid className="h-4 w-4" />
+            Cards
+          </Button>
+        </div>
         <Button variant="secondary" onClick={() => downloadJson(response, exportBaseName)}>
           <Download className="h-4 w-4" />
           JSON

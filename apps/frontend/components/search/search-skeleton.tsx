@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export function SearchSkeleton() {
   return (
-    <Card>
+    <Card data-testid="search-skeleton">
       <CardContent className="space-y-6 py-8">
         <div className="flex items-center justify-between gap-4">
           <Skeleton className="h-8 w-48" />

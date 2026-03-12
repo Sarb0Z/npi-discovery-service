@@ -57,7 +57,7 @@ export function TaxonomyBreakdownTable({ statistics }: TaxonomyBreakdownTablePro
       </CardHeader>
       <CardContent className="overflow-x-auto p-0">
         <table className="min-w-full divide-y divide-[var(--line)] text-left text-sm">
-          <thead className="bg-[var(--surface-100)] text-[var(--ink-600)]">
+          <thead className="bg-[hsl(var(--surface)/0.72)] text-[var(--ink-600)]">
             <tr>
               {[
                 ['description', 'Description'],
@@ -78,9 +78,9 @@ export function TaxonomyBreakdownTable({ statistics }: TaxonomyBreakdownTablePro
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--line)] bg-white">
+          <tbody className="divide-y divide-[var(--line)] bg-[hsl(var(--card)/0.72)]">
             {rows.map((taxonomy) => (
-              <tr key={`${taxonomy.code}-${taxonomy.description}`}>
+              <tr key={`${taxonomy.code}-${taxonomy.description}`} className="transition hover:bg-[linear-gradient(90deg,hsl(var(--primary)/0.05),transparent_72%)]">
                 <td className="px-6 py-4 font-medium text-[var(--ink-900)]">
                   {taxonomy.description}
                 </td>

@@ -147,11 +147,12 @@ export function SearchForm({
   return (
     <Card className="overflow-hidden">
       <CardHeader className="relative">
-        <div className="absolute inset-x-0 top-0 h-32 bg-[radial-gradient(circle_at_top_left,var(--brand-soft),transparent_60%),radial-gradient(circle_at_top_right,var(--accent-soft),transparent_55%)]" />
+        <div className="absolute inset-x-0 top-0 h-36 bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.18),transparent_58%),radial-gradient(circle_at_top_right,hsl(var(--secondary)/0.18),transparent_55%)]" />
+        <div className="absolute inset-x-6 top-0 h-px bg-[linear-gradient(90deg,transparent,hsl(var(--foreground)/0.3),transparent)]" />
         <Badge className="relative w-fit" variant="primary">
           Search orchestration
         </Badge>
-        <CardTitle className="relative text-3xl sm:text-4xl">
+        <CardTitle className="relative text-display-md max-w-3xl">
           Discover providers without the friction.
         </CardTitle>
         <CardDescription className="relative max-w-2xl text-base">
@@ -177,7 +178,7 @@ export function SearchForm({
         >
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div className={cn(searchMode === 'npi' ? 'block' : 'hidden')}>
-              <label className="mb-2 block text-sm font-medium text-[var(--ink-700)]" htmlFor="npi">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-600)]" htmlFor="npi">
                 NPI
               </label>
               <Input id="npi" inputMode="numeric" maxLength={10} placeholder="1234567893" {...form.register('npi')} />
@@ -188,7 +189,7 @@ export function SearchForm({
 
             <div className={cn(searchMode === 'zip' ? 'block' : 'hidden')}>
               <label
-                className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
+                className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-600)]"
                 htmlFor="zipCode"
               >
                 ZIP code
@@ -201,7 +202,7 @@ export function SearchForm({
 
             <div className={cn(searchMode === 'cityState' ? 'block' : 'hidden')}>
               <label
-                className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
+                className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-600)]"
                 htmlFor="city"
               >
                 City
@@ -210,7 +211,7 @@ export function SearchForm({
             </div>
 
             <div className={cn(searchMode !== 'zip' && searchMode !== 'npi' ? 'block' : 'hidden')}>
-              <label className="mb-2 block text-sm font-medium text-[var(--ink-700)]">State</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-600)]">State</label>
               <Controller
                 control={form.control}
                 name="state"
@@ -236,7 +237,7 @@ export function SearchForm({
 
             <div>
               <label
-                className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
+                className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-600)]"
                 htmlFor="taxonomyCode"
               >
                 Taxonomy code
@@ -254,7 +255,7 @@ export function SearchForm({
 
             <div>
               <label
-                className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
+                className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-600)]"
                 htmlFor="taxonomyDescription"
               >
                 Specialty focus
@@ -269,7 +270,7 @@ export function SearchForm({
             {variant === 'bulk' ? (
               <div>
                 <label
-                  className="mb-2 block text-sm font-medium text-[var(--ink-700)]"
+                  className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-600)]"
                   htmlFor="batchSize"
                 >
                   Batch size
@@ -294,10 +295,10 @@ export function SearchForm({
               <button
                 key={String(value)}
                 className={cn(
-                  'rounded-full px-4 py-2 text-sm font-medium transition',
+                  'font-display rounded-full px-4 py-2 text-sm font-medium transition-all duration-300',
                   providerType === value || (!providerType && value === undefined)
-                    ? 'bg-[var(--ink-900)] text-white'
-                    : 'bg-[var(--surface-200)] text-[var(--ink-700)] hover:bg-[var(--surface-300)]',
+                    ? 'bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--secondary)))] text-white shadow-[var(--shadow)]'
+                    : 'bg-[hsl(var(--surface-hover))] text-[var(--ink-700)] ring-1 ring-[hsl(var(--border)/0.8)] hover:bg-[hsl(var(--surface-strong))]',
                 )}
                 onClick={() =>
                   form.setValue('providerType', value as 1 | 2 | undefined, { shouldDirty: true })
@@ -315,13 +316,14 @@ export function SearchForm({
               Quick specialty picks
             </div>
             <div className="flex flex-wrap gap-2">
-              {suggestions.map((specialty) => (
+              {suggestions.map((specialty, index) => (
                 <button
                   key={specialty}
-                  className="rounded-full border border-[var(--line)] bg-white px-3 py-1.5 text-sm text-[var(--ink-700)] transition hover:border-[var(--brand-400)] hover:text-[var(--brand-700)]"
+                  className="animate-chip-enter rounded-full border border-[hsl(var(--border)/0.7)] bg-[hsl(var(--card)/0.8)] px-3 py-1.5 text-sm text-[var(--ink-700)] transition hover:border-[hsl(var(--primary)/0.4)] hover:bg-[hsl(var(--card))] hover:text-[var(--ink-900)]"
                   onClick={() =>
                     form.setValue('taxonomyDescription', specialty, { shouldDirty: true })
                   }
+                  style={{ animationDelay: `${index * 60}ms` }}
                   type="button"
                 >
                   {specialty}
@@ -335,7 +337,7 @@ export function SearchForm({
               {recentSearches.map((search) => (
                 <button
                   key={search.query}
-                  className="rounded-full bg-[var(--surface-200)] px-3 py-1.5 text-xs font-medium text-[var(--ink-700)] transition hover:bg-[var(--surface-300)]"
+                  className="rounded-full bg-[hsl(var(--surface-hover))] px-3 py-1.5 text-xs font-medium text-[var(--ink-700)] ring-1 ring-[hsl(var(--border)/0.75)] transition hover:bg-[hsl(var(--surface-strong))]"
                   onClick={() => {
                     const params = new URLSearchParams(search.query)
                     const nextValues: Partial<BulkFormValues> = {
@@ -358,7 +360,7 @@ export function SearchForm({
                 </button>
               ))}
             </div>
-            <Button className="min-w-44" disabled={isSubmitting} size="lg" type="submit">
+            <Button className="min-w-44" disabled={isSubmitting} size="lg" type="submit" variant={variant === 'bulk' ? 'gradient' : 'glow'}>
               <Search className="h-4 w-4" />
               {isSubmitting
                 ? 'Working…'

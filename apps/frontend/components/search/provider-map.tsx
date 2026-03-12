@@ -133,7 +133,7 @@ export function ProviderMap({ providers }: ProviderMapProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--surface-200)] text-[var(--brand-700)]">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,hsl(var(--primary)/0.18),hsl(var(--secondary)/0.18))] text-[var(--brand-700)]">
             <MapPinned className="h-5 w-5" />
           </span>
           <div>
@@ -157,7 +157,7 @@ export function ProviderMap({ providers }: ProviderMapProps) {
           <div
             ref={containerRef}
             aria-label="Provider footprint map"
-            className="provider-map h-[420px] overflow-hidden rounded-[28px] border border-[var(--line)]"
+            className="provider-map h-[420px] overflow-hidden rounded-[28px] border border-[var(--line)] bg-[hsl(var(--card)/0.8)] shadow-[var(--shadow-sm)]"
           />
         ) : (
           <div className="rounded-[28px] border border-dashed border-[var(--line)] bg-[var(--surface-100)] px-6 py-10 text-sm text-[var(--ink-600)]">

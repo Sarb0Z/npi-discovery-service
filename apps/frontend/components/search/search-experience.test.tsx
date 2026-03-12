@@ -64,6 +64,30 @@ function buildResponse(providers: SearchResponseDto['providers']): SearchRespons
   }
 }
 
+function buildProviderSearchResult(
+  overrides: Partial<ReturnType<typeof useProviderSearchHook>>,
+): ReturnType<typeof useProviderSearchHook> {
+  return {
+    context: undefined,
+    data: undefined,
+    error: null,
+    failureCount: 0,
+    failureReason: null,
+    isError: false,
+    isIdle: false,
+    isPaused: false,
+    isPending: false,
+    isSuccess: false,
+    mutate: mockMutate,
+    mutateAsync: jest.fn(),
+    reset: jest.fn(),
+    status: 'idle',
+    submittedAt: 0,
+    variables: undefined,
+    ...overrides,
+  } as unknown as ReturnType<typeof useProviderSearchHook>
+}
+
 describe('SearchExperience', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -71,34 +95,32 @@ describe('SearchExperience', () => {
   })
 
   it('loads initial search params and shows the loading skeleton', () => {
-    mockUseProviderSearch.mockReturnValue({
-      mutate: mockMutate,
-      data: undefined,
-      error: null,
-      isPending: true,
-    })
+    mockUseProviderSearch.mockReturnValue(
+      buildProviderSearchResult({ isPending: true, status: 'pending' }),
+    )
 
-    const { container } = render(<SearchExperience />)
+    render(<SearchExperience />)
 
     expect(mockMutate).toHaveBeenCalledWith(
       expect.objectContaining({
         zipCode: '75201',
       }),
     )
-    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
+    expect(screen.getByTestId('search-skeleton')).toBeInTheDocument()
   })
 
   it('renders upstream errors and retries with the original parameters', () => {
-    mockUseProviderSearch.mockReturnValue({
-      mutate: mockMutate,
-      data: undefined,
-      error: new FrontendApiError({
-        code: ApiErrorCode.RateLimited,
-        message: 'Rate limited',
-        timestamp: '2026-03-07T00:00:00.000Z',
+    mockUseProviderSearch.mockReturnValue(
+      buildProviderSearchResult({
+        error: new FrontendApiError({
+          code: ApiErrorCode.RateLimited,
+          message: 'Rate limited',
+          timestamp: '2026-03-07T00:00:00.000Z',
+        }),
+        isError: true,
+        status: 'error',
       }),
-      isPending: false,
-    })
+    )
 
     render(<SearchExperience />)
 
@@ -119,12 +141,13 @@ describe('SearchExperience', () => {
   })
 
   it('renders the empty state and resets the URL', () => {
-    mockUseProviderSearch.mockReturnValue({
-      mutate: mockMutate,
-      data: buildResponse([]),
-      error: null,
-      isPending: false,
-    })
+    mockUseProviderSearch.mockReturnValue(
+      buildProviderSearchResult({
+        data: buildResponse([]),
+        isSuccess: true,
+        status: 'success',
+      }),
+    )
 
     render(<SearchExperience />)
 
@@ -135,42 +158,43 @@ describe('SearchExperience', () => {
 
   it('renders successful results and submits new search params', () => {
     useSearchStore.setState({ viewMode: 'card' })
-    mockUseProviderSearch.mockReturnValue({
-      mutate: mockMutate,
-      data: buildResponse([
-        {
-          npi: '1234567890',
-          type: ProviderType.Individual,
-          name: 'Dr. Ada Lovelace',
-          primarySpecialty: 'Dentist',
-          specialties: ['Dentist', 'Orthodontics'],
-          taxonomies: [
-            {
-              code: '1223G0001X',
-              description: 'Dentist',
-              primary: true,
+    mockUseProviderSearch.mockReturnValue(
+      buildProviderSearchResult({
+        data: buildResponse([
+          {
+            npi: '1234567890',
+            type: ProviderType.Individual,
+            name: 'Dr. Ada Lovelace',
+            primarySpecialty: 'Dentist',
+            specialties: ['Dentist', 'Orthodontics'],
+            taxonomies: [
+              {
+                code: '1223G0001X',
+                description: 'Dentist',
+                primary: true,
+                state: 'TX',
+              },
+              {
+                code: '1223X0400X',
+                description: 'Orthodontics',
+                primary: false,
+                state: 'TX',
+              },
+            ],
+            address: {
+              address1: '123 Health Ave',
+              address2: null,
+              city: 'Austin',
               state: 'TX',
+              zipCode: '75201',
             },
-            {
-              code: '1223X0400X',
-              description: 'Orthodontics',
-              primary: false,
-              state: 'TX',
-            },
-          ],
-          address: {
-            address1: '123 Health Ave',
-            address2: null,
-            city: 'Austin',
-            state: 'TX',
-            zipCode: '75201',
+            phone: '555-0101',
           },
-          phone: '555-0101',
-        },
-      ]),
-      error: null,
-      isPending: false,
-    })
+        ]),
+        isSuccess: true,
+        status: 'success',
+      }),
+    )
 
     render(<SearchExperience />)
 

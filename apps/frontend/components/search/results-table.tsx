@@ -69,7 +69,7 @@ export function ResultsTable({ providers }: ResultsTableProps) {
           >
             Rows per page
             <select
-              className="rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-sm text-[var(--ink-900)] outline-none transition focus:border-[var(--brand-400)]"
+              className="rounded-[14px] border border-[hsl(var(--border)/0.8)] bg-[hsl(var(--card)/0.84)] px-3 py-2 text-sm text-[var(--ink-900)] outline-none transition focus:border-[hsl(var(--primary)/0.6)]"
               id="results-page-size"
               value={pageSize}
               onChange={(event) => {
@@ -86,7 +86,7 @@ export function ResultsTable({ providers }: ResultsTableProps) {
           </label>
         </div>
         <table className="min-w-full divide-y divide-[var(--line)] text-left text-sm">
-          <thead className="bg-[var(--surface-100)] text-[var(--ink-600)]">
+          <thead className="bg-[hsl(var(--surface)/0.72)] text-[var(--ink-600)]">
             <tr>
               {[
                 ['name', 'Name'],
@@ -110,13 +110,13 @@ export function ResultsTable({ providers }: ResultsTableProps) {
               <th className="px-6 py-4 font-medium">Details</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--line)] bg-white">
+          <tbody className="divide-y divide-[var(--line)] bg-[hsl(var(--card)/0.72)]">
             {visibleProviders.map((provider) => {
               const isExpanded = expandedProviderNpi === provider.npi
 
               return (
                 <Fragment key={provider.npi}>
-                  <tr className="transition hover:bg-[var(--surface-100)]">
+                  <tr className="transition hover:bg-[linear-gradient(90deg,hsl(var(--primary)/0.06),transparent_70%)]">
                     <td className="px-6 py-4 font-medium text-[var(--ink-900)]">{provider.name}</td>
                     <td className="px-6 py-4 text-[var(--ink-600)]">{provider.npi}</td>
                     <td className="px-6 py-4 text-[var(--ink-600)]">{provider.primarySpecialty}</td>
@@ -140,7 +140,7 @@ export function ResultsTable({ providers }: ResultsTableProps) {
                     </td>
                   </tr>
                   {isExpanded ? (
-                    <tr className="bg-[var(--surface-100)]">
+                    <tr className="bg-[hsl(var(--surface)/0.82)]">
                       <td className="px-6 py-5" colSpan={7}>
                         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
                           <div className="space-y-3">

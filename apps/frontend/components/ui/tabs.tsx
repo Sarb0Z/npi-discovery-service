@@ -8,7 +8,10 @@ export const Tabs = TabsPrimitive.Root
 export function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {
   return (
     <TabsPrimitive.List
-      className={cn('inline-flex rounded-full bg-[var(--surface-200)] p-1', className)}
+      className={cn(
+        'inline-flex rounded-full border border-[hsl(var(--border)/0.8)] bg-[hsl(var(--surface)/0.8)] p-1 shadow-[var(--shadow-sm)] backdrop-blur-xl',
+        className,
+      )}
       {...props}
     />
   )
@@ -21,7 +24,7 @@ export function TabsTrigger({
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        'rounded-full px-4 py-2 text-sm font-medium text-[var(--ink-600)] transition data-[state=active]:bg-white data-[state=active]:text-[var(--ink-900)] data-[state=active]:shadow-sm',
+        'font-display rounded-full px-4 py-2 text-sm font-medium text-[hsl(var(--ink-600))] transition-[background-color,color,box-shadow,transform] duration-300 data-[state=active]:bg-[hsl(var(--card)/0.96)] data-[state=active]:text-[hsl(var(--ink-900))] data-[state=active]:shadow-[var(--shadow-sm)] data-[state=active]:-translate-y-px',
         className,
       )}
       {...props}

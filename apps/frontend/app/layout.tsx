@@ -1,17 +1,20 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import { Navbar } from '@/components/layout/navbar'
 import { Providers } from '@/app/providers'
 import './globals.css'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: '--font-display',
   subsets: ['latin'],
+  display: 'swap',
+  weight: ['500', '600', '700', '800'],
 })
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const inter = Inter({
+  variable: '--font-body',
   subsets: ['latin'],
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -27,10 +30,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} app-shell antialiased`}>
+      <body className={`${plusJakartaSans.variable} ${inter.variable} app-shell antialiased`}>
         <Providers>
           <Navbar />
-          <main className="mx-auto min-h-[calc(100vh-88px)] max-w-7xl px-6 py-10 sm:px-8">
+          <main className="mx-auto min-h-[calc(100vh-96px)] max-w-[1440px] px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
             {children}
           </main>
         </Providers>
