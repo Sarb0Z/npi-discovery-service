@@ -14,10 +14,10 @@ describe('AppModule', () => {
   it('registers infrastructure, feature modules, and the health controller', () => {
     const imports = Reflect.getMetadata(MODULE_METADATA.IMPORTS, AppModule) as unknown[]
     const controllers = Reflect.getMetadata(MODULE_METADATA.CONTROLLERS, AppModule) as unknown[]
-    const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, AppModule) as Array<{
+    const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, AppModule) as {
       provide?: unknown
       useClass?: unknown
-    }>
+    }[]
 
     expect(imports).toEqual(
       expect.arrayContaining([

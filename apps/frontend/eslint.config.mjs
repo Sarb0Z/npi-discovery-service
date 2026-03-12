@@ -45,7 +45,14 @@ const eslintConfig = defineConfig([
       'prefer-const': 'error',
     },
   },
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'eslint.config.mjs', 'next-env.d.ts']),
+  globalIgnores([
+    '.next/**',
+    'coverage/**',
+    'out/**',
+    'build/**',
+    'eslint.config.mjs',
+    'next-env.d.ts',
+  ]),
 ])
 
 export default eslintConfig

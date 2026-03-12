@@ -2,7 +2,7 @@
 
 import { ProviderType, type ProviderDto } from '@npi/contracts'
 import { ArrowDownUp } from 'lucide-react'
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -44,11 +44,11 @@ export function ResultsTable({ providers }: ResultsTableProps) {
   }, [providers, sortDirection, sortField])
 
   const pageCount = Math.max(1, Math.ceil(sortedProviders.length / pageSize))
-  const visibleProviders = sortedProviders.slice((page - 1) * pageSize, page * pageSize)
-
-  useEffect(() => {
-    setPage((currentPage) => Math.min(currentPage, pageCount))
-  }, [pageCount])
+  const currentPage = Math.min(page, pageCount)
+  const visibleProviders = sortedProviders.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  )
 
   function toggleExpandedProvider(npi: string): void {
     setExpandedProviderNpi((currentNpi) => (currentNpi === npi ? null : npi))
@@ -59,7 +59,8 @@ export function ResultsTable({ providers }: ResultsTableProps) {
       <CardContent className="overflow-x-auto p-0">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--line)] px-6 py-4">
           <p className="text-sm text-[var(--ink-600)]">
-            Showing {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, sortedProviders.length)}{' '}
+            Showing {(currentPage - 1) * pageSize + 1}-
+            {Math.min(currentPage * pageSize, sortedProviders.length)}{' '}
             of {sortedProviders.length.toLocaleString()} providers
           </p>
           <label
@@ -193,22 +194,22 @@ export function ResultsTable({ providers }: ResultsTableProps) {
         </table>
         <div className="flex items-center justify-between gap-4 border-t border-[var(--line)] px-6 py-4">
           <p className="text-sm text-[var(--ink-600)]">
-            Page {page} of {pageCount}
+            Page {currentPage} of {pageCount}
           </p>
           <div className="flex items-center gap-2">
             <Button
-              disabled={page === 1}
+              disabled={currentPage === 1}
               size="sm"
               variant="secondary"
-              onClick={() => setPage((value) => value - 1)}
+              onClick={() => setPage((value) => Math.max(1, value - 1))}
             >
               Previous
             </Button>
             <Button
-              disabled={page === pageCount}
+              disabled={currentPage === pageCount}
               size="sm"
               variant="secondary"
-              onClick={() => setPage((value) => value + 1)}
+              onClick={() => setPage((value) => Math.min(pageCount, value + 1))}
             >
               Next
             </Button>

@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { FrontendApiError } from '@/lib/api/providers'
+import type * as ProvidersApiModule from '@/lib/api/providers'
 import {
   useBulkCollection,
   useProviderSearch,
@@ -23,13 +24,17 @@ const mockStartBulkCollection = jest.fn<Promise<BulkJobResponseDto>, [unknown]>(
 
 jest.mock('sonner', () => ({
   toast: {
-    success: (...args: unknown[]) => mockToastSuccess(...args),
-    error: (...args: unknown[]) => mockToastError(...args),
+    success: (...args: unknown[]) => {
+      mockToastSuccess(...args)
+    },
+    error: (...args: unknown[]) => {
+      mockToastError(...args)
+    },
   },
 }))
 
 jest.mock('@/lib/api/providers', () => {
-  const actual = jest.requireActual('@/lib/api/providers') as Record<string, unknown>
+  const actual = jest.requireActual<typeof ProvidersApiModule>('@/lib/api/providers')
 
   return {
     ...actual,

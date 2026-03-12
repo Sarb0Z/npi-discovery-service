@@ -1,9 +1,10 @@
 import { ApiErrorCode, type StatisticsResponseDto } from '@npi/contracts'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { StatisticsDashboard } from '@/components/statistics/statistics-dashboard'
+import type { useStatistics as useStatisticsHook } from '@/lib/hooks/use-provider-search'
 
 const mockUseSearchParams = jest.fn<URLSearchParams, []>()
-const mockUseStatistics = jest.fn()
+const mockUseStatistics = jest.fn<ReturnType<typeof useStatisticsHook>, [unknown]>()
 const mockRefetch = jest.fn()
 
 jest.mock('next/navigation', () => ({

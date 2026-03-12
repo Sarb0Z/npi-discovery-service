@@ -90,13 +90,15 @@ export class BulkCollectionGateway implements OnModuleInit, OnModuleDestroy {
   }
 
   private extractJobId(client: Socket): string | null {
-    const authJobId = client.handshake.auth.jobId
+    const auth = client.handshake.auth as { jobId?: unknown } | undefined
+    const authJobId = auth?.jobId
 
     if (typeof authJobId === 'string' && authJobId.trim().length > 0) {
       return authJobId.trim()
     }
 
-    const queryJobId = client.handshake.query.jobId
+    const query = client.handshake.query as { jobId?: unknown }
+    const queryJobId = query.jobId
 
     if (typeof queryJobId === 'string' && queryJobId.trim().length > 0) {
       return queryJobId.trim()

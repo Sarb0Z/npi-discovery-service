@@ -16,7 +16,7 @@ export class CorrelationIdMiddleware implements NestMiddleware {
     const requestWithCorrelationId = request as RequestWithCorrelationId
     const headerValue = request.headers[CORRELATION_ID_HEADER]
     const correlationId =
-      (Array.isArray(headerValue) ? headerValue[0] : headerValue)?.trim() || randomUUID()
+      (Array.isArray(headerValue) ? headerValue[0] : headerValue)?.trim() ?? randomUUID()
     const startedAt = Date.now()
 
     requestWithCorrelationId.correlationId = correlationId

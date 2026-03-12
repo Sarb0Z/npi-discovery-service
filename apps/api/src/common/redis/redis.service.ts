@@ -8,6 +8,10 @@ interface MemoryCacheEntry {
   expiresAt: number | null
 }
 
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Unknown Redis error'
+}
+
 @Injectable()
 export class RedisService implements OnModuleDestroy, OnModuleInit {
   private readonly logger = new Logger(RedisService.name)
@@ -139,9 +143,7 @@ export class RedisService implements OnModuleDestroy, OnModuleInit {
       return true
     }
 
-    if (!this.connecting) {
-      this.connecting = this.connectClients()
-    }
+    this.connecting ??= this.connectClients()
 
     await this.connecting
 
@@ -155,13 +157,13 @@ export class RedisService implements OnModuleDestroy, OnModuleInit {
       this.subscriber = createClient({ url: this.redisUrl })
 
       this.client.on('error', (error) => {
-        this.logger.error(`Redis client error: ${error.message}`)
+        this.logger.error(`Redis client error: ${getErrorMessage(error)}`)
       })
       this.publisher.on('error', (error) => {
-        this.logger.error(`Redis publisher error: ${error.message}`)
+        this.logger.error(`Redis publisher error: ${getErrorMessage(error)}`)
       })
       this.subscriber.on('error', (error) => {
-        this.logger.error(`Redis subscriber error: ${error.message}`)
+        this.logger.error(`Redis subscriber error: ${getErrorMessage(error)}`)
       })
 
       await Promise.all([

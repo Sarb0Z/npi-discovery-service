@@ -11,6 +11,7 @@ const config = {
   ],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testEnvironment: 'jest-environment-jsdom',
+  modulePathIgnorePatterns: ['<rootDir>/.next/'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
     '^.+\\.(css|sass|scss)$': 'identity-obj-proxy',

@@ -215,10 +215,7 @@ export function SearchForm({
                 control={form.control}
                 name="state"
                 render={({ field }) => (
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value && field.value.length > 0 ? field.value : undefined}
-                  >
+                  <Select onValueChange={field.onChange} value={field.value ?? ''}>
                     <SelectTrigger>
                       <SelectValue placeholder="Choose a state" />
                     </SelectTrigger>

@@ -2,11 +2,12 @@ import { ApiErrorCode, ProviderType, type SearchResponseDto } from '@npi/contrac
 import { fireEvent, render, screen } from '@testing-library/react'
 import { SearchExperience } from '@/components/search/search-experience'
 import { FrontendApiError } from '@/lib/api/providers'
+import type { useProviderSearch as useProviderSearchHook } from '@/lib/hooks/use-provider-search'
 import { useSearchStore } from '@/lib/stores/search-store'
 
 const mockReplace = jest.fn()
 const mockUseSearchParams = jest.fn<URLSearchParams, []>()
-const mockUseProviderSearch = jest.fn()
+const mockUseProviderSearch = jest.fn<ReturnType<typeof useProviderSearchHook>, []>()
 const mockMutate = jest.fn()
 
 jest.mock('next/navigation', () => ({

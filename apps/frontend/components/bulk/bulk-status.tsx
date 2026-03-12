@@ -16,22 +16,18 @@ interface BulkStatusProps {
   job: BulkJobResponseDto
 }
 
-export function BulkStatus({ job }: BulkStatusProps) {
-  const [liveJob, setLiveJob] = useState<BulkJobProgressDto>({
+function createInitialProgress(job: BulkJobResponseDto): BulkJobProgressDto {
+  return {
     ...job,
     totalProvidersFound: 0,
     collectedProviders: 0,
     estimatedRemainingProviders: 0,
-  })
+  }
+}
 
-  useEffect(() => {
-    setLiveJob({
-      ...job,
-      totalProvidersFound: 0,
-      collectedProviders: 0,
-      estimatedRemainingProviders: 0,
-    })
-  }, [job])
+export function BulkStatus({ job }: BulkStatusProps) {
+  const [socketProgress, setSocketProgress] = useState<BulkJobProgressDto | null>(null)
+  const liveJob = socketProgress?.jobId === job.jobId ? socketProgress : createInitialProgress(job)
 
   useEffect(() => {
     const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000').replace(
@@ -52,7 +48,7 @@ export function BulkStatus({ job }: BulkStatusProps) {
         return
       }
 
-      setLiveJob(event)
+      setSocketProgress(event)
     })
 
     return () => {

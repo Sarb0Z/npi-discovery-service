@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
+import type { BulkJobProgressDto } from '@npi/contracts'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
 import { createIndividualProvider } from '../../../test/fixtures/provider.fixture'
@@ -7,6 +8,10 @@ import { createBulkCollectionDto } from '../../../test/fixtures/search-params.fi
 import { ProvidersService } from '../providers/providers.service'
 import { BulkCollectionGateway } from './bulk-collection.gateway'
 import { BulkCollectionService } from './bulk-collection.service'
+
+const mockedMkdir = jest.mocked(mkdir)
+const mockedWriteFile = jest.mocked(writeFile)
+const mockedRandomUuid = jest.mocked(randomUUID)
 
 jest.mock('node:fs/promises', () => ({
   mkdir: jest.fn(),
@@ -20,7 +25,7 @@ jest.mock('node:crypto', () => ({
 describe('BulkCollectionService', () => {
   let service: BulkCollectionService
   let providersService: { search: jest.Mock }
-  let bulkCollectionGateway: { publishProgress: jest.Mock }
+  let bulkCollectionGateway: { publishProgress: jest.Mock<void, [BulkJobProgressDto]> }
 
   async function flushMicrotasks(): Promise<void> {
     await Promise.resolve()
@@ -48,9 +53,9 @@ describe('BulkCollectionService', () => {
       }),
     }
     bulkCollectionGateway = {
-      publishProgress: jest.fn(),
+      publishProgress: jest.fn<void, [BulkJobProgressDto]>(),
     }
-    ;(randomUUID as jest.Mock).mockReturnValue('job-123')
+    mockedRandomUuid.mockReturnValue('job-123')
 
     const module = await Test.createTestingModule({
       providers: [
@@ -68,7 +73,7 @@ describe('BulkCollectionService', () => {
 
     service = module.get(BulkCollectionService)
     jest.clearAllMocks()
-    ;(randomUUID as jest.Mock).mockReturnValue('job-123')
+    mockedRandomUuid.mockReturnValue('job-123')
   })
 
   it('returns a processing job response immediately', async () => {
@@ -98,23 +103,26 @@ describe('BulkCollectionService', () => {
       expect.objectContaining({ taxonomyDescription: 'Dentist' }),
       { upstreamLimit: 200 },
     )
-    expect(mkdir).toHaveBeenCalledWith(expect.any(String), { recursive: true })
-    expect(writeFile).toHaveBeenCalledWith(
+    expect(mockedMkdir).toHaveBeenCalledWith(expect.any(String), { recursive: true })
+    expect(mockedWriteFile).toHaveBeenCalledWith(
       expect.stringContaining('providers_75201_dentist_'),
       expect.stringContaining('"jobId": "job-123"'),
       'utf8',
     )
-    expect(bulkCollectionGateway.publishProgress).toHaveBeenCalledWith(
-      expect.objectContaining({
-        jobId: 'job-123',
-        status: 'COMPLETED',
-        outputFileName: expect.stringContaining('providers_75201_dentist_'),
-      }),
-    )
+    const completedProgressPayload = bulkCollectionGateway.publishProgress.mock.calls
+      .map(([payload]) => payload)
+      .find((payload) => payload.status === 'COMPLETED')
+
+    expect(completedProgressPayload).toMatchObject({
+      jobId: 'job-123',
+      status: 'COMPLETED',
+    })
+    expect(completedProgressPayload?.outputFileName).toContain('providers_75201_dentist_')
   })
 
   it('logs and swallows collection failures', async () => {
-    const loggerSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined)
+    const loggerSpy = jest.spyOn(Logger.prototype, 'error')
+    loggerSpy.mockImplementation(() => undefined)
     providersService.search.mockRejectedValueOnce(new Error('boom'))
 
     await service.startCollection(createBulkCollectionDto())
@@ -134,12 +142,12 @@ describe('BulkCollectionService', () => {
     await service.startCollection(createBulkCollectionDto())
     await flushMicrotasks()
 
-    expect(writeFile).toHaveBeenCalledWith(
+    expect(mockedWriteFile).toHaveBeenCalledWith(
       expect.any(String),
       expect.stringContaining('"metadata": {'),
       'utf8',
     )
-    expect(writeFile).toHaveBeenCalledWith(
+    expect(mockedWriteFile).toHaveBeenCalledWith(
       expect.any(String),
       expect.stringContaining('"upstreamLimitUsed": 200'),
       'utf8',

@@ -33,6 +33,24 @@ describe('SearchForm', () => {
     })
   })
 
+  it('switches to NPI mode and submits a valid NPI search', async () => {
+    const handleSubmit = jest.fn()
+
+    render(<SearchForm onSubmit={handleSubmit} />)
+
+    fireEvent.click(screen.getByRole('tab', { name: 'NPI' }))
+    fireEvent.change(screen.getByLabelText('NPI'), { target: { value: '1234567893' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Search providers' }))
+
+    await waitFor(() => {
+      expect(handleSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          npi: '1234567893',
+        }),
+      )
+    })
+  })
+
   it('applies a quick specialty pick before submit', async () => {
     const handleSubmit = jest.fn()
 

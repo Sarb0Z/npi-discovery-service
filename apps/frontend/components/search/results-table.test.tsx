@@ -38,7 +38,7 @@ function getFirstBodyRow() {
 
   expect(firstRow).toBeDefined()
 
-  return firstRow as HTMLElement
+  return firstRow!
 }
 
 describe('ResultsTable', () => {
@@ -100,7 +100,7 @@ describe('ResultsTable', () => {
 
     expect(expandButton).toBeDefined()
 
-    fireEvent.click(expandButton as HTMLElement)
+    fireEvent.click(expandButton!)
 
     expect(screen.getByText('Practice location')).toBeInTheDocument()
     expect(screen.getByText('Cardiology (207R00000X)')).toBeInTheDocument()
