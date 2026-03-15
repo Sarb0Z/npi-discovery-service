@@ -1,5 +1,6 @@
 import type { StatisticsResponseDto } from '@npi/contracts'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { ChartTooltip } from '@/components/statistics/chart-tooltip'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface CitiesChartProps {
@@ -25,7 +26,7 @@ export function CitiesChart({ statistics }: CitiesChartProps) {
             <CartesianGrid vertical={false} stroke="rgba(148, 163, 184, 0.25)" />
             <XAxis dataKey="name" angle={-20} textAnchor="end" height={70} />
             <YAxis allowDecimals={false} />
-            <Tooltip />
+            <Tooltip content={<ChartTooltip unit="providers" />} cursor={{ fill: 'hsl(var(--foreground) / 0.04)' }} />
             <Bar dataKey="count" fill="url(#citiesFill)" radius={[10, 10, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>

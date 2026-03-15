@@ -1,5 +1,9 @@
+'use client'
+
 import type { StatisticsResponseDto } from '@npi/contracts'
+import { useMemo } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
+import { PieChartTooltip } from '@/components/statistics/chart-tooltip'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface TypeDistributionChartProps {
@@ -7,6 +11,11 @@ interface TypeDistributionChartProps {
 }
 
 export function TypeDistributionChart({ statistics }: TypeDistributionChartProps) {
+  const total = useMemo(
+    () => statistics.providerTypeDistribution.reduce((sum, d) => sum + d.value, 0),
+    [statistics.providerTypeDistribution],
+  )
+
   return (
     <Card>
       <CardHeader>
@@ -40,7 +49,7 @@ export function TypeDistributionChart({ statistics }: TypeDistributionChartProps
                 <Cell key={entry.name} fill={index === 0 ? 'url(#typeIndividual)' : 'url(#typeOrg)'} />
               ))}
             </Pie>
-            <Tooltip />
+            <Tooltip content={<PieChartTooltip total={total} />} />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>
