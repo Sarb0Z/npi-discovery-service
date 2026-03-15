@@ -205,6 +205,20 @@ jobs:
           VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
         run: bunx vercel pull --yes --environment=production --token="$VERCEL_API_TOKEN"
 
+      - name: Fix rootDirectory for local build
+        working-directory: apps/frontend
+        run: |
+          # vercel pull downloads project settings with rootDirectory: apps/frontend
+          # Since we already run from apps/frontend, clear it to avoid doubled paths
+          node -e "
+            const fs = require('fs');
+            const p = '.vercel/project.json';
+            const cfg = JSON.parse(fs.readFileSync(p, 'utf8'));
+            if (cfg.settings) delete cfg.settings.rootDirectory;
+            delete cfg.rootDirectory;
+            fs.writeFileSync(p, JSON.stringify(cfg));
+          "
+
       - name: Build Vercel output
         working-directory: apps/frontend
         env:
