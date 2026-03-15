@@ -27,7 +27,7 @@ resource "render_web_service" "this" {
     generation = "off"
   }
 
-  custom_domains = [for domain in var.custom_domains : {
+  custom_domains = length(var.custom_domains) == 0 ? null : [for domain in var.custom_domains : {
     name = domain
   }]
 

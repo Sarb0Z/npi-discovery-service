@@ -50,7 +50,8 @@ Terraform reads provider credentials from environment variables:
 - `RENDER_API_KEY`
 - `RENDER_OWNER_ID`
 - `VERCEL_API_TOKEN`
-- `TF_VAR_vercel_team_id`
+
+The Vercel Terraform provider is currently configured to create resources in whatever account the `VERCEL_API_TOKEN` belongs to. If you later move this to a team-scoped token, reintroduce an explicit provider team setting.
 
 If you want to override production defaults locally, copy [infra/terraform/environments/production/terraform.tfvars.example](/home/sarvz/Projects/npi-discovery-service/infra/terraform/environments/production/terraform.tfvars.example) to `terraform.tfvars` in the same directory.
 
