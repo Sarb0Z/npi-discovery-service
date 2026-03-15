@@ -200,21 +200,24 @@ jobs:
           EOF
 
       - name: Pull Vercel environment
+        working-directory: apps/frontend
         env:
           VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
-        run: bunx vercel pull --cwd apps/frontend --yes --environment=production --token="$VERCEL_API_TOKEN"
+        run: bunx vercel pull --yes --environment=production --token="$VERCEL_API_TOKEN"
 
       - name: Build Vercel output
+        working-directory: apps/frontend
         env:
           VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
-        run: bunx vercel build --cwd apps/frontend --prod --token="$VERCEL_API_TOKEN"
+        run: bunx vercel build --prod --token="$VERCEL_API_TOKEN"
 
       - name: Deploy to Vercel
         id: deploy
+        working-directory: apps/frontend
         env:
           VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
         run: |
-          deployment_url=$(bunx vercel deploy --cwd apps/frontend --prebuilt --prod --token="$VERCEL_API_TOKEN")
+          deployment_url=$(bunx vercel deploy --prebuilt --prod --token="$VERCEL_API_TOKEN")
           echo "deployment_url=${deployment_url}" >> "$GITHUB_OUTPUT"
 
   smoke-tests:
