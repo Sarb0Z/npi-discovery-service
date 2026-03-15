@@ -90,7 +90,7 @@ export function BulkStatus({ job }: BulkStatusProps) {
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-[hsl(var(--card)/0.9)]">
             <div
-              className="relative h-full rounded-full bg-[linear-gradient(90deg,hsl(var(--primary)),hsl(var(--secondary)))] transition-[width] duration-500 after:absolute after:inset-y-0 after:left-0 after:w-1/2 after:bg-[linear-gradient(90deg,transparent,hsl(0_0%_100%/0.6),transparent)] after:animate-shimmer-sweep"
+              className="after:animate-shimmer-sweep relative h-full rounded-full bg-[linear-gradient(90deg,hsl(var(--primary)),hsl(var(--secondary)))] transition-[width] duration-500 after:absolute after:inset-y-0 after:left-0 after:w-1/2 after:bg-[linear-gradient(90deg,transparent,hsl(0_0%_100%/0.6),transparent)]"
               style={{ width: `${progressPercent}%` }}
             />
           </div>

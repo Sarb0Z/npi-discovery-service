@@ -38,7 +38,12 @@ export function SummaryCards({ statistics }: SummaryCardsProps) {
                   {value.toLocaleString()}
                 </p>
               </div>
-              <span className={cn('flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br text-[var(--ink-900)]', gradients[index % gradients.length])}>
+              <span
+                className={cn(
+                  'flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br text-[var(--ink-900)]',
+                  gradients[index % gradients.length],
+                )}
+              >
                 <Icon className="h-5 w-5" />
               </span>
             </CardContent>

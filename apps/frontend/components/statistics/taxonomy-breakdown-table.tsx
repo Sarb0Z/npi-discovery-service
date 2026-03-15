@@ -80,7 +80,10 @@ export function TaxonomyBreakdownTable({ statistics }: TaxonomyBreakdownTablePro
           </thead>
           <tbody className="divide-y divide-[var(--line)] bg-[hsl(var(--card)/0.72)]">
             {rows.map((taxonomy) => (
-              <tr key={`${taxonomy.code}-${taxonomy.description}`} className="transition hover:bg-[linear-gradient(90deg,hsl(var(--primary)/0.05),transparent_72%)]">
+              <tr
+                key={`${taxonomy.code}-${taxonomy.description}`}
+                className="transition hover:bg-[linear-gradient(90deg,hsl(var(--primary)/0.05),transparent_72%)]"
+              >
                 <td className="px-6 py-4 font-medium text-[var(--ink-900)]">
                   {taxonomy.description}
                 </td>

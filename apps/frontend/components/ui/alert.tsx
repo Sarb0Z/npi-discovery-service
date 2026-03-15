@@ -9,8 +9,7 @@ const alertVariants = cva(
       variant: {
         default:
           'border-[hsl(var(--border)/0.75)] bg-[hsl(var(--card)/0.72)] text-[hsl(var(--ink-900))] shadow-[var(--shadow-sm)] backdrop-blur-sm [&>svg]:text-[hsl(var(--ink-600))]',
-        info:
-          'border-[hsl(var(--info)/0.3)] bg-[var(--info-soft)] text-[hsl(var(--info-foreground))] [&>svg]:text-[hsl(var(--info))]',
+        info: 'border-[hsl(var(--info)/0.3)] bg-[var(--info-soft)] text-[hsl(var(--info-foreground))] [&>svg]:text-[hsl(var(--info))]',
         success:
           'border-[hsl(var(--success)/0.3)] bg-[hsl(var(--success)/0.12)] text-[hsl(var(--success-foreground))] [&>svg]:text-[hsl(var(--success))]',
         warning:
@@ -26,8 +25,7 @@ const alertVariants = cva(
 )
 
 export interface AlertProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof alertVariants> {}
+  extends HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {}
 
 export function Alert({ className, variant, ...props }: AlertProps) {
   return <div className={cn(alertVariants({ variant }), className)} role="alert" {...props} />
@@ -36,7 +34,10 @@ export function Alert({ className, variant, ...props }: AlertProps) {
 export function AlertTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h5
-      className={cn('font-display text-base font-semibold tracking-[var(--tracking-tight)]', className)}
+      className={cn(
+        'font-display text-base font-semibold tracking-[var(--tracking-tight)]',
+        className,
+      )}
       {...props}
     />
   )

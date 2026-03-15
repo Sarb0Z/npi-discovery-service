@@ -152,7 +152,7 @@ export function SearchForm({
         <Badge className="relative w-fit" variant="primary">
           Search orchestration
         </Badge>
-        <CardTitle className="relative text-display-md max-w-3xl">
+        <CardTitle className="text-display-md relative max-w-3xl">
           Discover providers without the friction.
         </CardTitle>
         <CardDescription className="relative max-w-2xl text-base">
@@ -178,10 +178,19 @@ export function SearchForm({
         >
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div className={cn(searchMode === 'npi' ? 'block' : 'hidden')}>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-600)]" htmlFor="npi">
+              <label
+                className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-600)]"
+                htmlFor="npi"
+              >
                 NPI
               </label>
-              <Input id="npi" inputMode="numeric" maxLength={10} placeholder="1234567893" {...form.register('npi')} />
+              <Input
+                id="npi"
+                inputMode="numeric"
+                maxLength={10}
+                placeholder="1234567893"
+                {...form.register('npi')}
+              />
               <p className="mt-2 text-xs text-[var(--danger-600)]">
                 {form.formState.errors.npi?.message}
               </p>
@@ -211,7 +220,9 @@ export function SearchForm({
             </div>
 
             <div className={cn(searchMode !== 'zip' && searchMode !== 'npi' ? 'block' : 'hidden')}>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-600)]">State</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-600)]">
+                State
+              </label>
               <Controller
                 control={form.control}
                 name="state"
@@ -360,7 +371,13 @@ export function SearchForm({
                 </button>
               ))}
             </div>
-            <Button className="min-w-44" disabled={isSubmitting} size="lg" type="submit" variant={variant === 'bulk' ? 'gradient' : 'glow'}>
+            <Button
+              className="min-w-44"
+              disabled={isSubmitting}
+              size="lg"
+              type="submit"
+              variant={variant === 'bulk' ? 'gradient' : 'glow'}
+            >
               <Search className="h-4 w-4" />
               {isSubmitting
                 ? 'Working…'

@@ -14,7 +14,9 @@ export function EmptyState({ onReset }: EmptyStateProps) {
           <SearchX className="h-8 w-8" />
         </div>
         <div className="space-y-2">
-          <h3 className="font-display text-2xl font-semibold text-[var(--ink-900)]">No providers found</h3>
+          <h3 className="font-display text-2xl font-semibold text-[var(--ink-900)]">
+            No providers found
+          </h3>
           <p className="max-w-xl text-sm leading-6 text-[var(--ink-600)]">
             Try broadening your search, removing a specialty filter, or switching from ZIP code to a
             wider state-based search.

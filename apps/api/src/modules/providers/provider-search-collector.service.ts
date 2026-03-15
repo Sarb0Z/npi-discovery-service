@@ -175,18 +175,19 @@ export class ProviderSearchCollectorService {
   }
 
   private buildRootQueries(searchInput: InternalSearchQuery): InternalSearchQuery[] {
-    const baseQueries = searchInput.providerType || searchInput.npi
-      ? [searchInput]
-      : [
-          {
-            ...searchInput,
-            providerType: ProviderType.Individual,
-          },
-          {
-            ...searchInput,
-            providerType: ProviderType.Organization,
-          },
-        ]
+    const baseQueries =
+      searchInput.providerType || searchInput.npi
+        ? [searchInput]
+        : [
+            {
+              ...searchInput,
+              providerType: ProviderType.Individual,
+            },
+            {
+              ...searchInput,
+              providerType: ProviderType.Organization,
+            },
+          ]
 
     return baseQueries.flatMap((query) =>
       shouldSeedPostalPartitions(query) ? buildInitialPostalPartitions(query) : [query],

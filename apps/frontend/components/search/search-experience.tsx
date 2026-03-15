@@ -97,13 +97,13 @@ export function SearchExperience() {
   ]
 
   return (
-    <div className="space-y-8 animate-page-enter">
+    <div className="animate-page-enter space-y-8">
       <section className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
         <div className="relative overflow-hidden rounded-[32px] border border-[hsl(var(--border)/0.85)] bg-[linear-gradient(180deg,hsl(var(--card)/0.86),hsl(var(--card)/0.64))] p-8 shadow-[var(--shadow-lg)] backdrop-blur-2xl sm:p-10">
           <div className="absolute -left-10 top-10 h-32 w-32 rounded-full bg-[hsl(var(--primary)/0.14)] blur-3xl" />
           <div className="absolute bottom-6 right-6 h-24 w-24 rounded-full bg-[hsl(var(--secondary)/0.14)] blur-3xl" />
-          <div className="absolute right-20 top-12 h-3 w-3 rounded-full bg-[hsl(var(--secondary))] animate-float" />
-          <div className="absolute right-10 top-28 h-2 w-2 rounded-full bg-[hsl(var(--tertiary))] animate-drift-x" />
+          <div className="animate-float absolute right-20 top-12 h-3 w-3 rounded-full bg-[hsl(var(--secondary))]" />
+          <div className="animate-drift-x absolute right-10 top-28 h-2 w-2 rounded-full bg-[hsl(var(--tertiary))]" />
           <div className="relative space-y-6">
             <span className="inline-flex items-center gap-2 rounded-full bg-[var(--accent-soft)] px-4 py-2 text-sm font-medium text-[var(--accent-700)] ring-1 ring-[hsl(var(--secondary)/0.16)]">
               <Sparkles className="h-4 w-4" />
@@ -114,8 +114,9 @@ export function SearchExperience() {
               <span className="text-gradient-brand">stunning, fluid operator experience.</span>
             </h1>
             <p className="max-w-2xl text-lg leading-8 text-[var(--ink-600)] sm:text-xl">
-              Move from state-wide market scans to exact ZIP-level provider discovery, then pivot into
-              analytics without breaking flow, losing context, or settling for flat enterprise UI.
+              Move from state-wide market scans to exact ZIP-level provider discovery, then pivot
+              into analytics without breaking flow, losing context, or settling for flat enterprise
+              UI.
             </p>
           </div>
         </div>
@@ -133,7 +134,9 @@ export function SearchExperience() {
                   <Icon className="h-5 w-5" />
                 </span>
                 <div>
-                  <p className="font-display text-base font-semibold text-[var(--ink-900)]">{title}</p>
+                  <p className="font-display text-base font-semibold text-[var(--ink-900)]">
+                    {title}
+                  </p>
                   <p className="mt-2 text-sm leading-6 text-[var(--ink-600)]">{description}</p>
                 </div>
               </div>

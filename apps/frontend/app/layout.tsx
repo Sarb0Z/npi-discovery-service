@@ -32,10 +32,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${plusJakartaSans.variable} ${inter.variable} app-shell antialiased`}>
         <Providers>
-          <Navbar />
-          <main className="mx-auto min-h-[calc(100vh-96px)] max-w-[1440px] px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
-            {children}
-          </main>
+          <>
+            <Navbar />
+            <main className="mx-auto min-h-[calc(100vh-96px)] max-w-[1440px] px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
+              {children}
+            </main>
+          </>
         </Providers>
       </body>
     </html>

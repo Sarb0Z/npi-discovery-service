@@ -17,13 +17,14 @@ export function BulkPageClient() {
   }
 
   return (
-    <div className="space-y-8 animate-page-enter">
+    <div className="animate-page-enter space-y-8">
       <section className="glass-panel max-w-4xl space-y-5 rounded-[32px] p-8 sm:p-10">
         <span className="inline-flex rounded-full bg-[var(--warning-soft)] px-4 py-2 text-sm font-medium text-[var(--warning-700)]">
           Bulk collection writes files asynchronously on the API host
         </span>
         <h1 className="text-display-lg text-[var(--ink-900)]">
-          Capture provider datasets for <span className="text-gradient-brand">downstream analysis at scale.</span>
+          Capture provider datasets for{' '}
+          <span className="text-gradient-brand">downstream analysis at scale.</span>
         </h1>
         <p className="text-lg leading-8 text-[var(--ink-600)]">
           Use the same discovery filters, then hand the backend a large collection job optimized for

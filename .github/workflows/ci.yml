@@ -14,14 +14,20 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.2.22
 
       - uses: actions/cache@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
           path: |
             ~/.bun/install/cache
@@ -36,14 +42,20 @@ jobs:
 
   typecheck:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.2.22
 
       - uses: actions/cache@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
           path: |
             ~/.bun/install/cache
@@ -58,14 +70,20 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.2.22
 
       - uses: actions/cache@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
           path: |
             ~/.bun/install/cache
@@ -84,14 +102,20 @@ jobs:
       - lint
       - typecheck
       - test
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.2.22
 
       - uses: actions/cache@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
           path: |
             ~/.bun/install/cache

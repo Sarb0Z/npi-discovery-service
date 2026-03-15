@@ -40,16 +40,11 @@ export function ChartTooltip({
         </p>
       ) : null}
       <div className="flex items-center gap-2.5">
-        <span
-          className="h-2.5 w-2.5 rounded-full"
-          style={{ background: dotColor }}
-        />
+        <span className="h-2.5 w-2.5 rounded-full" style={{ background: dotColor }} />
         <span className="font-display text-lg font-semibold text-[hsl(var(--ink-900))]">
           {displayValue}
         </span>
-        {unit ? (
-          <span className="text-xs text-[hsl(var(--ink-500))]">{unit}</span>
-        ) : null}
+        {unit ? <span className="text-xs text-[hsl(var(--ink-500))]">{unit}</span> : null}
       </div>
     </div>
   )

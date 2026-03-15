@@ -117,7 +117,12 @@ describe('StatisticsDashboard', () => {
   it('renders loading and error states for statistics requests', () => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams('state=TX'))
     mockUseStatistics.mockReturnValueOnce(
-      buildStatisticsResult({ isLoading: true, isPending: true, isFetching: true, status: 'pending' }),
+      buildStatisticsResult({
+        isLoading: true,
+        isPending: true,
+        isFetching: true,
+        status: 'pending',
+      }),
     )
 
     const { rerender } = render(<StatisticsDashboard />)

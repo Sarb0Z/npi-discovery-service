@@ -60,8 +60,8 @@ export function ResultsTable({ providers }: ResultsTableProps) {
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--line)] px-6 py-4">
           <p className="text-sm text-[var(--ink-600)]">
             Showing {(currentPage - 1) * pageSize + 1}-
-            {Math.min(currentPage * pageSize, sortedProviders.length)}{' '}
-            of {sortedProviders.length.toLocaleString()} providers
+            {Math.min(currentPage * pageSize, sortedProviders.length)} of{' '}
+            {sortedProviders.length.toLocaleString()} providers
           </p>
           <label
             className="flex items-center gap-3 text-sm text-[var(--ink-600)]"

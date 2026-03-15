@@ -9,6 +9,9 @@ import { ApiExceptionFilter } from './common/filters/api-exception.filter'
 import { bootstrap } from './main'
 
 describe('main bootstrap', () => {
+  const originalPort = process.env.PORT
+  const originalHost = process.env.HOST
+
   const createDocumentMock = jest.spyOn(SwaggerModule, 'createDocument')
   const setupMock = jest.spyOn(SwaggerModule, 'setup')
   const setTitleMock = jest.spyOn(DocumentBuilder.prototype, 'setTitle')
@@ -19,6 +22,8 @@ describe('main bootstrap', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    delete process.env.PORT
+    delete process.env.HOST
 
     setTitleMock.mockReturnThis()
     setDescriptionMock.mockReturnThis()
@@ -31,6 +36,20 @@ describe('main bootstrap', () => {
       },
     })
     setupMock.mockImplementation(() => undefined)
+  })
+
+  afterAll(() => {
+    if (originalPort === undefined) {
+      delete process.env.PORT
+    } else {
+      process.env.PORT = originalPort
+    }
+
+    if (originalHost === undefined) {
+      delete process.env.HOST
+    } else {
+      process.env.HOST = originalHost
+    }
   })
 
   it('bootstraps Nest with validation, filters, swagger, and listening port', async () => {

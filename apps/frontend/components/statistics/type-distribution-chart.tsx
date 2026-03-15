@@ -46,7 +46,10 @@ export function TypeDistributionChart({ statistics }: TypeDistributionChartProps
               paddingAngle={4}
             >
               {statistics.providerTypeDistribution.map((entry, index) => (
-                <Cell key={entry.name} fill={index === 0 ? 'url(#typeIndividual)' : 'url(#typeOrg)'} />
+                <Cell
+                  key={entry.name}
+                  fill={index === 0 ? 'url(#typeIndividual)' : 'url(#typeOrg)'}
+                />
               ))}
             </Pie>
             <Tooltip content={<PieChartTooltip total={total} />} />

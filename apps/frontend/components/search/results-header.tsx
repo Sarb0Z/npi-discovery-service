@@ -47,9 +47,7 @@ export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
           ) : null}
         </div>
         <div>
-          <h2 className="text-display-sm text-[var(--ink-900)]">
-            Results for {locationLabel}
-          </h2>
+          <h2 className="text-display-sm text-[var(--ink-900)]">Results for {locationLabel}</h2>
           <p className="text-sm text-[var(--ink-600)]">
             Switch views, export the current result set, or open the analytics view for this query.
           </p>
@@ -87,9 +85,7 @@ export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
           CSV
         </Button>
         <Button asChild variant="outline">
-          <Link href={`/statistics?${analyticsQuery}`}>
-            View analytics
-          </Link>
+          <Link href={`/statistics?${analyticsQuery}`}>View analytics</Link>
         </Button>
       </div>
     </div>

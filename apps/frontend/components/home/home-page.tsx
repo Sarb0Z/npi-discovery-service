@@ -49,17 +49,20 @@ const principles = [
   {
     icon: Zap,
     title: 'Partition intelligence',
-    description: 'Broad state-wide queries are automatically partitioned so they return full coverage without hitting NPPES rate limits.',
+    description:
+      'Broad state-wide queries are automatically partitioned so they return full coverage without hitting NPPES rate limits.',
   },
   {
     icon: Shield,
     title: 'Contract-first types',
-    description: 'Shared TypeScript contracts keep every DTO, enum, and validator in sync between the API and frontend.',
+    description:
+      'Shared TypeScript contracts keep every DTO, enum, and validator in sync between the API and frontend.',
   },
   {
     icon: Database,
     title: 'Async pipeline',
-    description: 'Heavy exports run as background jobs with Redis-backed queues and WebSocket progress, never blocking the UI.',
+    description:
+      'Heavy exports run as background jobs with Redis-backed queues and WebSocket progress, never blocking the UI.',
   },
 ] as const
 
@@ -71,7 +74,7 @@ const fadeUp = {
 
 export function HomePage() {
   return (
-    <div className="space-y-20 animate-page-enter">
+    <div className="animate-page-enter space-y-20">
       {/* ── Hero ────────────────────────────────────── */}
       <section className="relative overflow-hidden rounded-[36px] border border-[hsl(var(--border)/0.7)] bg-[linear-gradient(170deg,hsl(var(--card)/0.92),hsl(var(--card)/0.6)_68%,hsl(var(--surface)/0.5))] p-10 shadow-[var(--shadow-xl)] backdrop-blur-2xl sm:p-14 lg:p-20">
         {/* Decorative blobs */}
@@ -80,9 +83,12 @@ export function HomePage() {
         <div className="absolute left-1/2 top-0 h-48 w-48 -translate-x-1/2 rounded-full bg-[hsl(var(--tertiary)/0.08)] blur-[60px]" />
 
         {/* Floating particles */}
-        <div className="absolute right-[18%] top-[14%] h-3 w-3 rounded-full bg-[hsl(var(--secondary))] animate-float" />
-        <div className="absolute left-[12%] bottom-[22%] h-2 w-2 rounded-full bg-[hsl(var(--tertiary))] animate-drift-x" />
-        <div className="absolute right-[8%] bottom-[38%] h-2 w-2 rounded-full bg-[hsl(var(--primary)/0.7)] animate-float" style={{ animationDelay: '1.2s' }} />
+        <div className="animate-float absolute right-[18%] top-[14%] h-3 w-3 rounded-full bg-[hsl(var(--secondary))]" />
+        <div className="animate-drift-x absolute bottom-[22%] left-[12%] h-2 w-2 rounded-full bg-[hsl(var(--tertiary))]" />
+        <div
+          className="animate-float absolute bottom-[38%] right-[8%] h-2 w-2 rounded-full bg-[hsl(var(--primary)/0.7)]"
+          style={{ animationDelay: '1.2s' }}
+        />
 
         <div className="relative max-w-3xl space-y-8">
           <motion.div
@@ -113,9 +119,8 @@ export function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.16, duration: 0.55 }}
           >
-            Powered by the CMS NPPES API with intelligent partition-based searching,
-            real-time analytics, and async bulk collection — so broad queries never
-            hit dead ends.
+            Powered by the CMS NPPES API with intelligent partition-based searching, real-time
+            analytics, and async bulk collection — so broad queries never hit dead ends.
           </motion.p>
 
           <motion.div
@@ -162,7 +167,7 @@ export function HomePage() {
           <motion.div key={title} variants={fadeUp}>
             <Link
               href={href}
-              className="group glass-panel flex flex-col gap-5 rounded-[28px] p-7 transition-transform duration-300 hover:-translate-y-1"
+              className="glass-panel group flex flex-col gap-5 rounded-[28px] p-7 transition-transform duration-300 hover:-translate-y-1"
             >
               <span
                 className={`flex h-14 w-14 items-center justify-center rounded-[20px] bg-gradient-to-br ${gradient} ring-1 ring-[hsl(var(--border)/0.4)] transition-transform duration-300 group-hover:scale-105`}
@@ -170,7 +175,9 @@ export function HomePage() {
                 <Icon className={`h-6 w-6 ${iconColor}`} />
               </span>
               <div className="space-y-2">
-                <h3 className="font-display text-lg font-semibold text-[var(--ink-900)]">{title}</h3>
+                <h3 className="font-display text-lg font-semibold text-[var(--ink-900)]">
+                  {title}
+                </h3>
                 <p className="text-sm leading-6 text-[var(--ink-600)]">{description}</p>
               </div>
               <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-medium text-[hsl(var(--primary))] transition-transform duration-200 group-hover:translate-x-1">
@@ -195,9 +202,8 @@ export function HomePage() {
             Built on <span className="text-gradient-brand">first principles</span>
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-base leading-7 text-[var(--ink-600)]">
-            Every layer of the stack — from the shared contract package to the
-            Recharts visualizations — is designed for reliability, type safety,
-            and speed.
+            Every layer of the stack — from the shared contract package to the Recharts
+            visualizations — is designed for reliability, type safety, and speed.
           </p>
         </div>
 
@@ -217,7 +223,9 @@ export function HomePage() {
               <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-[hsl(var(--surface))] ring-1 ring-[hsl(var(--border)/0.6)]">
                 <Icon className="h-5 w-5 text-[var(--ink-600)]" />
               </span>
-              <h4 className="font-display text-base font-semibold text-[var(--ink-900)]">{title}</h4>
+              <h4 className="font-display text-base font-semibold text-[var(--ink-900)]">
+                {title}
+              </h4>
               <p className="mt-2 text-sm leading-6 text-[var(--ink-600)]">{description}</p>
             </motion.div>
           ))}
@@ -232,12 +240,10 @@ export function HomePage() {
         viewport={{ once: true, margin: '-40px' }}
         transition={{ duration: 0.55 }}
       >
-        <h2 className="text-display-sm text-[var(--ink-900)]">
-          Ready to discover providers?
-        </h2>
+        <h2 className="text-display-sm text-[var(--ink-900)]">Ready to discover providers?</h2>
         <p className="mx-auto mt-3 max-w-md text-base leading-7 text-[var(--ink-600)]">
-          Jump straight into the search experience — no setup, no sign-up. Every
-          query goes live against the NPPES registry.
+          Jump straight into the search experience — no setup, no sign-up. Every query goes live
+          against the NPPES registry.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Button asChild variant="glow" size="lg">
