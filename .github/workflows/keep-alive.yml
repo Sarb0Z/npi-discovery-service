@@ -1,0 +1,77 @@
+name: Keep Alive
+
+on:
+  schedule:
+    # Every 27 minutes — stays well within Render's 30-minute inactivity timeout.
+    # Free for public repos; ~3 090 min/month for private (adjust if over budget).
+    - cron: '*/27 * * * *'
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+
+jobs:
+  warm-backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Resolve Render API URL
+        id: url
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_API_SERVICE_ID: ${{ secrets.RENDER_API_SERVICE_ID }}
+        run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_API_SERVICE_ID" ]; then
+            echo "Missing RENDER_API_KEY or RENDER_API_SERVICE_ID"
+            exit 1
+          fi
+
+          service_response=$(curl --fail-with-body --silent --show-error \
+            --url "https://api.render.com/v1/services/${RENDER_API_SERVICE_ID}" \
+            --header "accept: application/json" \
+            --header "authorization: Bearer ${RENDER_API_KEY}")
+
+          api_url=$(echo "$service_response" | python3 -c "import sys,json; print(json.load(sys.stdin).get('serviceDetails',{}).get('url',''))")
+
+          if [ -z "$api_url" ]; then
+            echo "Could not resolve Render service URL"
+            exit 1
+          fi
+
+          echo "api_url=${api_url}" >> "$GITHUB_OUTPUT"
+
+      - name: Health check
+        run: |
+          curl --fail --silent --show-error \
+            "${{ steps.url.outputs.api_url }}/api/health"
+
+      - name: Provider search (small query)
+        run: |
+          # Jitter: random 1–3 second pause between probes
+          sleep $(( RANDOM % 3 + 1 ))
+          curl --fail --silent --show-error \
+            --request POST \
+            --header "Content-Type: application/json" \
+            --data '{"state":"WY","limit":5}' \
+            "${{ steps.url.outputs.api_url }}/api/providers/search"
+
+      - name: Statistics query
+        run: |
+          sleep $(( RANDOM % 3 + 1 ))
+          curl --fail --silent --show-error \
+            --request POST \
+            --header "Content-Type: application/json" \
+            --data '{"state":"WY"}' \
+            "${{ steps.url.outputs.api_url }}/api/statistics"
+
+      - name: Single NPI lookup
+        run: |
+          sleep $(( RANDOM % 3 + 1 ))
+          curl --fail --silent --show-error \
+            --request POST \
+            --header "Content-Type: application/json" \
+            --data '{"npi":"1234567893"}' \
+            "${{ steps.url.outputs.api_url }}/api/providers/search"

@@ -35,7 +35,7 @@ jobs:
       render_api_url: ${{ steps.deploy_targets.outputs.render_api_url }}
       vercel_project_id: ${{ steps.deploy_targets.outputs.vercel_project_id }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.apply_infra }}
         env:
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -158,7 +158,7 @@ jobs:
     outputs:
       deployment_url: ${{ steps.deploy.outputs.deployment_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         env:
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
