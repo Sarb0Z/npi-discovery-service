@@ -6,6 +6,7 @@ import { Fragment, useMemo, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 import { useSearchStore } from '@/lib/stores/search-store'
 
 interface ResultsTableProps {
@@ -111,22 +112,33 @@ export function ResultsTable({ providers }: ResultsTableProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--line)] bg-[hsl(var(--card)/0.72)]">
-            {visibleProviders.map((provider) => {
+            {visibleProviders.map((provider, index) => {
               const isExpanded = expandedProviderNpi === provider.npi
+              const isIndividual = provider.type === ProviderType.Individual
+              const typeBorder = isIndividual
+                ? 'border-l-[3px] border-l-[hsl(var(--primary)/0.6)]'
+                : 'border-l-[3px] border-l-[hsl(var(--secondary)/0.6)]'
+              const zebraRow = index % 2 === 1 ? 'bg-[hsl(var(--surface)/0.38)]' : ''
 
               return (
                 <Fragment key={provider.npi}>
-                  <tr className="transition hover:bg-[linear-gradient(90deg,hsl(var(--primary)/0.06),transparent_70%)]">
-                    <td className="px-6 py-4 font-medium text-[var(--ink-900)]">{provider.name}</td>
+                  <tr
+                    className={cn(
+                      typeBorder,
+                      zebraRow,
+                      'transition hover:bg-[linear-gradient(90deg,hsl(var(--primary)/0.06),transparent_70%)]',
+                    )}
+                  >
+                    <td className="max-w-[240px] truncate px-6 py-4 font-medium text-[var(--ink-900)]">
+                      {provider.name}
+                    </td>
                     <td className="px-6 py-4 text-[var(--ink-600)]">{provider.npi}</td>
                     <td className="px-6 py-4 text-[var(--ink-600)]">{provider.primarySpecialty}</td>
                     <td className="px-6 py-4 text-[var(--ink-600)]">{provider.address.city}</td>
                     <td className="px-6 py-4 text-[var(--ink-600)]">{provider.address.state}</td>
                     <td className="px-6 py-4">
-                      <Badge
-                        variant={provider.type === ProviderType.Individual ? 'primary' : 'success'}
-                      >
-                        {provider.type === ProviderType.Individual ? 'Individual' : 'Organization'}
+                      <Badge variant={isIndividual ? 'primary' : 'success'}>
+                        {isIndividual ? 'Individual' : 'Organization'}
                       </Badge>
                     </td>
                     <td className="px-6 py-4">

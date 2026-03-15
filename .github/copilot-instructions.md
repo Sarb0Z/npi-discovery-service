@@ -20,6 +20,21 @@ and production-finished. "Good enough" is a death sentence.
    practices for similar features.
 3. **Smallest fix.** Prefer minimal changes that fully solve the request; avoid
    over-engineering.
+4. **Persist until complete.** Continue working until the user's task is fully
+  complete: iterate, test, and resolve follow-ups without stopping mid-task.
+5. **Ask clarifying questions.** When requirements are unclear or follow-up is
+  needed, use the ask-questions tooling to request focused clarifications and
+  follow-up information so multiple issues can be resolved within the same
+  session.
+6. **UI quality bar.** Aim for Steve Jobs–level polish: UIs must be highly
+  scannable, visually harmonious, and frictionless to use — prioritize
+  clarity, typography, spacing, and micro-interactions.
+7. **Backend craftsmanship.** Build backend code as if John Carmack would:
+  prefer simple, fast, well-measured implementations with minimal abstraction
+  layers, clear performance reasoning, and thorough correctness tests.
+8. **Rigorous review expectation.** Assume Linus Torvalds will review the PR;
+  the submission must be minimal, correct, well-justified, and able to withstand
+  strict technical scrutiny.
 
 ## Delegation
 
@@ -40,9 +55,7 @@ descriptions; include only the minimal snippet required for action.
 
 ## Post-Task Validation
 
-**Skill** - Run `/post-task` to validate before committing
-
-- Commit—hook validates automatically (ESLint, Prettier, TypeScript)
+**Verify** - Ensure basic validation passes (ESLint, Prettier, TypeScript)
 
 If validation fails, read the error and fix immediately. For non-trivial
 failures, dispatch `@debugger`.

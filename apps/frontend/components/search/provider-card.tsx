@@ -13,7 +13,7 @@ export function ProviderCard({ provider }: ProviderCardProps) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
-      <Card className="h-full overflow-hidden transition-transform duration-300 hover:-translate-y-1">
+      <Card className="group h-full overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.3),0_24px_64px_-16px_hsl(var(--primary)/0.2)]">
         <CardContent className="flex h-full flex-col gap-5">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">

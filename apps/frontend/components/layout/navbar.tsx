@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Activity, Menu, Moon, Sparkles, Sun, X } from 'lucide-react'
+import { Activity, Menu, Moon, Sun, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/search', label: 'Search' },
+  { href: '/', label: 'Search' },
   { href: '/statistics', label: 'Statistics' },
   { href: '/bulk', label: 'Bulk Export' },
 ] as const
@@ -77,10 +77,6 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <span className="hidden items-center gap-2 rounded-full bg-[hsl(var(--accent)/0.7)] px-3 py-1 text-xs font-medium text-[hsl(var(--accent-foreground))] lg:inline-flex">
-            <Sparkles className="h-3.5 w-3.5" />
-            Premium provider workflow
-          </span>
           <Button
             aria-label="Toggle theme"
             size="icon"

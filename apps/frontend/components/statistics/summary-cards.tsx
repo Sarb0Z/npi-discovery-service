@@ -1,10 +1,36 @@
 import type { StatisticsResponseDto } from '@npi/contracts'
 import { Building2, Layers3, MapPin, Users } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
 interface SummaryCardsProps {
   statistics: StatisticsResponseDto
+}
+
+function AnimatedCount({ value }: { value: number }) {
+  const [display, setDisplay] = useState(0)
+  const rafRef = useRef<number>(0)
+
+  useEffect(() => {
+    const duration = 800
+    const start = performance.now()
+
+    function tick(now: number) {
+      const elapsed = now - start
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setDisplay(Math.round(eased * value))
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(tick)
+      }
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [value])
+
+  return <>{display.toLocaleString()}</>
 }
 
 const items = [
@@ -35,7 +61,7 @@ export function SummaryCards({ statistics }: SummaryCardsProps) {
               <div>
                 <p className="text-sm text-[var(--ink-500)]">{item.label}</p>
                 <p className="font-display mt-3 text-3xl font-semibold text-[var(--ink-900)]">
-                  {value.toLocaleString()}
+                  <AnimatedCount value={value} />
                 </p>
               </div>
               <span

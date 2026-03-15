@@ -16,10 +16,15 @@ jest.mock('next/navigation', () => ({
 }))
 
 jest.mock('framer-motion', () => ({
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   motion: {
     section: ({ children }: { children: React.ReactNode }) => <section>{children}</section>,
     div: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   },
+}))
+
+jest.mock('@/components/search/results-analytics-panel', () => ({
+  ResultsAnalyticsPanel: () => <div data-testid="results-analytics-panel" />,
 }))
 
 jest.mock('@/lib/hooks/use-provider-search', () => ({
@@ -153,7 +158,7 @@ describe('SearchExperience', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Reset search' }))
 
-    expect(mockReplace).toHaveBeenCalledWith('/search')
+    expect(mockReplace).toHaveBeenCalledWith('/')
   })
 
   it('renders successful results and submits new search params', () => {
@@ -205,7 +210,7 @@ describe('SearchExperience', () => {
     mockMutate.mockClear()
     fireEvent.click(screen.getByRole('button', { name: 'Mock search form' }))
 
-    expect(mockReplace).toHaveBeenCalledWith('/search?zipCode=75201&taxonomyDescription=Dentist')
+    expect(mockReplace).toHaveBeenCalledWith('/?zipCode=75201&taxonomyDescription=Dentist')
     expect(mockMutate).toHaveBeenCalledWith({ zipCode: '75201', taxonomyDescription: 'Dentist' })
   })
 })

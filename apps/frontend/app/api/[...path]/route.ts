@@ -19,6 +19,18 @@ function buildUpstreamHeaders(request: NextRequest): Headers {
   return headers
 }
 
+function buildClientResponseHeaders(response: Response): Headers {
+  const headers = new Headers(response.headers)
+
+  // These headers are specific to the upstream transport and can become stale
+  // when Next.js re-streams the response body to the browser.
+  headers.delete('content-encoding')
+  headers.delete('content-length')
+  headers.delete('transfer-encoding')
+
+  return headers
+}
+
 async function proxyRequest(request: NextRequest, context: ProxyRouteContext): Promise<Response> {
   const { path } = await context.params
   const upstreamPath = path.join('/')
@@ -41,7 +53,7 @@ async function proxyRequest(request: NextRequest, context: ProxyRouteContext): P
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
-      headers: response.headers,
+      headers: buildClientResponseHeaders(response),
     })
   } catch {
     return NextResponse.json(

@@ -1,6 +1,12 @@
 import type { SearchResponseDto } from '@npi/contracts'
-import { Download, LayoutGrid, TableProperties } from 'lucide-react'
-import Link from 'next/link'
+import {
+  BarChart3,
+  ChevronDown,
+  ChevronUp,
+  Download,
+  LayoutGrid,
+  TableProperties,
+} from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useSearchStore } from '@/lib/stores/search-store'
@@ -9,20 +15,18 @@ import { buildExportFileName, downloadCsv, downloadJson } from '@/lib/utils/expo
 interface ResultsHeaderProps {
   locationLabel: string
   response: SearchResponseDto
+  showAnalytics?: boolean
+  onToggleAnalytics?: () => void
 }
 
-export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
+export function ResultsHeader({
+  locationLabel,
+  response,
+  showAnalytics,
+  onToggleAnalytics,
+}: ResultsHeaderProps) {
   const viewMode = useSearchStore((state) => state.viewMode)
   const setViewMode = useSearchStore((state) => state.setViewMode)
-  const analyticsQuery = new URLSearchParams(
-    Object.entries(response.metadata.searchParams).flatMap(([key, value]) => {
-      if (value === undefined || value === null || value === '') {
-        return []
-      }
-
-      return [[key, String(value)]]
-    }),
-  ).toString()
 
   const exportBaseName = buildExportFileName(
     locationLabel,
@@ -84,9 +88,17 @@ export function ResultsHeader({ locationLabel, response }: ResultsHeaderProps) {
           <Download className="h-4 w-4" />
           CSV
         </Button>
-        <Button asChild variant="outline">
-          <Link href={`/statistics?${analyticsQuery}`}>View analytics</Link>
-        </Button>
+        {onToggleAnalytics ? (
+          <Button variant={showAnalytics ? 'gradient' : 'outline'} onClick={onToggleAnalytics}>
+            <BarChart3 className="h-4 w-4" />
+            Analytics
+            {showAnalytics ? (
+              <ChevronUp className="h-3.5 w-3.5" />
+            ) : (
+              <ChevronDown className="h-3.5 w-3.5" />
+            )}
+          </Button>
+        ) : null}
       </div>
     </div>
   )

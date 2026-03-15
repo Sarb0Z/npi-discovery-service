@@ -1,10 +1,5 @@
-import { Suspense } from 'react'
-import { SearchExperience } from '@/components/search/search-experience'
+import { redirect } from 'next/navigation'
 
 export default function SearchPage() {
-  return (
-    <Suspense fallback={null}>
-      <SearchExperience />
-    </Suspense>
-  )
+  redirect('/')
 }

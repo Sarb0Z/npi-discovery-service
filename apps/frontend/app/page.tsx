@@ -1,10 +1,10 @@
 import { Suspense } from 'react'
-import { HomePage } from '@/components/home/home-page'
+import { SearchExperience } from '@/components/search/search-experience'
 
 export default function HomePageRoute() {
   return (
     <Suspense fallback={null}>
-      <HomePage />
+      <SearchExperience />
     </Suspense>
   )
 }

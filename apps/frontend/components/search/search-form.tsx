@@ -344,35 +344,41 @@ export function SearchForm({
           </div>
 
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex flex-wrap gap-2">
-              {recentSearches.map((search) => (
-                <button
-                  key={search.query}
-                  className="rounded-full bg-[hsl(var(--surface-hover))] px-3 py-1.5 text-xs font-medium text-[var(--ink-700)] ring-1 ring-[hsl(var(--border)/0.75)] transition hover:bg-[hsl(var(--surface-strong))]"
-                  onClick={() => {
-                    const params = new URLSearchParams(search.query)
-                    const nextValues: Partial<BulkFormValues> = {
-                      npi: params.get('npi') ?? '',
-                      zipCode: params.get('zipCode') ?? '',
-                      city: params.get('city') ?? '',
-                      state: params.get('state') ?? '',
-                      taxonomyCode: params.get('taxonomyCode') ?? '',
-                      taxonomyDescription: params.get('taxonomyDescription') ?? '',
-                      providerType: params.get('providerType')
-                        ? (Number(params.get('providerType')) as 1 | 2)
-                        : undefined,
-                    }
-                    form.reset({ ...form.getValues(), ...nextValues })
-                    startTransition(() => setSearchMode(getModeFromValues(nextValues)))
-                  }}
-                  type="button"
-                >
-                  {search.label}
-                </button>
-              ))}
-            </div>
+            {recentSearches.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {recentSearches.map((search) => (
+                  <button
+                    key={search.query}
+                    className="rounded-full bg-[hsl(var(--surface-hover))] px-3 py-1.5 text-xs font-medium text-[var(--ink-700)] ring-1 ring-[hsl(var(--border)/0.75)] transition hover:bg-[hsl(var(--surface-strong))]"
+                    onClick={() => {
+                      const params = new URLSearchParams(search.query)
+                      const nextValues: Partial<BulkFormValues> = {
+                        npi: params.get('npi') ?? '',
+                        zipCode: params.get('zipCode') ?? '',
+                        city: params.get('city') ?? '',
+                        state: params.get('state') ?? '',
+                        taxonomyCode: params.get('taxonomyCode') ?? '',
+                        taxonomyDescription: params.get('taxonomyDescription') ?? '',
+                        providerType: params.get('providerType')
+                          ? (Number(params.get('providerType')) as 1 | 2)
+                          : undefined,
+                      }
+                      form.reset({ ...form.getValues(), ...nextValues })
+                      startTransition(() => setSearchMode(getModeFromValues(nextValues)))
+                    }}
+                    type="button"
+                  >
+                    {search.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          {/* ── Submit — always anchored, full width ── */}
+          <div className="border-t border-[var(--line)] pt-5">
             <Button
-              className="min-w-44"
+              className="w-full"
               disabled={isSubmitting}
               size="lg"
               type="submit"
