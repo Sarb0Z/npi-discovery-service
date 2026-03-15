@@ -6,30 +6,111 @@ on:
       - CI
     types:
       - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy-${{ github.event.workflow_run.head_branch || github.ref_name || 'manual' }}
+  cancel-in-progress: false
 
 jobs:
+  provision-infra:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
+    runs-on: ubuntu-latest
+    outputs:
+      render_api_service_id: ${{ steps.infra_outputs.outputs.render_api_service_id }}
+      render_api_url: ${{ steps.infra_outputs.outputs.render_api_url }}
+      vercel_project_id: ${{ steps.infra_outputs.outputs.vercel_project_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: Apply production infrastructure
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_OWNER_ID: ${{ secrets.RENDER_OWNER_ID }}
+          VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+          TF_VAR_vercel_team_id: ${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_OWNER_ID" ] || [ -z "$VERCEL_API_TOKEN" ] || [ -z "$TF_VAR_vercel_team_id" ]; then
+            echo "Missing required infrastructure secrets"
+            exit 1
+          fi
+
+          ./scripts/terraform-env.sh apply production
+
+      - name: Export infrastructure outputs
+        id: infra_outputs
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_OWNER_ID: ${{ secrets.RENDER_OWNER_ID }}
+          VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+          TF_VAR_vercel_team_id: ${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          echo "render_api_service_id=$(terraform -chdir=infra/terraform/environments/production output -raw render_api_service_id)" >> "$GITHUB_OUTPUT"
+          echo "render_api_url=$(terraform -chdir=infra/terraform/environments/production output -raw render_api_url)" >> "$GITHUB_OUTPUT"
+          echo "vercel_project_id=$(terraform -chdir=infra/terraform/environments/production output -raw vercel_project_id)" >> "$GITHUB_OUTPUT"
+
   deploy-api:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    needs:
+      - provision-infra
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render deployment
         env:
-          RENDER_API_KEY: ${{ secrets['RENDER_API_KEY'] }}
-          RENDER_API_SERVICE_ID: ${{ secrets['RENDER_API_SERVICE_ID'] }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_API_SERVICE_ID: ${{ needs.provision-infra.outputs.render_api_service_id }}
         run: |
-          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_API_SERVICE_ID" ]; then
-            echo "Missing Render deployment secrets"
+          deploy_response=$(curl --fail-with-body --silent --show-error --request POST \
+            --url "https://api.render.com/v1/services/${RENDER_API_SERVICE_ID}/deploys" \
+            --header "accept: application/json" \
+            --header "authorization: Bearer ${RENDER_API_KEY}")
+
+          deploy_id=$(printf '%s' "$deploy_response" | node -e "const fs = require('fs'); const payload = JSON.parse(fs.readFileSync(0, 'utf8')); process.stdout.write(payload.id ?? payload.deploy?.id ?? '')")
+
+          if [ -z "$deploy_id" ]; then
+            echo "Render deploy ID was not returned"
+            echo "$deploy_response"
             exit 1
           fi
 
-          curl --fail-with-body --request POST \
-            --url "https://api.render.com/v1/services/${RENDER_API_SERVICE_ID}/deploys" \
-            --header "accept: application/json" \
-            --header "authorization: Bearer ${RENDER_API_KEY}"
+          for attempt in $(seq 1 90); do
+            status_response=$(curl --fail-with-body --silent --show-error \
+              --url "https://api.render.com/v1/services/${RENDER_API_SERVICE_ID}/deploys/${deploy_id}" \
+              --header "accept: application/json" \
+              --header "authorization: Bearer ${RENDER_API_KEY}")
+
+            deploy_status=$(printf '%s' "$status_response" | node -e "const fs = require('fs'); const payload = JSON.parse(fs.readFileSync(0, 'utf8')); process.stdout.write(String(payload.status ?? payload.deploy?.status ?? 'unknown').toLowerCase())")
+
+            echo "Render deploy ${deploy_id} status: ${deploy_status}"
+
+            if [ "$deploy_status" = "live" ]; then
+              exit 0
+            fi
+
+            if [ "$deploy_status" = "build_failed" ] || [ "$deploy_status" = "update_failed" ] || [ "$deploy_status" = "canceled" ] || [ "$deploy_status" = "failed" ]; then
+              echo "$status_response"
+              exit 1
+            fi
+
+            sleep 10
+          done
+
+          echo "Timed out waiting for Render deploy ${deploy_id} to become live"
+          exit 1
 
   deploy-frontend:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    needs:
+      - provision-infra
+      - deploy-api
     runs-on: ubuntu-latest
+    outputs:
+      deployment_url: ${{ steps.deploy.outputs.deployment_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -39,17 +120,43 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
+      - name: Link Vercel project
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ needs.provision-infra.outputs.vercel_project_id }}
+        run: |
+          mkdir -p .vercel
+          cat <<EOF > .vercel/project.json
+          {"orgId":"${VERCEL_ORG_ID}","projectId":"${VERCEL_PROJECT_ID}"}
+          EOF
+
       - name: Pull Vercel environment
         env:
-          VERCEL_TOKEN: ${{ secrets['VERCEL_TOKEN'] }}
-        run: bunx vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+        run: bunx vercel pull --yes --environment=production --token="$VERCEL_API_TOKEN"
 
       - name: Build Vercel output
         env:
-          VERCEL_TOKEN: ${{ secrets['VERCEL_TOKEN'] }}
-        run: bunx vercel build --prod --token="$VERCEL_TOKEN"
+          VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+        run: bunx vercel build --prod --token="$VERCEL_API_TOKEN"
 
       - name: Deploy to Vercel
+        id: deploy
         env:
-          VERCEL_TOKEN: ${{ secrets['VERCEL_TOKEN'] }}
-        run: bunx vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+          VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+        run: |
+          deployment_url=$(bunx vercel deploy --prebuilt --prod --token="$VERCEL_API_TOKEN")
+          echo "deployment_url=${deployment_url}" >> "$GITHUB_OUTPUT"
+
+  smoke-tests:
+    needs:
+      - provision-infra
+      - deploy-api
+      - deploy-frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Render health endpoint
+        run: curl --fail --silent --show-error "${{ needs.provision-infra.outputs.render_api_url }}/api/health"
+
+      - name: Check Vercel deployment
+        run: curl --fail --silent --show-error "${{ needs.deploy-frontend.outputs.deployment_url }}"

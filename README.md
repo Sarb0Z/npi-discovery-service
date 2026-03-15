@@ -86,16 +86,17 @@ GitHub Actions workflows are now defined under `.github/workflows/`:
 Required GitHub secrets:
 
 - `RENDER_API_KEY`
-- `RENDER_API_SERVICE_ID`
-- `VERCEL_TOKEN`
+- `RENDER_OWNER_ID`
+- `VERCEL_API_TOKEN`
 - `VERCEL_ORG_ID`
-- `VERCEL_PROJECT_ID`
 
 Current branch mapping:
 
 - `main` -> production deployment
 
 If a `develop` branch is introduced later, the deploy workflow can be extended to support a separate staging environment.
+
+Deployment infrastructure now lives under `infra/terraform/`, with GitHub Actions orchestrating Terraform, Render releases, Vercel releases, and smoke checks for `main`. See [docs/DEPLOYMENT.md](/home/sarvz/Projects/npi-discovery-service/docs/DEPLOYMENT.md) for the production setup and the exact repository secrets required.
 
 ## Architecture
 

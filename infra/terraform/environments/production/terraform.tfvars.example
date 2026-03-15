@@ -1,0 +1,7 @@
+project_slug        = "npi-discovery"
+vercel_project_name = "npi-discovery-service"
+
+# Optional overrides.
+# render_api_plan            = "standard"
+# render_keyvalue_plan       = "starter"
+# render_api_custom_domains  = ["api.example.com"]
