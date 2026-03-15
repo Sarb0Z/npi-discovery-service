@@ -23,6 +23,8 @@ jest.mock('node:crypto', () => ({
 }))
 
 describe('BulkCollectionService', () => {
+  const jobId = '11111111-1111-4111-8111-111111111111'
+
   let service: BulkCollectionService
   let providersService: { search: jest.Mock }
   let bulkCollectionGateway: { publishProgress: jest.Mock<void, [BulkJobProgressDto]> }
@@ -55,7 +57,7 @@ describe('BulkCollectionService', () => {
     bulkCollectionGateway = {
       publishProgress: jest.fn<void, [BulkJobProgressDto]>(),
     }
-    mockedRandomUuid.mockReturnValue('job-123')
+    mockedRandomUuid.mockReturnValue(jobId)
 
     const module = await Test.createTestingModule({
       providers: [
@@ -73,20 +75,20 @@ describe('BulkCollectionService', () => {
 
     service = module.get(BulkCollectionService)
     jest.clearAllMocks()
-    mockedRandomUuid.mockReturnValue('job-123')
+    mockedRandomUuid.mockReturnValue(jobId)
   })
 
   it('returns a processing job response immediately', async () => {
     const result = await service.startCollection(createBulkCollectionDto())
 
     expect(result).toEqual({
-      jobId: 'job-123',
+      jobId,
       status: 'PROCESSING',
       message:
         'Bulk collection initiated. Results will be saved to the configured output directory.',
     })
     expect(bulkCollectionGateway.publishProgress).toHaveBeenCalledWith({
-      jobId: 'job-123',
+      jobId,
       status: 'PROCESSING',
       message: 'Bulk collection queued. Collecting providers from the registry.',
       totalProvidersFound: 0,
@@ -106,7 +108,7 @@ describe('BulkCollectionService', () => {
     expect(mockedMkdir).toHaveBeenCalledWith(expect.any(String), { recursive: true })
     expect(mockedWriteFile).toHaveBeenCalledWith(
       expect.stringContaining('providers_75201_dentist_'),
-      expect.stringContaining('"jobId": "job-123"'),
+      expect.stringContaining(`"jobId": "${jobId}"`),
       'utf8',
     )
     const completedProgressPayload = bulkCollectionGateway.publishProgress.mock.calls
@@ -114,7 +116,7 @@ describe('BulkCollectionService', () => {
       .find((payload) => payload.status === 'COMPLETED')
 
     expect(completedProgressPayload).toMatchObject({
-      jobId: 'job-123',
+      jobId,
       status: 'COMPLETED',
     })
     expect(completedProgressPayload?.outputFileName).toContain('providers_75201_dentist_')
@@ -128,10 +130,10 @@ describe('BulkCollectionService', () => {
     await service.startCollection(createBulkCollectionDto())
     await flushMicrotasks()
 
-    expect(loggerSpy).toHaveBeenCalledWith('Bulk collection job job-123 failed', expect.any(Error))
+    expect(loggerSpy).toHaveBeenCalledWith(`Bulk collection job ${jobId} failed`, expect.any(Error))
     expect(bulkCollectionGateway.publishProgress).toHaveBeenCalledWith(
       expect.objectContaining({
-        jobId: 'job-123',
+        jobId,
         status: 'FAILED',
         error: 'boom',
       }),

@@ -102,9 +102,11 @@ Required GitHub repository secrets:
 
 - `RENDER_API_KEY`
 - `RENDER_API_SERVICE_ID`
-- `VERCEL_TOKEN`
+- `VERCEL_API_TOKEN`
 - `VERCEL_ORG_ID`
 - `VERCEL_PROJECT_ID`
+
+For manual infrastructure provisioning through the `Deploy` workflow with `apply_infra=true`, also provide `RENDER_OWNER_ID`.
 
 ## API Reference
 

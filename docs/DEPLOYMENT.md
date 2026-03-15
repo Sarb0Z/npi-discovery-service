@@ -27,14 +27,16 @@ Add these repository secrets in GitHub:
 
 - `RENDER_API_KEY`
 - `RENDER_OWNER_ID`
+- `RENDER_API_SERVICE_ID`
 - `VERCEL_API_TOKEN`
 - `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
 
 Notes:
 
 - `RENDER_OWNER_ID` is the Render user or team owner ID, such as `usr-...` or `tea-...`.
 - `VERCEL_ORG_ID` should be the Vercel org or account ID used in `.vercel/project.json`, not just a display name.
-- The workflow derives `RENDER_API_SERVICE_ID` and `VERCEL_PROJECT_ID` from Terraform outputs, so you no longer store those as GitHub secrets.
+- `RENDER_API_SERVICE_ID` and `VERCEL_PROJECT_ID` should be stored as repository secrets for routine application deploys.
 - If you want manual approval or deployment protection later, add a `production` GitHub environment and move the same secrets there before reintroducing job-level `environment` bindings.
 
 ## Local Infrastructure Commands
@@ -59,10 +61,12 @@ If you want to override production defaults locally, copy [infra/terraform/envir
 
 On successful CI for `main`, the deploy workflow runs in this order:
 
-1. Apply production Terraform.
+1. Resolve the existing Render and Vercel production targets.
 2. Trigger a Render API deploy.
 3. Build and deploy the frontend to Vercel.
 4. Run smoke checks against Render and Vercel.
+
+When you need to reprovision infrastructure, run the `Deploy` workflow manually with `apply_infra=true`. That path runs Terraform first, then deploys the updated services in the same workflow.
 
 ## Render Notes
 
@@ -74,7 +78,7 @@ On successful CI for `main`, the deploy workflow runs in this order:
 ## Vercel Notes
 
 - Terraform creates the Vercel project and injects `API_URL` and `NEXT_PUBLIC_API_URL`.
-- GitHub Actions writes `.vercel/project.json` at runtime using the Terraform-managed project ID and the `VERCEL_ORG_ID` secret.
+- GitHub Actions writes `apps/frontend/.vercel/project.json` at runtime using the stored `VERCEL_PROJECT_ID` and `VERCEL_ORG_ID` secrets.
 - The deploy job uses `vercel pull`, `vercel build`, and `vercel deploy --prebuilt` so GitHub Actions remains the release gate.
 
 ## First Run Checklist
@@ -82,7 +86,7 @@ On successful CI for `main`, the deploy workflow runs in this order:
 1. Add the required repository secrets in GitHub.
 2. Review [infra/terraform/environments/production/terraform.tfvars.example](/home/sarvz/Projects/npi-discovery-service/infra/terraform/environments/production/terraform.tfvars.example) and create a local `terraform.tfvars` only if you need overrides.
 3. Run `bun run infra:plan:production` locally.
-4. Run `bun run infra:apply:production` locally or let the GitHub deploy workflow do the first apply.
+4. Run `bun run infra:apply:production` locally or trigger the GitHub `Deploy` workflow manually with `apply_infra=true` for the first apply.
 5. Push to `main` and watch the `Deploy` workflow.
 
 ## Current Limitation
