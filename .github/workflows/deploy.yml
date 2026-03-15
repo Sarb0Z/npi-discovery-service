@@ -194,40 +194,23 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ needs.provision-infra.outputs.vercel_project_id || vars.VERCEL_PROJECT_ID }}
         run: |
-          mkdir -p apps/frontend/.vercel
-          cat <<EOF > apps/frontend/.vercel/project.json
+          mkdir -p .vercel
+          cat <<EOF > .vercel/project.json
           {"orgId":"${VERCEL_ORG_ID}","projectId":"${VERCEL_PROJECT_ID}"}
           EOF
 
       - name: Pull Vercel environment
-        working-directory: apps/frontend
         env:
           VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
         run: bunx vercel pull --yes --environment=production --token="$VERCEL_API_TOKEN"
 
-      - name: Fix rootDirectory for local build
-        working-directory: apps/frontend
-        run: |
-          # vercel pull downloads project settings with rootDirectory: apps/frontend
-          # Since we already run from apps/frontend, clear it to avoid doubled paths
-          node -e "
-            const fs = require('fs');
-            const p = '.vercel/project.json';
-            const cfg = JSON.parse(fs.readFileSync(p, 'utf8'));
-            if (cfg.settings) delete cfg.settings.rootDirectory;
-            delete cfg.rootDirectory;
-            fs.writeFileSync(p, JSON.stringify(cfg));
-          "
-
       - name: Build Vercel output
-        working-directory: apps/frontend
         env:
           VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
         run: bunx vercel build --prod --token="$VERCEL_API_TOKEN"
 
       - name: Deploy to Vercel
         id: deploy
-        working-directory: apps/frontend
         env:
           VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
         run: |
