@@ -550,7 +550,7 @@ Include these scripts in your package.json files:
 "scripts":	{
 "dev":	"nest	start	--watch",
 "build":	"nest	build",
-"start:prod":	"node	dist/main",
+"start:prod":	"node	dist/apps/api/src/main.js",
 "test":	"jest",
 "test:cov":	"jest	--coverage",
 "lint":	"eslint	\"{src,test}/**/*.ts\"	--fix"

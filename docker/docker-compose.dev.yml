@@ -1,6 +1,6 @@
 services:
   api:
-    image: oven/bun:1
+    image: node:22-slim
     working_dir: /workspace
     env_file:
       - ../.env.example
@@ -12,13 +12,13 @@ services:
     command:
       - sh
       - -lc
-      - bun install --frozen-lockfile --ignore-scripts && bun --cwd packages/contracts build && bun --cwd apps/api build && bun apps/api/dist/main.js
+      - npm install -g bun && bun install --frozen-lockfile --ignore-scripts && bun --cwd packages/contracts build && rm -f apps/api/tsconfig.build.tsbuildinfo && bun --cwd apps/api build && node apps/api/dist/apps/api/src/main.js
     ports:
       - '3000:3000'
     healthcheck:
       test:
         - CMD
-        - bun
+        - node
         - -e
         - fetch('http://127.0.0.1:3000/api/health').then((response) => { if (!response.ok) { process.exit(1) } }).catch(() => process.exit(1))
       interval: 5s
