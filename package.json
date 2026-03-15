@@ -25,7 +25,7 @@
     "lint": "bun --cwd packages/contracts lint && bun --cwd apps/api lint && bun --cwd apps/frontend lint",
     "format": "bun --cwd packages/contracts format && bun --cwd apps/api format && bun --cwd apps/frontend format",
     "test": "bun --cwd packages/contracts test && bun --cwd apps/api test && bun --cwd apps/frontend test",
-    "test:cov": "bun --cwd packages/contracts run test:cov && bun --cwd apps/api run test:cov && bun --cwd apps/frontend run test:cov",
+    "test:cov": "bun --cwd packages/contracts test:cov && bun --cwd apps/api test:cov && bun --cwd apps/frontend test:cov",
     "typecheck": "bun --cwd packages/contracts typecheck && bun --cwd apps/api typecheck && bun --cwd apps/frontend typecheck"
   }
 }
