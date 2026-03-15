@@ -29,12 +29,26 @@ jobs:
             exit 1
           fi
 
-          service_response=$(curl --fail-with-body --silent --show-error \
+          # Sanitize: strip whitespace and accidental "Bearer " prefix
+          _render_key=$(printf '%s' "$RENDER_API_KEY" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          _render_key="${_render_key#Bearer }"
+          _render_key="${_render_key#bearer }"
+
+          service_response=$(curl -w "\n%{http_code}" --silent --show-error \
             --url "https://api.render.com/v1/services/${RENDER_API_SERVICE_ID}" \
             --header "accept: application/json" \
-            --header "authorization: Bearer ${RENDER_API_KEY}")
+            --header "authorization: Bearer ${_render_key}")
 
-          api_url=$(echo "$service_response" | python3 -c "import sys,json; print(json.load(sys.stdin).get('serviceDetails',{}).get('url',''))")
+          http_code=$(printf '%s' "$service_response" | tail -1)
+          response_body=$(printf '%s' "$service_response" | sed '$d')
+
+          if [ "$http_code" -lt 200 ] 2>/dev/null || [ "$http_code" -ge 300 ] 2>/dev/null; then
+            echo "::error::Render API returned HTTP ${http_code}. Verify RENDER_API_KEY (no whitespace, no 'Bearer ' prefix)."
+            echo "Response: ${response_body}"
+            exit 1
+          fi
+
+          api_url=$(printf '%s' "$response_body" | python3 -c "import sys,json; print(json.load(sys.stdin).get('serviceDetails',{}).get('url',''))")
 
           if [ -z "$api_url" ]; then
             echo "Could not resolve Render service URL"
