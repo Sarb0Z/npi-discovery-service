@@ -230,4 +230,15 @@ jobs:
         run: curl --fail --silent --show-error "${{ needs.provision-infra.outputs.render_api_url }}/api/health"
 
       - name: Check Vercel deployment
-        run: curl --fail --silent --show-error "${{ needs.deploy-frontend.outputs.deployment_url }}"
+        run: |
+          http_code=$(curl -o /dev/null -w "%{http_code}" --silent --show-error "${{ needs.deploy-frontend.outputs.deployment_url }}")
+          echo "Vercel deployment returned HTTP ${http_code}"
+          if [ "$http_code" -ge 500 ] 2>/dev/null; then
+            echo "::error::Vercel deployment is unhealthy (HTTP ${http_code})"
+            exit 1
+          fi
+          # 200 = public, 401/403 = Deployment Protection enabled (deployment is live)
+          if [ "$http_code" -lt 200 ] 2>/dev/null || [ "$http_code" -ge 500 ] 2>/dev/null; then
+            echo "::error::Unexpected response from Vercel deployment (HTTP ${http_code})"
+            exit 1
+          fi
