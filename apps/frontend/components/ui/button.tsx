@@ -10,13 +10,9 @@ const BASE_INTERACTIVE_CLASSES = [
   'gap-2',
   'rounded-full',
   'font-semibold',
-  'transition-[transform,box-shadow,background-color,border-color,color,opacity]',
+  'transition-[box-shadow,background-color,border-color,color,opacity]',
   'duration-300',
   'ease-out',
-  'hover:-translate-y-0.5',
-  'hover:scale-[1.02]',
-  'active:translate-y-0',
-  'active:scale-[0.98]',
   'focus-visible:outline-none',
   'focus-visible:ring-2',
   'focus-visible:ring-[hsl(var(--ring)/0.35)]',
@@ -39,7 +35,7 @@ const buttonVariants = cva(`${BASE_INTERACTIVE_CLASSES} text-sm`, {
         'bg-transparent px-5 py-3 text-[hsl(var(--ink-900))] ring-1 ring-[hsl(var(--border))] hover:bg-[hsl(var(--card)/0.7)]',
       gradient:
         'bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--secondary))_58%,hsl(var(--tertiary)))] px-5 py-3 text-white shadow-[0_24px_55px_-22px_hsl(var(--primary)/0.7)] hover:shadow-[0_28px_65px_-24px_hsl(var(--primary)/0.85)]',
-      glow: 'bg-[linear-gradient(90deg,hsl(var(--primary)),hsl(var(--secondary)),hsl(var(--primary)))] bg-[length:200%_100%] px-5 py-3 text-white shadow-[0_0_0_1px_hsl(var(--primary)/0.2),0_0_24px_hsl(var(--primary)/0.3),0_18px_44px_hsl(var(--primary)/0.4)] hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.26),0_0_30px_hsl(var(--primary)/0.45),0_22px_54px_hsl(var(--primary)/0.5)] animate-shimmer-sweep',
+      glow: 'bg-[linear-gradient(90deg,hsl(var(--primary)),hsl(var(--secondary)),hsl(var(--primary)))] bg-[length:200%_100%] px-5 py-3 text-white shadow-[0_0_0_1px_hsl(var(--primary)/0.2),0_0_24px_hsl(var(--primary)/0.3),0_18px_44px_hsl(var(--primary)/0.4)] hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.26),0_0_30px_hsl(var(--primary)/0.45),0_22px_54px_hsl(var(--primary)/0.5)]',
       pill: 'bg-[hsl(var(--surface))] px-5 py-3 text-[hsl(var(--ink-900))] ring-1 ring-[hsl(var(--border)/0.85)] shadow-[var(--shadow-sm)] hover:bg-[hsl(var(--surface-hover))]',
     },
     size: {

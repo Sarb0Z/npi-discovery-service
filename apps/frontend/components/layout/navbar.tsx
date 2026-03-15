@@ -34,7 +34,7 @@ export function Navbar() {
           href="/"
           onClick={() => setMobileOpen(false)}
         >
-          <span className="relative flex h-12 w-12 items-center justify-center rounded-[18px] bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--secondary))_60%,hsl(var(--tertiary)))] text-white shadow-[var(--shadow)] transition-transform duration-300 group-hover:scale-105">
+          <span className="relative flex h-12 w-12 items-center justify-center rounded-[18px] bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--secondary))_60%,hsl(var(--tertiary)))] text-white shadow-[var(--shadow)] transition-opacity duration-300">
             <span className="absolute inset-0 rounded-[18px] bg-[linear-gradient(90deg,transparent,hsl(0_0%_100%/0.34),transparent)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             <Activity className="h-5 w-5" />
           </span>

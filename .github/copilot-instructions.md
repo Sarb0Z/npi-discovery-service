@@ -42,16 +42,12 @@ Hand off cross-domain work immediately:
 
 | Trigger                                  | Agent         |
 | ---------------------------------------- | ------------- |
-| Linear issue key or tracking request     | `@linear`     |
 | Architecture / planning / spec breakdown | `@architect`  |
 | Bug investigation / stack trace analysis | `@debugger`   |
 | Research / docs / code discovery         | `@researcher` |
 
 **Dense handoffs.** Summarize only essential context: decisions, affected paths,
 and the single next step. No raw logs or full issue bodies.
-
-**Linking discipline.** Link to Linear issues and docs instead of copying long
-descriptions; include only the minimal snippet required for action.
 
 ## Post-Task Validation
 
