@@ -3,7 +3,6 @@
 import { ProviderType, type ProviderDto } from '@npi/contracts'
 import { ArrowDownUp } from 'lucide-react'
 import { Fragment, useMemo, useState } from 'react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -137,9 +136,19 @@ export function ResultsTable({ providers }: ResultsTableProps) {
                     <td className="px-6 py-4 text-[var(--ink-600)]">{provider.address.city}</td>
                     <td className="px-6 py-4 text-[var(--ink-600)]">{provider.address.state}</td>
                     <td className="px-6 py-4">
-                      <Badge variant={isIndividual ? 'primary' : 'success'}>
-                        {isIndividual ? 'Individual' : 'Organization'}
-                      </Badge>
+                      <div>
+                        <p
+                          className={cn(
+                            'text-[10px] font-semibold uppercase tracking-[0.24em]',
+                            isIndividual
+                              ? 'text-[hsl(var(--primary-hover))]'
+                              : 'text-[hsl(var(--secondary-active))]',
+                          )}
+                        >
+                          {isIndividual ? 'Individual' : 'Organization'}
+                        </p>
+                        <p className="mt-1 text-xs text-[var(--ink-500)]">Provider record</p>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <Button
@@ -184,14 +193,22 @@ export function ResultsTable({ providers }: ResultsTableProps) {
                             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--ink-500)]">
                               Taxonomies
                             </p>
-                            <div className="mt-3 flex flex-wrap gap-2">
+                            <div className="mt-3 space-y-2">
                               {provider.taxonomies.map((taxonomy) => (
-                                <Badge
+                                <div
                                   key={`${provider.npi}-${taxonomy.code}-${taxonomy.description}`}
-                                  variant={taxonomy.primary ? 'primary' : 'neutral'}
+                                  className={cn(
+                                    'rounded-[16px] border px-3 py-3 text-sm',
+                                    taxonomy.primary
+                                      ? 'border-[hsl(var(--primary)/0.24)] bg-[hsl(var(--primary)/0.08)] text-[var(--ink-900)]'
+                                      : 'border-[hsl(var(--border)/0.72)] bg-[hsl(var(--surface)/0.48)] text-[var(--ink-700)]',
+                                  )}
                                 >
-                                  {taxonomy.description} ({taxonomy.code})
-                                </Badge>
+                                  <p className="font-medium">{taxonomy.description}</p>
+                                  <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[var(--ink-500)]">
+                                    {taxonomy.code}{taxonomy.primary ? ' • primary taxonomy' : ''}
+                                  </p>
+                                </div>
                               ))}
                             </div>
                           </div>

@@ -103,7 +103,7 @@ describe('ResultsTable', () => {
     fireEvent.click(expandButton!)
 
     expect(screen.getByText('Practice location')).toBeInTheDocument()
-    expect(screen.getByText('Cardiology (207R00000X)')).toBeInTheDocument()
+    expect(screen.getByText(/207R00000X/)).toBeInTheDocument()
 
     fireEvent.change(screen.getByLabelText('Rows per page'), { target: { value: '25' } })
 

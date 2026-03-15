@@ -5,9 +5,9 @@ import {
   ChevronUp,
   Download,
   LayoutGrid,
+  ScanSearch,
   TableProperties,
 } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useSearchStore } from '@/lib/stores/search-store'
 import { buildExportFileName, downloadCsv, downloadJson } from '@/lib/utils/export'
@@ -37,28 +37,53 @@ export function ResultsHeader({
     ),
   )
 
+  const metrics = [
+    ['Providers', response.metadata.totalCount.toLocaleString()],
+    ['Latency', `${response.metadata.duration} ms`],
+    ['Coverage', response.metadata.complete ? 'Complete' : 'Partial'],
+  ] as const
+
   return (
-    <div className="flex flex-col gap-5 rounded-[30px] border border-[hsl(var(--border)/0.85)] bg-[linear-gradient(180deg,hsl(var(--card)/0.86),hsl(var(--card)/0.68))] p-6 shadow-[var(--shadow-md)] backdrop-blur-xl lg:flex-row lg:items-end lg:justify-between">
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="primary">{response.metadata.totalCount.toLocaleString()} providers</Badge>
-          <Badge>{response.metadata.duration} ms</Badge>
-          <Badge variant={response.metadata.complete ? 'success' : 'warning'}>
-            {response.metadata.complete ? 'Complete coverage' : 'Partial coverage'}
-          </Badge>
-          {response.metadata.partitioned ? (
-            <Badge>Partitioned x{response.metadata.partitionCount}</Badge>
-          ) : null}
+    <div className="grid gap-6 rounded-[30px] border border-[hsl(var(--border)/0.85)] bg-[linear-gradient(180deg,hsl(var(--card)/0.9),hsl(var(--card)/0.68))] p-6 shadow-[var(--shadow-md)] backdrop-blur-xl xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
+      <div className="space-y-5">
+        <div className="grid gap-3 sm:grid-cols-3">
+          {metrics.map(([label, value]) => (
+            <div
+              key={label}
+              className="rounded-[22px] border border-[hsl(var(--border)/0.72)] bg-[linear-gradient(180deg,hsl(var(--card)/0.72),hsl(var(--surface)/0.45))] px-4 py-4"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--ink-500)]">
+                {label}
+              </p>
+              <p className="font-display mt-3 text-xl font-semibold text-[var(--ink-900)]">
+                {value}
+              </p>
+            </div>
+          ))}
         </div>
-        <div>
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div>
+            <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-[var(--ink-500)]">
+              <ScanSearch className="h-4 w-4" />
+              Query workspace
+            </div>
           <h2 className="text-display-sm text-[var(--ink-900)]">Results for {locationLabel}</h2>
           <p className="text-sm text-[var(--ink-600)]">
-            Switch views, export the current result set, or open the analytics view for this query.
+            Switch views, export the current result set, or open analytics without leaving the page.
           </p>
+          </div>
+          {response.metadata.partitioned ? (
+            <div className="rounded-[20px] border border-[hsl(var(--secondary)/0.18)] bg-[hsl(var(--secondary)/0.08)] px-4 py-3 text-sm text-[var(--ink-700)]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--ink-500)]">
+                Deep search strategy
+              </p>
+              <p className="mt-2 font-medium">Partitioned across {response.metadata.partitionCount} query slices</p>
+            </div>
+          ) : null}
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3 xl:justify-end">
         <div className="flex items-center gap-2 rounded-full border border-[hsl(var(--border)/0.8)] bg-[hsl(var(--surface)/0.82)] p-1 shadow-[var(--shadow-sm)]">
           <Button
             size="sm"

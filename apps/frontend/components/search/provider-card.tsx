@@ -1,7 +1,6 @@
 import { ProviderType, type ProviderDto } from '@npi/contracts'
 import { Building2, MapPin, Phone, UserRound } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 
 interface ProviderCardProps {
@@ -25,9 +24,16 @@ export function ProviderCard({ provider }: ProviderCardProps) {
                     <Building2 className="h-4 w-4" />
                   )}
                 </span>
-                <Badge variant={isIndividual ? 'primary' : 'success'}>
-                  {isIndividual ? 'Individual' : 'Organization'}
-                </Badge>
+                <span
+                  className={isIndividual ? 'text-[hsl(var(--primary-hover))]' : 'text-[hsl(var(--secondary-active))]'}
+                >
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.28em] opacity-70">
+                    Provider type
+                  </span>
+                  <span className="mt-1 block text-sm font-semibold text-[var(--ink-900)]">
+                    {isIndividual ? 'Individual' : 'Organization'}
+                  </span>
+                </span>
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-[var(--ink-900)]">{provider.name}</h3>
@@ -36,11 +42,16 @@ export function ProviderCard({ provider }: ProviderCardProps) {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="primary">{provider.primarySpecialty}</Badge>
-            {provider.specialties.slice(1, 3).map((specialty) => (
-              <Badge key={specialty}>{specialty}</Badge>
-            ))}
+          <div className="rounded-[22px] border border-[hsl(var(--border)/0.72)] bg-[linear-gradient(180deg,hsl(var(--card)/0.78),hsl(var(--surface)/0.44))] px-4 py-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--ink-500)]">
+              Specialty profile
+            </p>
+            <p className="mt-2 text-base font-semibold text-[var(--ink-900)]">
+              {provider.primarySpecialty}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-[var(--ink-600)]">
+              {provider.specialties.slice(1, 3).join(' • ') || 'No secondary specialties listed'}
+            </p>
           </div>
 
           <div className="space-y-3 text-sm text-[var(--ink-700)]">

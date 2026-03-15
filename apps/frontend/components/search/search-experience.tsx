@@ -1,7 +1,6 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { Sparkles } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { EmptyState } from '@/components/search/empty-state'
@@ -84,8 +83,7 @@ export function SearchExperience() {
 
   return (
     <div className="animate-page-enter space-y-6">
-      {/* ── Compact hero with maximalist decorative elements ── */}
-      <section className="relative overflow-hidden rounded-[32px] border border-[hsl(var(--border)/0.7)] bg-[linear-gradient(170deg,hsl(var(--card)/0.92),hsl(var(--card)/0.6)_68%,hsl(var(--surface)/0.5))] px-8 py-8 shadow-[var(--shadow-lg)] backdrop-blur-2xl sm:px-10 sm:py-10">
+      <section className="relative overflow-hidden rounded-[32px] border border-[hsl(var(--border)/0.7)] bg-[linear-gradient(168deg,hsl(var(--card)/0.94),hsl(var(--card)/0.68)_62%,hsl(var(--surface)/0.52))] px-8 py-8 shadow-[var(--shadow-lg)] backdrop-blur-2xl sm:px-10 sm:py-10">
         {/* Decorative gradient orbs */}
         <div className="deco-orb absolute -left-16 -top-8 h-56 w-56 rounded-full bg-[hsl(var(--primary)/0.2)] blur-[80px]" />
         <div
@@ -117,21 +115,49 @@ export function SearchExperience() {
         {/* Diamond decoration */}
         <div className="absolute right-[25%] top-4 h-4 w-4 rotate-45 rounded-sm bg-[linear-gradient(135deg,hsl(var(--primary)/0.3),hsl(var(--secondary)/0.3))]" />
 
-        <div className="relative">
+        <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(300px,0.7fr)] lg:items-end">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
-            className="flex flex-col gap-3"
+            className="flex flex-col gap-4"
           >
-            <span className="inline-flex w-fit items-center gap-2 rounded-full bg-[var(--accent-soft)] px-4 py-1.5 text-sm font-medium text-[var(--accent-700)] ring-1 ring-[hsl(var(--secondary)/0.16)]">
-              <Sparkles className="h-3.5 w-3.5" />
-              National Provider Intelligence Platform
-            </span>
+            <div className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.34em] text-[var(--ink-500)]">
+              <span>Registry search</span>
+              <span className="h-px w-10 bg-[linear-gradient(90deg,hsl(var(--primary)/0.55),transparent)]" />
+              <span>Live analytics</span>
+            </div>
             <h1 className="text-display-lg max-w-3xl text-[var(--ink-900)]">
               Search, analyze, and export{' '}
               <span className="text-gradient-brand">every healthcare provider</span> in one flow.
             </h1>
+            <p className="max-w-2xl text-base leading-7 text-[var(--ink-600)] sm:text-lg">
+              Built like an instrument panel, not a marketing page. Broad discovery, exact lookup,
+              embedded analytics, and export all live in the same workspace.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.08 }}
+            className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1"
+          >
+            {[
+              ['Search modes', 'NPI, ZIP, city/state, statewide'],
+              ['Response shape', 'Mapped providers, charts, exports'],
+              ['Workflow', 'Search first, analyze inline, export on demand'],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-[24px] border border-[hsl(var(--border)/0.72)] bg-[linear-gradient(180deg,hsl(var(--card)/0.74),hsl(var(--surface)/0.4))] px-4 py-4 backdrop-blur-xl"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--ink-500)]">
+                  {label}
+                </p>
+                <p className="mt-3 text-sm font-medium leading-6 text-[var(--ink-900)]">{value}</p>
+              </div>
+            ))}
           </motion.div>
         </div>
       </section>
