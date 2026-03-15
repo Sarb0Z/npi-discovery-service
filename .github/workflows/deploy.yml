@@ -63,8 +63,8 @@ jobs:
         id: deploy_targets
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_API_SERVICE_ID: ${{ secrets.RENDER_API_SERVICE_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          RENDER_API_SERVICE_ID: ${{ vars.RENDER_API_SERVICE_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.apply_infra }}" = "true" ]; then
             render_api_service_id=$(terraform -chdir=infra/terraform/environments/production output -raw render_api_service_id)
@@ -124,7 +124,7 @@ jobs:
       - name: Trigger Render deployment
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_API_SERVICE_ID: ${{ needs.provision-infra.outputs.render_api_service_id }}
+          RENDER_API_SERVICE_ID: ${{ needs.provision-infra.outputs.render_api_service_id || vars.RENDER_API_SERVICE_ID }}
         run: |
           # Sanitize: strip whitespace and accidental "Bearer " prefix
           _render_key=$(printf '%s' "$RENDER_API_KEY" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
@@ -192,7 +192,7 @@ jobs:
       - name: Link Vercel project
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ needs.provision-infra.outputs.vercel_project_id }}
+          VERCEL_PROJECT_ID: ${{ needs.provision-infra.outputs.vercel_project_id || vars.VERCEL_PROJECT_ID }}
         run: |
           mkdir -p apps/frontend/.vercel
           cat <<EOF > apps/frontend/.vercel/project.json

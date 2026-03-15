@@ -22,7 +22,7 @@ jobs:
         id: url
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_API_SERVICE_ID: ${{ secrets.RENDER_API_SERVICE_ID }}
+          RENDER_API_SERVICE_ID: ${{ vars.RENDER_API_SERVICE_ID }}
         run: |
           if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_API_SERVICE_ID" ]; then
             echo "Missing RENDER_API_KEY or RENDER_API_SERVICE_ID"
